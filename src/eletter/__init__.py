@@ -11,7 +11,7 @@ __license__ = "MIT"
 __url__ = "https://github.com/jwodder/eletter"
 
 from email import headerregistry as hr
-from email.messages import EmailMessage
+from email.message import EmailMessage
 from typing import Iterable, NamedTuple, Optional, Union
 
 
@@ -52,6 +52,6 @@ def compose(
 
 def compile_address(addr: Union[str, Address]) -> hr.Address:
     if isinstance(addr, str):
-        return hr.Address(addr_spec=str)
+        return hr.Address(addr_spec=addr)
     else:
         return hr.Address(display_name=addr.display_name, addr_spec=addr.address)
