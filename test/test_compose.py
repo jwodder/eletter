@@ -1,4 +1,5 @@
 from email2dict import email2dict
+import pytest
 from eletter import Address, compose
 
 
@@ -140,3 +141,13 @@ def test_compose_text_html() -> None:
         ],
         "epilogue": None,
     }
+
+
+def test_compose_neither() -> None:
+    with pytest.raises(ValueError) as excinfo:
+        compose(
+            from_="me@here.com",
+            to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+            subject="Some electronic mail",
+        )
+    assert str(excinfo.value) == "At least one of text and html must be non-None"
