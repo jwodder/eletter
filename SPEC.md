@@ -4,33 +4,15 @@ Python module for simple e-mail construction
   to all lines in a string
     - Also include functions for de-quoting text and deleting all quoted text?
 
-- Non-multipart MIME objects should have `content: bytes` and?/or (for
-  `text/*`) `text: str` attributes for getting & setting their contents
-
-- Messages should have an `append` method that takes a MIME object or text
-  string to add to the message.  When given a text string, if the last MIME
-  subobject in the message is text, the string is appended to it instead of
-  creating a new subobject; the user can prevent this by converting the string
-  to a MIME object beforehand.
-
-- On output/serialization, text objects are converted to quoted-printable
-  UTF-8.  The user can override this by creating the text objects as explicit
-  `MIMEText` (or whatever) objects with the appropriate parameters set.
+- Non-multipart MIME objects should have `content: bytes` or (for `text/*`)
+  `content: str` attributes for getting & setting their contents
 
 - Addresses can be given in the following formats:
     - `'user@example.com'`
-    - `'Egg Sampler <user@example.com>` ?
-    - `('Egg Sampler', 'user@example.com')` ?
-    - `Address('Egg Sampler', 'user@example.com')` (format used when returning
-      addresses)
+    - `Address('Egg Sampler', 'user@example.com')`
 
 - Make message/MIME objects support combining into a multipart sequence with
   `__add__` and combining into a `multipart/alternative` with `__or__`
-
-- Include a (hopefully small) number of functions for creating complete Message
-  objects from simple specifications (e.g., addresses + subject + (text / text
-  + html))
-    - cf. <https://sendgrid.com/docs/API_Reference/api_v3.html>?
 
 - Simple composition:
 
@@ -43,6 +25,8 @@ Python module for simple e-mail construction
             cc: Optional[Iterable[Union[str, Address]] = None,
             bcc: Optional[Iterable[Union[str, Address]] = None,
             attachments: Optional[Iterable[Attachment]] = None,
+            date: Optional[datetime] = None,
+            headers: Optional[Dict[str, Union[str, Iterable[str]]]] = None,
         ) -> email.message.EmailMessage
 
     - At least one of `text` and `html` must be set.
@@ -51,10 +35,10 @@ Python module for simple e-mail construction
 
 - Complex composition:
     
-    MailItem(ABC):  # Mailable?
+    ELetter(ABC):
         abstractmethod: compose(subject, from_, ...) -> EmailMessage
 
-    Attachment(MailItem)
+    Attachment(ELetter)
     BytesAttachment(Attachment)
         __init__(filename: str, content: bytes, content_type: str = "application/octet-stream", inline: bool = False)
     TextAttachment(Attachment)
@@ -62,16 +46,18 @@ Python module for simple e-mail construction
     EmailAttachment(Attachment)
         __init__(filename: str, content: EmailMessage, content_type: str = "message/rfc822", inline: bool = False)
 
-    TextBody(MailItem) ?
-    HTMLBody(MailItem) ???
+    TextBody(ELetter)
+        __init__(content: str, subtype="plain")
+    HTMLBody(ELetter)
+        __init__(content: str, subtype="html")
 
-    MailItem + MailItem = MultipartMixed
-    MailItem | MailItem = MultipartAlternative
+    ELetter + ELetter = Mixed
+    ELetter | ELetter = Alternative
 
-    MultipartMixed([MailItem, ...])
-    MultipartAlternative([MailItem, ...])
+    Mixed([ELetter, ...])
+    Alternative([ELetter, ...])
 
-    MultipartMixed += MultipartMixed
-    MultipartAlternative |= MultipartAlternative
+    Mixed += Mixed
+    Alternative |= Alternative
 
     # Support multipart/related somehow
