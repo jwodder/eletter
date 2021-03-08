@@ -268,3 +268,53 @@ def test_compose_date() -> None:
         "content": "This is the text of an e-mail.\n",
         "epilogue": None,
     }
+
+
+def test_compose_headers() -> None:
+    msg = compose(
+        from_="me@here.com",
+        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+        subject="Some electronic mail",
+        text="This is the text of an e-mail.",
+        headers={
+            "User-Agent": "eletter",
+            "Received": [
+                "From mx.example.com",
+                "From mail.sender.nil",
+            ],
+        },
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Some electronic mail",
+            "from": [
+                {
+                    "display_name": "",
+                    "address": "me@here.com",
+                }
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "you@there.net",
+                },
+                {
+                    "display_name": "Thaddeus Hem",
+                    "address": "them@hither.yon",
+                },
+            ],
+            "user-agent": ["eletter"],
+            "received": [
+                "From mx.example.com",
+                "From mail.sender.nil",
+            ],
+            "content-type": {
+                "content_type": "text/plain",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": "This is the text of an e-mail.\n",
+        "epilogue": None,
+    }

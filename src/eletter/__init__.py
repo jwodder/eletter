@@ -13,7 +13,7 @@ __url__ = "https://github.com/jwodder/eletter"
 from datetime import datetime
 from email import headerregistry as hr
 from email.message import EmailMessage
-from typing import Iterable, NamedTuple, Optional, Union
+from typing import Iterable, List, Mapping, NamedTuple, Optional, Union
 
 
 class Address(NamedTuple):
@@ -30,9 +30,9 @@ def compose(
     cc: Optional[Iterable[Union[str, Address]]] = None,
     bcc: Optional[Iterable[Union[str, Address]]] = None,
     reply_to: Optional[Union[str, Address]] = None,
-    # attachments: Optional[Iterable[Attachment]] = None,
     date: Optional[datetime] = None,
-    # headers: Optional[Dict[str, Union[str, Iterable[str]]]] = None,
+    headers: Optional[Mapping[str, Union[str, Iterable[str]]]] = None,
+    # attachments: Optional[Iterable[Attachment]] = None,
 ) -> EmailMessage:
     msg: Optional[EmailMessage] = None
     if text is not None:
@@ -57,6 +57,15 @@ def compose(
         msg["Reply-To"] = compile_address(reply_to)
     if date is not None:
         msg["Date"] = date
+    if headers is not None:
+        for k, v in headers.items():
+            values: List[str]
+            if isinstance(v, str):
+                values = [v]
+            else:
+                values = list(v)
+            for v2 in values:
+                msg[k] = v2
     return msg
 
 

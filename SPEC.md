@@ -38,6 +38,7 @@ Python module for simple e-mail construction
 - Replace `Address` with the one in headerregistry?
     - Make my `Address` a subclass or wrapper around the stdlib one?
 - Support address groups?
+- Allow `Any` as values for headers?
 
 - Complex composition:
 
