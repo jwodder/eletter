@@ -151,3 +151,71 @@ def test_compose_neither() -> None:
             subject="Some electronic mail",
         )
     assert str(excinfo.value) == "At least one of text and html must be non-None"
+
+
+def test_compose_addresses() -> None:
+    msg = compose(
+        from_=Address("Mme E.", "me@here.com"),
+        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+        cc=[Address("Cee Cee Cecil", "ccc@seesaws.cc"), "coco@nu.tz"],
+        bcc=[
+            "eletter@depository.nil",
+            Address("Secret Cabal", "illuminati@new.world.order"),
+            "mom@house.home",
+        ],
+        subject="To: Everyone",
+        text="This is the text of an e-mail.",
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "To: Everyone",
+            "from": [
+                {
+                    "display_name": "Mme E.",
+                    "address": "me@here.com",
+                }
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "you@there.net",
+                },
+                {
+                    "display_name": "Thaddeus Hem",
+                    "address": "them@hither.yon",
+                },
+            ],
+            "cc": [
+                {
+                    "display_name": "Cee Cee Cecil",
+                    "address": "ccc@seesaws.cc",
+                },
+                {
+                    "display_name": "",
+                    "address": "coco@nu.tz",
+                },
+            ],
+            "bcc": [
+                {
+                    "display_name": "",
+                    "address": "eletter@depository.nil",
+                },
+                {
+                    "display_name": "Secret Cabal",
+                    "address": "illuminati@new.world.order",
+                },
+                {
+                    "display_name": "",
+                    "address": "mom@house.home",
+                },
+            ],
+            "content-type": {
+                "content_type": "text/plain",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": "This is the text of an e-mail.\n",
+        "epilogue": None,
+    }
