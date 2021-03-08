@@ -34,7 +34,7 @@ Python module for simple e-mail construction
       as `Address(realname, address)` objects
 
 - Complex composition:
-    
+
     ELetter(ABC):
         abstractmethod: compose(subject, from_, ...) -> EmailMessage
 

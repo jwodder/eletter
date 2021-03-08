@@ -1,6 +1,7 @@
 from email2dict import email2dict
 from eletter import Address, compose
 
+
 def test_compose_text() -> None:
     msg = compose(
         from_="me@here.com",
@@ -38,6 +39,7 @@ def test_compose_text() -> None:
         "epilogue": None,
     }
 
+
 def test_compose_html() -> None:
     msg = compose(
         from_="me@here.com",
@@ -74,6 +76,7 @@ def test_compose_html() -> None:
         "content": "<p>This is the <i>text</i> of an <b>e</b>-mail.<p>\n",
         "epilogue": None,
     }
+
 
 def test_compose_text_html() -> None:
     msg = compose(

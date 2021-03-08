@@ -4,19 +4,21 @@ Simple e-mail composition
 Visit <https://github.com/jwodder/eletter> for more information.
 """
 
-__version__      = '0.1.0.dev1'
-__author__       = 'John Thorvald Wodder II'
-__author_email__ = 'eletter@varonathe.org'
-__license__      = 'MIT'
-__url__          = 'https://github.com/jwodder/eletter'
+__version__ = "0.1.0.dev1"
+__author__ = "John Thorvald Wodder II"
+__author_email__ = "eletter@varonathe.org"
+__license__ = "MIT"
+__url__ = "https://github.com/jwodder/eletter"
 
 from email import headerregistry as hr
 from email.messages import EmailMessage
 from typing import Iterable, NamedTuple, Optional, Union
 
+
 class Address(NamedTuple):
     display_name: str
     address: str
+
 
 def compose(
     subject: str,
@@ -46,6 +48,7 @@ def compose(
     msg["From"] = compile_address(from_)
     msg["To"] = list(map(compile_address, to))
     return msg
+
 
 def compile_address(addr: Union[str, Address]) -> hr.Address:
     if isinstance(addr, str):
