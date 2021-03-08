@@ -10,6 +10,7 @@ __author_email__ = "eletter@varonathe.org"
 __license__ = "MIT"
 __url__ = "https://github.com/jwodder/eletter"
 
+from datetime import datetime
 from email import headerregistry as hr
 from email.message import EmailMessage
 from typing import Iterable, NamedTuple, Optional, Union
@@ -30,7 +31,7 @@ def compose(
     bcc: Optional[Iterable[Union[str, Address]]] = None,
     reply_to: Optional[Union[str, Address]] = None,
     # attachments: Optional[Iterable[Attachment]] = None,
-    # date: Optional[datetime] = None,
+    date: Optional[datetime] = None,
     # headers: Optional[Dict[str, Union[str, Iterable[str]]]] = None,
 ) -> EmailMessage:
     msg: Optional[EmailMessage] = None
@@ -54,6 +55,8 @@ def compose(
         msg["BCC"] = list(map(compile_address, bcc))
     if reply_to is not None:
         msg["Reply-To"] = compile_address(reply_to)
+    if date is not None:
+        msg["Date"] = date
     return msg
 
 

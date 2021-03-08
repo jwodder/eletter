@@ -37,6 +37,7 @@ Python module for simple e-mail construction
 - Support `sender` header?
 - Replace `Address` with the one in headerregistry?
     - Make my `Address` a subclass or wrapper around the stdlib one?
+- Support address groups?
 
 - Complex composition:
 

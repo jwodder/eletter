@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from email2dict import email2dict
 import pytest
 from eletter import Address, compose
@@ -217,6 +218,47 @@ def test_compose_addresses() -> None:
                     "address": "replyee@some.where",
                 },
             ],
+            "content-type": {
+                "content_type": "text/plain",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": "This is the text of an e-mail.\n",
+        "epilogue": None,
+    }
+
+
+def test_compose_date() -> None:
+    when = datetime(2021, 3, 8, 18, 14, 29, tzinfo=timezone(timedelta(hours=-5)))
+    msg = compose(
+        from_="me@here.com",
+        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+        subject="Some electronic mail",
+        text="This is the text of an e-mail.",
+        date=when,
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Some electronic mail",
+            "from": [
+                {
+                    "display_name": "",
+                    "address": "me@here.com",
+                }
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "you@there.net",
+                },
+                {
+                    "display_name": "Thaddeus Hem",
+                    "address": "them@hither.yon",
+                },
+            ],
+            "date": when,
             "content-type": {
                 "content_type": "text/plain",
                 "params": {},
