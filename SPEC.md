@@ -33,6 +33,11 @@ Python module for simple e-mail construction
     - Addresses can be given as either strings (for just an e-mail address) or
       as `Address(realname, address)` objects
 
+- Support lists for `from_` and `reply_to`?
+- Support `sender` header?
+- Replace `Address` with the one in headerregistry?
+    - Make my `Address` a subclass or wrapper around the stdlib one?
+
 - Complex composition:
 
     ELetter(ABC):

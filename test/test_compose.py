@@ -163,6 +163,7 @@ def test_compose_addresses() -> None:
             Address("Secret Cabal", "illuminati@new.world.order"),
             "mom@house.home",
         ],
+        reply_to="replyee@some.where",
         subject="To: Everyone",
         text="This is the text of an e-mail.",
     )
@@ -208,6 +209,12 @@ def test_compose_addresses() -> None:
                 {
                     "display_name": "",
                     "address": "mom@house.home",
+                },
+            ],
+            "reply-to": [
+                {
+                    "display_name": "",
+                    "address": "replyee@some.where",
                 },
             ],
             "content-type": {

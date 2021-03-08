@@ -28,6 +28,7 @@ def compose(
     html: Optional[str] = None,
     cc: Optional[Iterable[Union[str, Address]]] = None,
     bcc: Optional[Iterable[Union[str, Address]]] = None,
+    reply_to: Optional[Union[str, Address]] = None,
     # attachments: Optional[Iterable[Attachment]] = None,
     # date: Optional[datetime] = None,
     # headers: Optional[Dict[str, Union[str, Iterable[str]]]] = None,
@@ -51,6 +52,8 @@ def compose(
         msg["CC"] = list(map(compile_address, cc))
     if bcc is not None:
         msg["BCC"] = list(map(compile_address, bcc))
+    if reply_to is not None:
+        msg["Reply-To"] = compile_address(reply_to)
     return msg
 
 
