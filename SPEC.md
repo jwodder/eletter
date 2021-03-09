@@ -1,43 +1,18 @@
 Python module for simple e-mail construction
 
-- Include a `reply_quote(text, prefix="> ")` function for prepending a prefix
-  to all lines in a string
-    - Also include functions for de-quoting text and deleting all quoted text?
-
-- Non-multipart MIME objects should have `content: bytes` or (for `text/*`)
-  `content: str` attributes for getting & setting their contents
-
-- Addresses can be given in the following formats:
-    - `'user@example.com'`
-    - `Address('Egg Sampler', 'user@example.com')`
-
-- Make message/MIME objects support combining into a multipart sequence with
-  `__add__` and combining into a `multipart/alternative` with `__or__`
-
-- Simple composition:
-
-        compose(
-            subject: str,
-            text: Optional[str] = None,
-            html: Optional[str] = None,
-            from_: Union[str, Address],
-            to: Iterable[Union[str, Address]],
-            cc: Optional[Iterable[Union[str, Address]] = None,
-            bcc: Optional[Iterable[Union[str, Address]] = None,
-            attachments: Optional[Iterable[Attachment]] = None,
-            date: Optional[datetime] = None,
-            headers: Optional[Dict[str, Union[str, Iterable[str]]]] = None,
-        ) -> email.message.EmailMessage
-
-    - At least one of `text` and `html` must be set.
-    - Addresses can be given as either strings (for just an e-mail address) or
-      as `Address(realname, address)` objects
-
 - Support lists for `from_` and `reply_to`?
 - Replace `Address` with the one in headerregistry?
     - Make my `Address` a subclass or wrapper around the stdlib one?
 - Support address groups?
 - Allow `Any` as values for headers?
+    - Add a function for converting an iterable of eletter addresses (and
+      groups) to a list of headerregistry Groups and Addresses?
+
+- Include a `reply_quote(text, prefix="> ")` function for prepending a prefix
+  to all lines in a string
+
+- Make message/MIME objects support combining into a multipart sequence with
+  `__add__` and combining into a `multipart/alternative` with `__or__`
 
 - Complex composition:
 
