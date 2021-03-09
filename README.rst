@@ -78,8 +78,10 @@ Example
         attachments=[picture],
     )
 
-    # Now you can send `msg` like any other EmailMessage, say, by using
-    # outgoing <https://github/jwodder/outgoing>.
+``msg`` can then be sent like any other ``EmailMessage``, say, by using
+outgoing_.
+
+.. _outgoing: https://github/jwodder/outgoing
 
 
 API
