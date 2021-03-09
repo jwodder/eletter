@@ -1,6 +1,12 @@
 """
 Simple e-mail composition
 
+``eletter`` provides a basic function for constructing an
+``email.message.EmailMessage`` instance without having to touch the needlessly
+complicated ``EmailMessage`` class itself.  E-mails with text bodies and/or
+HTML bodies plus attachments are supported.  Support for more complex e-mails
+is planned for later.
+
 Visit <https://github.com/jwodder/eletter> for more information.
 """
 
