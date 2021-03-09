@@ -1,7 +1,7 @@
-.. image:: http://www.repostatus.org/badges/latest/wip.svg
-    :target: http://www.repostatus.org/#wip
-    :alt: Project Status: WIP — Initial development is in progress, but there
-          has not yet been a stable, usable release suitable for the public.
+.. image:: http://www.repostatus.org/badges/latest/active.svg
+    :target: http://www.repostatus.org/#active
+    :alt: Project Status: Active — The project has reached a stable, usable
+          state and is being actively developed.
 
 .. image:: https://github.com/jwodder/eletter/workflows/Test/badge.svg?branch=master
     :target: https://github.com/jwodder/eletter/actions?workflow=Test
@@ -10,11 +10,15 @@
 .. image:: https://codecov.io/gh/jwodder/eletter/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/jwodder/eletter
 
+.. image:: https://img.shields.io/pypi/pyversions/eletter.svg
+    :target: https://pypi.org/project/eletter/
+
 .. image:: https://img.shields.io/github/license/jwodder/eletter.svg
     :target: https://opensource.org/licenses/MIT
     :alt: MIT License
 
 `GitHub <https://github.com/jwodder/eletter>`_
+| `PyPI <https://pypi.org/project/eletter/>`_
 | `Issues <https://github.com/jwodder/eletter/issues>`_
 
 ``eletter`` provides a basic function for constructing an
