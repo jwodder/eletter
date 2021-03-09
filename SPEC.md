@@ -1,51 +1,54 @@
 Python module for simple e-mail construction
 
-- Allow `Any` as values for headers?
-    - Add a function for converting an iterable of eletter addresses (and
-      groups) to a list of headerregistry Groups and Addresses?
-    - Alternatively, add a function for converting an iterable of eletter
-      addresses to an address header string?
-
 - Make message/MIME objects support combining into a multipart sequence with
   `__add__` and combining into a `multipart/alternative` with `__or__`
 
 - Complex composition:
 
-    MailItem(ABC):
-        @abstractmethod
-        def _compile() -> EmailMessage
+        MailItem(ABC):
+            @abstractmethod
+            def _compile() -> EmailMessage
 
-    Composable(MailItem):
-        compose(subject, from_, ...) -> EmailMessage
+            # All MailItems (or at least attachments and bodies) have a
+            # nullable `msgid` attribute that the user must set themselves if
+            # they want to use.
 
-    Attachment(MailItem)
-    BytesAttachment(Attachment)
-        __init__(filename: str, content: bytes, filename: str, content_type: str = "application/octet-stream", inline: bool = False)
-    TextAttachment(Attachment)
-        __init__(filename: str, content: str, filename: str, content_type: str = "text/plain", inline: bool = False)
-    EmailAttachment(Attachment)
-        __init__(filename: str, content: EmailMessage, filename: str, content_type: str = "message/rfc822", inline: bool = False)
+        Composable(MailItem):
+            compose(subject, from_, ...) -> EmailMessage
 
-    TextBody(Composable)
-        __init__(content: str, subtype="plain")
-    HTMLBody(Composable)
-        __init__(content: str, subtype="html")
+        Attachment(MailItem)
+        BytesAttachment(Attachment)
+            __init__(filename: str, content: bytes, filename: str, content_type: str = "application/octet-stream", inline: bool = False)
+        TextAttachment(Attachment)
+            __init__(filename: str, content: str, filename: str, content_type: str = "text/plain", inline: bool = False)
+        EmailAttachment(Attachment)
+            __init__(filename: str, content: EmailMessage, filename: str, content_type: str = "message/rfc822", inline: bool = False)
 
-    MailItem + MailItem = Mixed
-    MailItem | MailItem = Alternative
+        TextBody(Composable)
+            __init__(content: str, subtype="plain")
+        HTMLBody(Composable)
+            __init__(content: str, subtype="html")
 
-    Mixed([MailItem, ...])
-    Alternative([MailItem, ...])
+        MailItem + MailItem = Mixed
+        MailItem | MailItem = Alternative
 
-    Mixed += Mixed
-    Alternative |= Alternative
+        Mixed([MailItem, ...])  # Implements Composable
+        Alternative([MailItem, ...])  # Implements Composable
 
-    # Support multipart/related somehow
+        Mixed += Mixed
+        Alternative |= Alternative
+
+    - TODO: Support multipart/related somehow (just with construction via
+      `Related([MailItem, ...])`?)
 
 - Add a `decompose()` function for converting an EmailMessage to an OO
   representation? (as an `ELetter` object with `content: Composable`, `subject`,
   `from_`, etc. fields)
+    - Include a `parse_addresses()` function for parsing unhandled address
+      headers (like Resent-To) into lists of `Group` and `Address` objects
 
 - Add a `decompose_simple()` function for converting an EmailMessage to a
   `SimpleELetter` object with `text`, `html`, `attachments`, `subject`,
   `from_`, etc. fields?
+    - Give basic decomposed objects a `simplify()` method for
+      simple-decomposition?

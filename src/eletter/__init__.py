@@ -35,6 +35,7 @@ __all__ = [
     "TextAttachment",
     "assemble_content_type",
     "compose",
+    "format_addresses",
     "reply_quote",
 ]
 
@@ -252,7 +253,10 @@ def compose(
     :param mapping headers:
         A collection of additional headers to add to the e-mail.  A header
         value may be either a single string or an iterable of strings to add
-        multiple headers with the same name.
+        multiple headers with the same name.  If you wish to set an
+        otherwise-unsupported address header like :mailheader:`Resent-From` to
+        a list of addresses, use the `format_addresses()` function to first
+        convert the addresses to a string.
     :rtype: email.message.EmailMessage
     :raises ValueError: if neither ``text`` nor ``html`` is set
     """
@@ -387,3 +391,12 @@ def reply_quote(s: str, prefix: str = "> ") -> str:
     if not s2.endswith(("\n", "\r")):
         s2 += "\n"
     return s2
+
+
+def format_addresses(addresses: Iterable[AddressOrGroup]) -> str:
+    """
+    Format a sequence of addresses for use in a custom address header field
+    """
+    msg = EmailMessage()
+    msg["To"] = compile_addresses(addresses)
+    return str(msg["To"])

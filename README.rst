@@ -148,7 +148,9 @@ Arguments:
 ``headers`` : mapping from header names to strings or iterables of strings (optional)
     A collection of additional headers to add to the e-mail.  A header value
     may be either a single string or an iterable of strings to add multiple
-    headers with the same name.
+    headers with the same name.  If you wish to set an otherwise-unsupported
+    address header like ``Resent-From`` to a list of addresses, use the
+    ``format_addresses()`` function to first convert the addresses to a string.
 
 
 Addresses
@@ -244,6 +246,12 @@ Utility Functions
 
 Construct a Content-Type string from a maintype, subtype, and some number of
 parameters
+
+.. code:: python
+
+    eletter.format_addresses(addresses: Iterable[AnyAddress]) -> str
+
+Format a sequence of addresses for use in a custom address header field.
 
 .. code:: python
 
