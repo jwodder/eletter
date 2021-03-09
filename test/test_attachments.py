@@ -92,6 +92,13 @@ def test_bytes_attachment_from_file_content_type() -> None:
     )
 
 
+def test_bytes_attachment_from_file_inline() -> None:
+    ba = BytesAttachment.from_file(DATA_DIR / "ternary.png", inline=True)
+    assert ba == BytesAttachment(
+        PNG, filename="ternary.png", content_type="image/png", inline=True
+    )
+
+
 def test_text_attachment_from_file() -> None:
     ta = TextAttachment.from_file(DATA_DIR / "fibonacci.py")
     assert ta == TextAttachment(
@@ -111,11 +118,19 @@ def test_text_attachment_from_file_content_type() -> None:
     )
 
 
-def test_email_attachment_from_file() -> None:
-    ea = EmailAttachment.from_file(DATA_DIR / "sample.eml")
+def test_text_attachment_from_file_inline() -> None:
+    ta = TextAttachment.from_file(DATA_DIR / "fibonacci.py", inline=True)
+    assert ta == TextAttachment(
+        PY, filename="fibonacci.py", content_type="text/x-python", inline=True
+    )
+
+
+@pytest.mark.parametrize("inline", [False, True])
+def test_email_attachment_from_file(inline: bool) -> None:
+    ea = EmailAttachment.from_file(DATA_DIR / "sample.eml", inline=inline)
     assert attr.asdict(ea, filter=lambda attr, _: attr.name != "content") == {
         "filename": "sample.eml",
-        "inline": False,
+        "inline": inline,
     }
     assert email2dict(ea.content) == {
         "unixfrom": None,

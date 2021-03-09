@@ -203,6 +203,7 @@ instances can also be constructed via the ``from_file()`` classmethod:
         cls,
         path: Union[bytes, str, os.PathLike],
         content_type: Optional[str] = None,
+        inline: bool = False,
     ) -> BytesAttachment
 
 Construct a ``BytesAttachment`` from the contents of the file at ``path``.  The
@@ -236,6 +237,7 @@ the ``from_file()`` classmethod:
         content_type: Optional[str] = None,
         encoding: Optional[str] = None,
         errors: Optional[str] = None,
+        inline: bool = False,
     ) -> TextAttachment
 
 Construct a ``TextAttachment`` from the contents of the file at ``path``.  The
@@ -266,6 +268,7 @@ classmethod:
     eletter.EmailAttachment.from_file(
         cls,
         path: Union[bytes, str, os.PathLike],
+        inline: bool = False,
     ) -> EmailAttachment
 
 Construct an ``EmailAttachment`` from the contents of the file at ``path``.

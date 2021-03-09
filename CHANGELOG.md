@@ -1,3 +1,7 @@
+v0.3.0 (in development)
+-----------------------
+- Gave the `from_file()` classmethods `inline` arguments
+
 v0.2.0 (2021-03-09)
 -------------------
 - Gave `BytesAttachment` and `FileAttachment` each a `from_file()` classmethod
