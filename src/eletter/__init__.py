@@ -23,6 +23,8 @@ from email.message import EmailMessage
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple, Union
 import attr
 
+__all__ = ["Address", "Attachment", "BytesAttachment", "TextAttachment", "compose"]
+
 
 @attr.s(auto_attribs=True)
 class Address:
