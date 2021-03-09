@@ -14,6 +14,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from email import headerregistry as hr
 from email.message import EmailMessage
+from functools import partial
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple, Union
 import attr
 
@@ -24,33 +25,57 @@ class Address:
     address: str
 
 
+@attr.s(auto_attribs=True)
+class ContentType:
+    maintype: str
+    subtype: str
+    params: Dict[str, Any]
+
+    @classmethod
+    def parse(cls, s: str) -> "ContentType":
+        maintype, subtype, params = parse_content_type(s)
+        return cls(maintype, subtype, params)
+
+
 class Attachment(ABC):
     @abstractmethod
     def _compile(self) -> EmailMessage:
         ...
 
 
+def cache_content_type(
+    attach: Union["TextAttachment", "BytesAttachment"],
+    _attr: Optional[attr.Attribute],
+    value: str,
+    text: bool = False,
+) -> None:
+    ct = ContentType.parse(value)
+    if text and ct.maintype != "text":
+        raise ValueError("content_type must be text/*")
+    attach._ct = ct
+
+
 @attr.s(auto_attribs=True)
 class TextAttachment(Attachment):
     content: str
     filename: str
-    content_type: str = attr.ib(default="text/plain", on_setattr=attr.setters.validate)
+    content_type: str = attr.ib(
+        default="text/plain", on_setattr=partial(cache_content_type, text=True)
+    )
     inline: bool = False
+    _ct: ContentType = attr.ib(init=False, repr=False, eq=False, order=False)
 
-    @content_type.validator
-    def _validate_content_type(self, _attribute: attr.Attribute, value: str) -> None:
-        maintype, _, _ = parse_content_type(value)
-        if maintype != "text":
-            raise ValueError("TextAttachment.content_type must be text/*")
+    def __attrs_post_init__(self) -> None:
+        cache_content_type(self, None, self.content_type, text=True)
 
     def _compile(self) -> EmailMessage:
-        maintype, subtype, params = parse_content_type(self.content_type)
-        assert maintype == "text"
+        assert self._ct.maintype == "text", "Content-Type is not text/*"
+        params = dict(self._ct.params)
         charset = params.pop("charset", "utf-8")
         msg = EmailMessage()
         msg.set_content(
             self.content,
-            subtype=subtype,
+            subtype=self._ct.subtype,
             disposition="inline" if self.inline else "attachment",
             filename=self.filename,
             params=params,
@@ -64,24 +89,23 @@ class BytesAttachment(Attachment):
     content: bytes
     filename: str
     content_type: str = attr.ib(
-        default="application/octet-stream", on_setattr=attr.setters.validate
+        default="application/octet-stream", on_setattr=cache_content_type
     )
     inline: bool = False
+    _ct: ContentType = attr.ib(init=False, repr=False, eq=False, order=False)
 
-    @content_type.validator
-    def _validate_content_type(self, _attribute: attr.Attribute, value: str) -> None:
-        parse_content_type(value)
+    def __attrs_post_init__(self) -> None:
+        cache_content_type(self, None, self.content_type)
 
     def _compile(self) -> EmailMessage:
-        maintype, subtype, params = parse_content_type(self.content_type)
         msg = EmailMessage()
         msg.set_content(
             self.content,
-            maintype,
-            subtype,
+            self._ct.maintype,
+            self._ct.subtype,
             disposition="inline" if self.inline else "attachment",
             filename=self.filename,
-            params=params,
+            params=self._ct.params,
         )
         return msg
 

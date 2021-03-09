@@ -399,6 +399,76 @@ def test_compose_text_bytes_attachment_custom_content_type() -> None:
     }
 
 
+def test_compose_text_bytes_attachment_set_custom_content_type() -> None:
+    attach = BytesAttachment(b"\xFE\xED\xFA\xCE", filename="blob.dat")
+    attach.content_type = "application/x-feedface; face=pretty"
+    msg = compose(
+        from_="me@here.com",
+        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+        subject="Some electronic mail",
+        text="This is the text of an e-mail.",
+        attachments=[attach],
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Some electronic mail",
+            "from": [
+                {
+                    "display_name": "",
+                    "address": "me@here.com",
+                }
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "you@there.net",
+                },
+                {
+                    "display_name": "Thaddeus Hem",
+                    "address": "them@hither.yon",
+                },
+            ],
+            "content-type": {
+                "content_type": "multipart/mixed",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": [
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "text/plain",
+                        "params": {},
+                    },
+                },
+                "preamble": None,
+                "content": "This is the text of an e-mail.\n",
+                "epilogue": None,
+            },
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "application/x-feedface",
+                        "params": {"face": "pretty"},
+                    },
+                    "content-disposition": {
+                        "disposition": "attachment",
+                        "params": {"filename": "blob.dat"},
+                    },
+                },
+                "preamble": None,
+                "content": b"\xFE\xED\xFA\xCE",
+                "epilogue": None,
+            },
+        ],
+        "epilogue": None,
+    }
+
+
 def test_compose_text_bytes_attachment_custom_main_type() -> None:
     msg = compose(
         from_="me@here.com",
@@ -939,6 +1009,76 @@ def test_compose_text_text_attachment_custom_content_type() -> None:
     }
 
 
+def test_compose_text_text_attachment_set_custom_content_type() -> None:
+    attach = TextAttachment("This is a text document.", filename="blob.md")
+    attach.content_type = "text/markdown; variant=CommonMark"
+    msg = compose(
+        from_="me@here.com",
+        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+        subject="Some electronic mail",
+        text="This is the text of an e-mail.",
+        attachments=[attach],
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Some electronic mail",
+            "from": [
+                {
+                    "display_name": "",
+                    "address": "me@here.com",
+                }
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "you@there.net",
+                },
+                {
+                    "display_name": "Thaddeus Hem",
+                    "address": "them@hither.yon",
+                },
+            ],
+            "content-type": {
+                "content_type": "multipart/mixed",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": [
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "text/plain",
+                        "params": {},
+                    },
+                },
+                "preamble": None,
+                "content": "This is the text of an e-mail.\n",
+                "epilogue": None,
+            },
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "text/markdown",
+                        "params": {"variant": "CommonMark"},
+                    },
+                    "content-disposition": {
+                        "disposition": "attachment",
+                        "params": {"filename": "blob.md"},
+                    },
+                },
+                "preamble": None,
+                "content": "This is a text document.\n",
+                "epilogue": None,
+            },
+        ],
+        "epilogue": None,
+    }
+
+
 def test_compose_text_text_attachment_paramed_content_type() -> None:
     msg = compose(
         from_="me@here.com",
@@ -1086,14 +1226,14 @@ def test_compose_text_text_attachment_inline() -> None:
 def test_text_attachment_non_text_content_type() -> None:
     with pytest.raises(ValueError) as excinfo:
         TextAttachment("[]", filename="foo.json", content_type="application/json")
-    assert str(excinfo.value) == "TextAttachment.content_type must be text/*"
+    assert str(excinfo.value) == "content_type must be text/*"
 
 
 def test_text_attachment_set_non_text_content_type() -> None:
     a = TextAttachment("[]", filename="foo.json")
     with pytest.raises(ValueError) as excinfo:
         a.content_type = "application/json"
-    assert str(excinfo.value) == "TextAttachment.content_type must be text/*"
+    assert str(excinfo.value) == "content_type must be text/*"
 
 
 def test_text_attachment_bad_content_type() -> None:
