@@ -1,10 +1,11 @@
 Python module for simple e-mail construction
 
-- Support lists for `from_` and `reply_to`?
 - Support address groups?
 - Allow `Any` as values for headers?
     - Add a function for converting an iterable of eletter addresses (and
       groups) to a list of headerregistry Groups and Addresses?
+    - Alternatively, add a function for converting an iterable of eletter
+      addresses to an address header string?
 
 - Include a `reply_quote(text, prefix="> ")` function for prepending a prefix
   to all lines in a string

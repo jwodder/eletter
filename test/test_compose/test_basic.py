@@ -323,3 +323,59 @@ def test_compose_headers() -> None:
         "content": "This is the text of an e-mail.\n",
         "epilogue": None,
     }
+
+
+def test_compose_list_from_list_reply_to() -> None:
+    msg = compose(
+        from_=[Address("Mme E.", "me@here.com"), "also-me@hence.thither"],
+        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+        reply_to=[
+            "replyee@some.where",
+            Address("Response Handler", "r.handler@answers.4.you"),
+        ],
+        subject="Some electronic mail",
+        text="This is the text of an e-mail.",
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Some electronic mail",
+            "from": [
+                {
+                    "display_name": "Mme E.",
+                    "address": "me@here.com",
+                },
+                {
+                    "display_name": "",
+                    "address": "also-me@hence.thither",
+                },
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "you@there.net",
+                },
+                {
+                    "display_name": "Thaddeus Hem",
+                    "address": "them@hither.yon",
+                },
+            ],
+            "reply-to": [
+                {
+                    "display_name": "",
+                    "address": "replyee@some.where",
+                },
+                {
+                    "display_name": "Response Handler",
+                    "address": "r.handler@answers.4.you",
+                },
+            ],
+            "content-type": {
+                "content_type": "text/plain",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": "This is the text of an e-mail.\n",
+        "epilogue": None,
+    }

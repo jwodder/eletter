@@ -17,6 +17,7 @@ __license__ = "MIT"
 __url__ = "https://github.com/jwodder/eletter"
 
 from abc import ABC, abstractmethod
+from collections.abc import Iterable as IterableABC
 from datetime import datetime
 from email import headerregistry as hr
 from email.message import EmailMessage
@@ -29,6 +30,8 @@ import attr
 __all__ = ["Address", "Attachment", "BytesAttachment", "TextAttachment", "compose"]
 
 AnyPath = Union[bytes, str, "os.PathLike[bytes]", "os.PathLike[str]"]
+
+AnyAddress = Union[str, hr.Address]
 
 
 class Address(hr.Address):
@@ -151,14 +154,14 @@ class BytesAttachment(Attachment):
 
 def compose(
     subject: str,
-    from_: Union[str, hr.Address],
-    to: Iterable[Union[str, hr.Address]],
+    from_: Union[AnyAddress, Iterable[AnyAddress]],
+    to: Iterable[AnyAddress],
     text: Optional[str] = None,
     html: Optional[str] = None,
-    cc: Optional[Iterable[Union[str, hr.Address]]] = None,
-    bcc: Optional[Iterable[Union[str, hr.Address]]] = None,
-    reply_to: Optional[Union[str, hr.Address]] = None,
-    sender: Optional[Union[str, hr.Address]] = None,
+    cc: Optional[Iterable[AnyAddress]] = None,
+    bcc: Optional[Iterable[AnyAddress]] = None,
+    reply_to: Optional[Union[AnyAddress, Iterable[AnyAddress]]] = None,
+    sender: Optional[AnyAddress] = None,
     date: Optional[datetime] = None,
     headers: Optional[Mapping[str, Union[str, Iterable[str]]]] = None,
     attachments: Optional[Iterable[Attachment]] = None,
@@ -180,14 +183,14 @@ def compose(
         for a in attachments:
             msg.attach(a._compile())
     msg["Subject"] = subject
-    msg["From"] = compile_address(from_)
-    msg["To"] = list(map(compile_address, to))
+    msg["From"] = compile_addresses(from_)
+    msg["To"] = compile_addresses(to)
     if cc is not None:
-        msg["CC"] = list(map(compile_address, cc))
+        msg["CC"] = compile_addresses(cc)
     if bcc is not None:
-        msg["BCC"] = list(map(compile_address, bcc))
+        msg["BCC"] = compile_addresses(bcc)
     if reply_to is not None:
-        msg["Reply-To"] = compile_address(reply_to)
+        msg["Reply-To"] = compile_addresses(reply_to)
     if sender is not None:
         msg["Sender"] = compile_address(sender)
     if date is not None:
@@ -204,11 +207,22 @@ def compose(
     return msg
 
 
-def compile_address(addr: Union[str, hr.Address]) -> hr.Address:
+def compile_address(addr: AnyAddress) -> hr.Address:
     if isinstance(addr, str):
         return hr.Address(addr_spec=addr)
     else:
         return addr
+
+
+def compile_addresses(
+    addrs: Union[AnyAddress, Iterable[AnyAddress]]
+) -> List[hr.Address]:
+    if isinstance(addrs, str):
+        return [hr.Address(addr_spec=addrs)]
+    elif not isinstance(addrs, IterableABC):
+        return [addrs]
+    else:
+        return list(map(compile_address, addrs))
 
 
 def parse_content_type(s: str) -> Tuple[str, str, Dict[str, Any]]:

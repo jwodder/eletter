@@ -89,14 +89,14 @@ API
 
     eletter.compose(
         subject: str,
-        from_: Union[str, Address],
-        to: Iterable[Union[str, Address]],
+        from_: Union[AnyAddress, Iterable[AnyAddress]],
+        to: Iterable[AnyAddress],
         text: Optional[str] = None,
         html: Optional[str] = None,
-        cc: Optional[Iterable[Union[str, Address]]] = None,
-        bcc: Optional[Iterable[Union[str, Address]]] = None,
-        reply_to: Optional[Union[str, Address]] = None,
-        sender: Optional[Union[str, Address]] = None,
+        cc: Optional[Iterable[AnyAddress]] = None,
+        bcc: Optional[Iterable[AnyAddress]] = None,
+        reply_to: Optional[Union[AnyAddress, Iterable[AnyAddress]]] = None,
+        sender: Optional[AnyAddress] = None,
         date: Optional[datetime.datetime] = None,
         attachments: Optional[Iterable[Attachment]] = None,
         headers: Optional[Mapping[str, Union[str, Iterable[str]]]] = None,
@@ -107,14 +107,17 @@ value, and a plain text and/or HTML body, optionally accompanied by attachments
 and other headers.
 
 Addresses are specified as either ``"address@domain.com"`` strings or as
-``eletter.Address("Display Name", "address@domain.com")`` objects.
+``eletter.Address("Display Name", "address@domain.com")`` objects.  (**Note:**
+``eletter.Address`` is just a subclass of ``email.headerregistry.Address`` with
+a slightly more convenient constructor.  You can also use the standard library
+``Address`` directly, if you want to.)
 
 Arguments:
 
 ``subject`` : string (required)
     The e-mail's "Subject:" line
 
-``from_`` : address (required)
+``from_`` : address or iterable of addresses (required)
     The e-mail's "From:" line.  Note that this argument is spelled with an
     underscore, as "``from``" is a keyword in Python.
 
@@ -135,7 +138,7 @@ Arguments:
 ``bcc`` : iterable of addresses (optional)
     The e-mail's "BCC:" line
 
-``reply_to`` : address (optional)
+``reply_to`` : address or iterable of addresses (optional)
     The e-mail's "Reply-To:" line
 
 ``sender`` : address (optional)
