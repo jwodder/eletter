@@ -14,7 +14,6 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from email import headerregistry as hr
 from email.message import EmailMessage
-from functools import partial
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple, Union
 import attr
 
@@ -37,36 +36,45 @@ class ContentType:
         return cls(maintype, subtype, params)
 
 
-class Attachment(ABC):
+def cache_content_type(
+    ctd: "ContentTyped",
+    _attr: Optional[attr.Attribute],
+    value: str,
+) -> None:
+    ct = ContentType.parse(value)
+    if ctd.DEFAULT_CONTENT_TYPE.startswith("text/") and ct.maintype != "text":
+        raise ValueError("content_type must be text/*")
+    ctd._ct = ct
+
+
+@attr.s
+class ContentTyped:
+    DEFAULT_CONTENT_TYPE = "application/octet-stream"
+
+    content_type: str = attr.ib(
+        kw_only=True,
+        default=attr.Factory(lambda self: self.DEFAULT_CONTENT_TYPE, takes_self=True),
+        on_setattr=cache_content_type,
+    )
+    _ct: ContentType = attr.ib(init=False, repr=False, eq=False, order=False)
+
+    def __attrs_post_init__(self) -> None:
+        cache_content_type(self, None, self.content_type)
+
+
+class Attachment(ABC, ContentTyped):
     @abstractmethod
     def _compile(self) -> EmailMessage:
         ...
 
 
-def cache_content_type(
-    attach: Union["TextAttachment", "BytesAttachment"],
-    _attr: Optional[attr.Attribute],
-    value: str,
-    text: bool = False,
-) -> None:
-    ct = ContentType.parse(value)
-    if text and ct.maintype != "text":
-        raise ValueError("content_type must be text/*")
-    attach._ct = ct
-
-
 @attr.s(auto_attribs=True)
 class TextAttachment(Attachment):
+    DEFAULT_CONTENT_TYPE = "text/plain"
+
     content: str
     filename: str
-    content_type: str = attr.ib(
-        default="text/plain", on_setattr=partial(cache_content_type, text=True)
-    )
-    inline: bool = False
-    _ct: ContentType = attr.ib(init=False, repr=False, eq=False, order=False)
-
-    def __attrs_post_init__(self) -> None:
-        cache_content_type(self, None, self.content_type, text=True)
+    inline: bool = attr.ib(default=False, kw_only=True)
 
     def _compile(self) -> EmailMessage:
         assert self._ct.maintype == "text", "Content-Type is not text/*"
@@ -88,14 +96,7 @@ class TextAttachment(Attachment):
 class BytesAttachment(Attachment):
     content: bytes
     filename: str
-    content_type: str = attr.ib(
-        default="application/octet-stream", on_setattr=cache_content_type
-    )
-    inline: bool = False
-    _ct: ContentType = attr.ib(init=False, repr=False, eq=False, order=False)
-
-    def __attrs_post_init__(self) -> None:
-        cache_content_type(self, None, self.content_type)
+    inline: bool = attr.ib(default=False, kw_only=True)
 
     def _compile(self) -> EmailMessage:
         msg = EmailMessage()
