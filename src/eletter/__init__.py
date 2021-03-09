@@ -2,10 +2,10 @@
 Simple e-mail composition
 
 ``eletter`` provides a basic function for constructing an
-``email.message.EmailMessage`` instance without having to touch the needlessly
-complicated ``EmailMessage`` class itself.  E-mails with text bodies and/or
-HTML bodies plus attachments are supported.  Support for more complex e-mails
-is planned for later.
+`email.message.EmailMessage` instance without having to touch the needlessly
+complicated `EmailMessage` class itself.  E-mails with text bodies and/or HTML
+bodies plus attachments are supported.  Support for more complex e-mails is
+planned for later.
 
 Visit <https://github.com/jwodder/eletter> for more information.
 """
@@ -44,11 +44,15 @@ AddressOrGroup = Union[str, hr.Address, hr.Group]
 
 
 class Address(hr.Address):
+    """ A combination of a person's name and their e-mail address """
+
     def __init__(self, display_name: str, address: str) -> None:
         super().__init__(display_name=display_name, addr_spec=address)
 
 
 class Group(hr.Group):
+    """ A e-mail address group """
+
     def __init__(self, display_name: str, addresses: Iterable[SingleAddress]) -> None:
         super().__init__(
             display_name=display_name, addresses=tuple(map(compile_address, addresses))
@@ -82,6 +86,7 @@ def cache_content_type(
 class ContentTyped:
     DEFAULT_CONTENT_TYPE = "application/octet-stream"
 
+    #: The :mailheader:`Content-Type` of the attachment
     content_type: str = attr.ib(
         kw_only=True,
         default=attr.Factory(lambda self: self.DEFAULT_CONTENT_TYPE, takes_self=True),
@@ -94,6 +99,8 @@ class ContentTyped:
 
 
 class Attachment(ABC, ContentTyped):
+    """ Base class for the attachment classes """
+
     @abstractmethod
     def _compile(self) -> EmailMessage:
         ...
@@ -101,10 +108,18 @@ class Attachment(ABC, ContentTyped):
 
 @attr.s(auto_attribs=True)
 class TextAttachment(Attachment):
+    """
+    A representation of a textual e-mail attachment.  The content type must
+    have a maintype of :mimetype:`text`.
+    """
+
     DEFAULT_CONTENT_TYPE = "text/plain"
 
+    #: The body of the attachment
     content: str
+    #: The filename of the attachment
     filename: str
+    #: Whether the attachment should be displayed inline in clients
     inline: bool = attr.ib(default=False, kw_only=True)
 
     def _compile(self) -> EmailMessage:
@@ -130,6 +145,14 @@ class TextAttachment(Attachment):
         encoding: Optional[str] = None,
         errors: Optional[str] = None,
     ) -> "TextAttachment":
+        """
+        Construct a `TextAttachment` from the contents of the file at ``path``.
+        The filename of the attachment will be set to the basename of ``path``.
+        If ``content_type`` is `None`, the :mailheader:`Content-Type` is
+        guessed based on ``path``'s file extension.  ``encoding`` and
+        ``errors`` are used when opening the file and have no relation to the
+        :mailheader:`Content-Type`.
+        """
         with open(path, "r", encoding=encoding, errors=errors) as fp:
             content = fp.read()
         filename = os.path.basename(os.fsdecode(path))
@@ -140,8 +163,13 @@ class TextAttachment(Attachment):
 
 @attr.s(auto_attribs=True)
 class BytesAttachment(Attachment):
+    """ A representation of a binary e-mail attachment """
+
+    #: The body of the attachment
     content: bytes
+    #: The filename of the attachment
     filename: str
+    #: Whether the attachment should be displayed inline in clients
     inline: bool = attr.ib(default=False, kw_only=True)
 
     def _compile(self) -> EmailMessage:
@@ -160,6 +188,13 @@ class BytesAttachment(Attachment):
     def from_file(
         cls, path: AnyPath, content_type: Optional[str] = None
     ) -> "BytesAttachment":
+        """
+        Construct a `BytesAttachment` from the contents of the file at
+        ``path``.  The filename of the attachment will be set to the basename
+        of ``path``.  If ``content_type`` is `None`, the
+        :mailheader:`Content-Type` is guessed based on ``path``'s file
+        extension.
+        """
         with open(path, "rb") as fp:
             content = fp.read()
         filename = os.path.basename(os.fsdecode(path))
@@ -182,6 +217,41 @@ def compose(
     headers: Optional[Mapping[str, Union[str, Iterable[str]]]] = None,
     attachments: Optional[Iterable[Attachment]] = None,
 ) -> EmailMessage:
+    """
+    Construct an `~email.message.EmailMessage` instance from a subject,
+    :mailheader:`From` address, :mailheader:`To` value, and a plain text and/or
+    HTML body, optionally accompanied by attachments and other headers.
+
+    :param str subject: The e-mail's :mailheader:`Subject` line
+    :param from_:
+        The e-mail's :mailheader:`From` line.  Note that this argument is
+        spelled with an underscore, as "``from``" is a keyword in Python.
+    :type from_: address or iterable of addresses
+    :param to: The e-mail's :mailheader:`To` line
+    :type to: iterable of addresses
+    :param str text:
+        The contents of a :mimetype:`text/plain` body for the e-mail.  At least
+        one of ``text`` and ``html`` must be specified.
+    :param str html:
+        The contents of a :mimetype:`text/html` body for the e-mail.  At least
+        one of ``text`` and ``html`` must be specified.
+    :param cc: The e-mail's :mailheader:`CC` line
+    :type cc: iterable of addresses
+    :param bcc: The e-mail's :mailheader:`BCC` line
+    :type bcc: iterable of addresses
+    :param reply_to: The e-mail's :mailheader:`Reply-To` line
+    :type reply_to: address or iterable of addresses
+    :param address sender:
+        The e-mail's :mailheader:`Sender` line.  The address must be a string
+        or `Address`, not a `Group`.
+    :param datetime date: The e-mail's :mailheader:`Date` line
+    :param attachments: A collection of attachments to append to the e-mail
+    :type attachments: iterable of attachments
+    :param mapping headers:
+        A collection of additional headers to add to the e-mail.  A header
+        value may be either a single string or an iterable of strings to add
+        multiple headers with the same name.
+    """
     msg: Optional[EmailMessage] = None
     if text is not None:
         msg = EmailMessage()
