@@ -34,7 +34,6 @@ Python module for simple e-mail construction
       as `Address(realname, address)` objects
 
 - Support lists for `from_` and `reply_to`?
-- Support `sender` header?
 - Replace `Address` with the one in headerregistry?
     - Make my `Address` a subclass or wrapper around the stdlib one?
 - Support address groups?
@@ -42,29 +41,47 @@ Python module for simple e-mail construction
 
 - Complex composition:
 
-    ELetter(ABC):
-        abstractmethod: compose(subject, from_, ...) -> EmailMessage
+    MailItem(ABC):
+        @abstractmethod
+        def _compile() -> EmailMessage
 
-    Attachment(ELetter)
+    Composable(MailItem):
+        compose(subject, from_, ...) -> EmailMessage
+
+    Attachment(MailItem)
     BytesAttachment(Attachment)
-        __init__(filename: str, content: bytes, content_type: str = "application/octet-stream", inline: bool = False)
+        __init__(filename: str, content: bytes, filename: str, content_type: str = "application/octet-stream", inline: bool = False)
     TextAttachment(Attachment)
-        __init__(filename: str, content: str, content_type: str = "text/plain", inline: bool = False)
+        __init__(filename: str, content: str, filename: str, content_type: str = "text/plain", inline: bool = False)
     EmailAttachment(Attachment)
-        __init__(filename: str, content: EmailMessage, content_type: str = "message/rfc822", inline: bool = False)
+        __init__(filename: str, content: EmailMessage, filename: str, content_type: str = "message/rfc822", inline: bool = False)
 
-    TextBody(ELetter)
+    TextBody(Composable)
         __init__(content: str, subtype="plain")
-    HTMLBody(ELetter)
+    HTMLBody(Composable)
         __init__(content: str, subtype="html")
 
-    ELetter + ELetter = Mixed
-    ELetter | ELetter = Alternative
+    MailItem + MailItem = Mixed
+    MailItem | MailItem = Alternative
 
-    Mixed([ELetter, ...])
-    Alternative([ELetter, ...])
+    Mixed([MailItem, ...])
+    Alternative([MailItem, ...])
 
     Mixed += Mixed
     Alternative |= Alternative
 
     # Support multipart/related somehow
+
+- Add a `decompose()` function for converting an EmailMessage to an OO
+  representation? (as an `ELetter` object with `content: Composable`, `subject`,
+  `from_`, etc. fields)
+
+- Add a `decompose_simple()` function for converting an EmailMessage to a
+  `SimpleELetter` object with `text`, `html`, `attachments`, `subject`,
+  `from_`, etc. fields?
+
+- Add & export an `assemble_content_type(maintype, subtype, **params)`
+  function?
+
+- Give `BytesAttachment` and `TextAttachment` a `from_file(path,
+  content_type=None)` classmethod

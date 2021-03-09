@@ -165,6 +165,7 @@ def test_compose_addresses() -> None:
             "mom@house.home",
         ],
         reply_to="replyee@some.where",
+        sender="steven.ender@big.senders",
         subject="To: Everyone",
         text="This is the text of an e-mail.",
     )
@@ -218,6 +219,10 @@ def test_compose_addresses() -> None:
                     "address": "replyee@some.where",
                 },
             ],
+            "sender": {
+                "display_name": "",
+                "address": "steven.ender@big.senders",
+            },
             "content-type": {
                 "content_type": "text/plain",
                 "params": {},
