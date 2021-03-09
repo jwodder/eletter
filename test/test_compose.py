@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from email2dict import email2dict
 import pytest
-from eletter import Address, BytesAttachment, TextAttachment, compose
+from eletter import Address, BytesAttachment, ContentType, TextAttachment, compose
 
 
 def test_compose_text() -> None:
@@ -1234,6 +1234,8 @@ def test_text_attachment_set_non_text_content_type() -> None:
     with pytest.raises(ValueError) as excinfo:
         a.content_type = "application/json"
     assert str(excinfo.value) == "content_type must be text/*"
+    assert a.content_type == "text/plain"
+    assert a._ct == ContentType("text", "plain", {})
 
 
 def test_text_attachment_bad_content_type() -> None:
@@ -1247,6 +1249,8 @@ def test_text_attachment_set_bad_content_type() -> None:
     with pytest.raises(ValueError) as excinfo:
         a.content_type = "application-json"
     assert str(excinfo.value) == "application-json"
+    assert a.content_type == "text/plain"
+    assert a._ct == ContentType("text", "plain", {})
 
 
 def test_bytes_attachment_bad_content_type() -> None:
@@ -1260,6 +1264,8 @@ def test_bytes_attachment_set_bad_content_type() -> None:
     with pytest.raises(ValueError) as excinfo:
         a.content_type = "application-json"
     assert str(excinfo.value) == "application-json"
+    assert a.content_type == "application/octet-stream"
+    assert a._ct == ContentType("application", "octet-stream", {})
 
 
 def test_compose_text_text_attachment_charset() -> None:
