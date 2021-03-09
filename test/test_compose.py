@@ -1084,6 +1084,39 @@ def test_text_attachment_non_text_content_type() -> None:
     assert str(excinfo.value) == "TextAttachment.content_type must be text/*"
 
 
+def test_text_attachment_set_non_text_content_type() -> None:
+    a = TextAttachment("[]", filename="foo.json")
+    with pytest.raises(ValueError) as excinfo:
+        a.content_type = "application/json"
+    assert str(excinfo.value) == "TextAttachment.content_type must be text/*"
+
+
+def test_text_attachment_bad_content_type() -> None:
+    with pytest.raises(ValueError) as excinfo:
+        TextAttachment("[]", filename="foo.json", content_type="application-json")
+    assert str(excinfo.value) == "application-json"
+
+
+def test_text_attachment_set_bad_content_type() -> None:
+    a = TextAttachment("[]", filename="foo.json")
+    with pytest.raises(ValueError) as excinfo:
+        a.content_type = "application-json"
+    assert str(excinfo.value) == "application-json"
+
+
+def test_bytes_attachment_bad_content_type() -> None:
+    with pytest.raises(ValueError) as excinfo:
+        BytesAttachment(b"[]", filename="foo.json", content_type="application-json")
+    assert str(excinfo.value) == "application-json"
+
+
+def test_bytes_attachment_set_bad_content_type() -> None:
+    a = BytesAttachment(b"[]", filename="foo.json")
+    with pytest.raises(ValueError) as excinfo:
+        a.content_type = "application-json"
+    assert str(excinfo.value) == "application-json"
+
+
 def test_compose_text_text_attachment_charset() -> None:
     msg = compose(
         from_="me@here.com",

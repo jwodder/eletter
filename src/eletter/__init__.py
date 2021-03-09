@@ -34,7 +34,7 @@ class Attachment(ABC):
 class TextAttachment(Attachment):
     content: str
     filename: str
-    content_type: str = attr.ib(default="text/plain")
+    content_type: str = attr.ib(default="text/plain", on_setattr=attr.setters.validate)
     inline: bool = False
 
     @content_type.validator
@@ -63,7 +63,9 @@ class TextAttachment(Attachment):
 class BytesAttachment(Attachment):
     content: bytes
     filename: str
-    content_type: str = attr.ib(default="application/octet-stream")
+    content_type: str = attr.ib(
+        default="application/octet-stream", on_setattr=attr.setters.validate
+    )
     inline: bool = False
 
     @content_type.validator
