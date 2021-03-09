@@ -27,16 +27,32 @@ import os.path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple, Union
 import attr
 
-__all__ = ["Address", "Attachment", "BytesAttachment", "TextAttachment", "compose"]
+__all__ = [
+    "Address",
+    "Attachment",
+    "BytesAttachment",
+    "Group",
+    "TextAttachment",
+    "compose",
+]
 
 AnyPath = Union[bytes, str, "os.PathLike[bytes]", "os.PathLike[str]"]
 
-AnyAddress = Union[str, hr.Address]
+SingleAddress = Union[str, hr.Address]
+
+AddressOrGroup = Union[str, hr.Address, hr.Group]
 
 
 class Address(hr.Address):
     def __init__(self, display_name: str, address: str) -> None:
         super().__init__(display_name=display_name, addr_spec=address)
+
+
+class Group(hr.Group):
+    def __init__(self, display_name: str, addresses: Iterable[SingleAddress]) -> None:
+        super().__init__(
+            display_name=display_name, addresses=tuple(map(compile_address, addresses))
+        )
 
 
 @attr.s(auto_attribs=True)
@@ -154,14 +170,14 @@ class BytesAttachment(Attachment):
 
 def compose(
     subject: str,
-    from_: Union[AnyAddress, Iterable[AnyAddress]],
-    to: Iterable[AnyAddress],
+    from_: Union[AddressOrGroup, Iterable[AddressOrGroup]],
+    to: Iterable[AddressOrGroup],
     text: Optional[str] = None,
     html: Optional[str] = None,
-    cc: Optional[Iterable[AnyAddress]] = None,
-    bcc: Optional[Iterable[AnyAddress]] = None,
-    reply_to: Optional[Union[AnyAddress, Iterable[AnyAddress]]] = None,
-    sender: Optional[AnyAddress] = None,
+    cc: Optional[Iterable[AddressOrGroup]] = None,
+    bcc: Optional[Iterable[AddressOrGroup]] = None,
+    reply_to: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,
+    sender: Optional[SingleAddress] = None,
     date: Optional[datetime] = None,
     headers: Optional[Mapping[str, Union[str, Iterable[str]]]] = None,
     attachments: Optional[Iterable[Attachment]] = None,
@@ -207,7 +223,7 @@ def compose(
     return msg
 
 
-def compile_address(addr: AnyAddress) -> hr.Address:
+def compile_address(addr: SingleAddress) -> hr.Address:
     if isinstance(addr, str):
         return hr.Address(addr_spec=addr)
     else:
@@ -215,14 +231,14 @@ def compile_address(addr: AnyAddress) -> hr.Address:
 
 
 def compile_addresses(
-    addrs: Union[AnyAddress, Iterable[AnyAddress]]
-) -> List[hr.Address]:
+    addrs: Union[AddressOrGroup, Iterable[AddressOrGroup]]
+) -> List[Union[hr.Address, hr.Group]]:
     if isinstance(addrs, str):
         return [hr.Address(addr_spec=addrs)]
     elif not isinstance(addrs, IterableABC):
         return [addrs]
     else:
-        return list(map(compile_address, addrs))
+        return [hr.Address(addr_spec=a) if isinstance(a, str) else a for a in addrs]
 
 
 def parse_content_type(s: str) -> Tuple[str, str, Dict[str, Any]]:

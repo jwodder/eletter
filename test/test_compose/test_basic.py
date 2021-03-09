@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from email2dict import email2dict
 import pytest
-from eletter import Address, compose
+from eletter import Address, Group, compose
 
 
 def test_compose_text() -> None:
@@ -368,6 +368,58 @@ def test_compose_list_from_list_reply_to() -> None:
                 {
                     "display_name": "Response Handler",
                     "address": "r.handler@answers.4.you",
+                },
+            ],
+            "content-type": {
+                "content_type": "text/plain",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": "This is the text of an e-mail.\n",
+        "epilogue": None,
+    }
+
+
+def test_compose_group() -> None:
+    msg = compose(
+        from_=Address("Mme E.", "me@here.com"),
+        to=[
+            Group(
+                "friends", ["you@there.net", Address("Thaddeus Hem", "them@hither.yon")]
+            ),
+            "those@ovar.thar",
+        ],
+        subject="Some electronic mail",
+        text="This is the text of an e-mail.",
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Some electronic mail",
+            "from": [
+                {
+                    "display_name": "Mme E.",
+                    "address": "me@here.com",
+                },
+            ],
+            "to": [
+                {
+                    "group": "friends",
+                    "addresses": [
+                        {
+                            "display_name": "",
+                            "address": "you@there.net",
+                        },
+                        {
+                            "display_name": "Thaddeus Hem",
+                            "address": "them@hither.yon",
+                        },
+                    ],
+                },
+                {
+                    "display_name": "",
+                    "address": "those@ovar.thar",
                 },
             ],
             "content-type": {

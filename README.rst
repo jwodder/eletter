@@ -106,12 +106,6 @@ Construct an ``EmailMessage`` instance from a subject, "From:" address, "To:"
 value, and a plain text and/or HTML body, optionally accompanied by attachments
 and other headers.
 
-Addresses are specified as either ``"address@domain.com"`` strings or as
-``eletter.Address("Display Name", "address@domain.com")`` objects.  (**Note:**
-``eletter.Address`` is just a subclass of ``email.headerregistry.Address`` with
-a slightly more convenient constructor.  You can also use the standard library
-``Address`` directly, if you want to.)
-
 Arguments:
 
 ``subject`` : string (required)
@@ -142,13 +136,14 @@ Arguments:
     The e-mail's "Reply-To:" line
 
 ``sender`` : address (optional)
-    The e-mail's "Sender:" line
+    The e-mail's "Sender:" line.  The address must be a string or ``Address``,
+    not a ``Group``.
 
 ``date`` : datetime (optional)
     The e-mail's "Date:" line
 
 ``attachments`` : iterable of attachments (optional)
-    A collection of attachments (see below) to append to the e-mail
+    A collection of attachments (see "Attachments_") to append to the e-mail
 
 ``headers`` : mapping from header names to strings or iterables of strings (optional)
     A collection of additional headers to add to the e-mail.  A header value
@@ -156,8 +151,27 @@ Arguments:
     headers with the same name.
 
 
-Attachment Objects
-------------------
+Addresses
+---------
+
+Addresses in ``eletter`` can be specified in three ways:
+
+- As an ``"address@domain.com"`` string giving just a bare e-mail address
+
+- As an ``eletter.Address("Display Name", "address@domain.com")`` instance
+  pairing a person's name with an e-mail address
+
+- As an ``eletter.Group("Group Name", iterable_of_addresses)`` instance
+  specifying a group of addresses (strings or ``Address`` instances)
+
+**Note:** ``eletter.Address`` and ``eletter.Group`` are actually just
+subclasses of ``Address`` and ``Group`` from ``email.headerregistry`` with
+slightly more convenient constructors.  You can also use the standard library
+types directly, if you want to.
+
+
+Attachments
+-----------
 
 ``eletter`` has two concrete attachment classes, ``TextAttachment`` and
 ``BytesAttachment``:
