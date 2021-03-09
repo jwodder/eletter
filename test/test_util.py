@@ -1,6 +1,6 @@
 from typing import Any, Dict, Tuple
 import pytest
-from eletter import parse_content_type
+from eletter import get_mime_type, parse_content_type
 
 
 @pytest.mark.parametrize(
@@ -40,3 +40,28 @@ def test_parse_content_type(s: str, ct: Tuple[str, str, Dict[str, Any]]) -> None
 def test_parse_content_type_error(s: str) -> None:
     with pytest.raises(ValueError):
         parse_content_type(s)
+
+
+@pytest.mark.parametrize(
+    "filename,mtype",
+    [
+        ("foo.txt", "text/plain"),
+        ("foo", "application/octet-stream"),
+        ("foo.gz", "application/gzip"),
+        ("foo.tar.gz", "application/gzip"),
+        ("foo.tgz", "application/gzip"),
+        ("foo.taz", "application/gzip"),
+        ("foo.svg.gz", "application/gzip"),
+        ("foo.svgz", "application/gzip"),
+        ("foo.Z", "application/x-compress"),
+        ("foo.tar.Z", "application/x-compress"),
+        ("foo.bz2", "application/x-bzip2"),
+        ("foo.tar.bz2", "application/x-bzip2"),
+        ("foo.tbz2", "application/x-bzip2"),
+        ("foo.xz", "application/x-xz"),
+        ("foo.tar.xz", "application/x-xz"),
+        ("foo.txz", "application/x-xz"),
+    ],
+)
+def test_get_mime_type(filename: str, mtype: str) -> None:
+    assert get_mime_type(filename) == mtype

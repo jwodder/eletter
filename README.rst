@@ -20,6 +20,7 @@
 `GitHub <https://github.com/jwodder/eletter>`_
 | `PyPI <https://pypi.org/project/eletter/>`_
 | `Issues <https://github.com/jwodder/eletter/issues>`_
+| `Changelog <https://github.com/jwodder/eletter/blob/master/CHANGELOG.md>`_
 
 ``eletter`` provides a basic function for constructing an
 ``email.message.EmailMessage`` instance without having to touch the needlessly
@@ -163,20 +164,55 @@ Attachment Objects
     eletter.BytesAttachment(
         content: bytes,
         filename: str,
+        *,
         content_type: str = "application/octet-stream",
         inline: bool = False,
     )
 
-Representation of a binary attachment.
+Representation of a binary attachment.  Besides using the constructor,
+instances can also be constructed via the ``from_file()`` classmethod:
+
+.. code:: python
+
+    @classmethod
+    eletter.BytesAttachment.from_file(
+        cls,
+        path: Union[bytes, str, os.PathLike],
+        content_type: Optional[str] = None,
+    ) -> BytesAttachment
+
+Construct a ``BytesAttachment`` from the contents of the file at ``path``.  The
+filename of the attachment will be set to the basename of ``path``.  If
+``content_type`` is ``None``, the Content-Type is guessed based on ``path``'s
+file extension.
 
 .. code:: python
 
     eletter.TextAttachment(
         content: str,
         filename: str,
+        *,
         content_type: str = "text/plain",
         inline: bool = False,
     )
 
 Representation of a text attachment.  The content type must have a maintype of
-"text".
+"text".  Besides using the constructor, instances can also be constructed via
+the ``from_file()`` classmethod:
+
+.. code:: python
+
+    @classmethod
+    eletter.TextAttachment.from_file(
+        cls,
+        path: Union[bytes, str, os.PathLike],
+        content_type: Optional[str] = None,
+        encoding: Optional[str] = None,
+        errors: Optional[str] = None,
+    ) -> TextAttachment
+
+Construct a ``TextAttachment`` from the contents of the file at ``path``.  The
+filename of the attachment will be set to the basename of ``path``.  If
+``content_type`` is ``None``, the Content-Type is guessed based on ``path``'s
+file extension.  ``encoding`` and ``errors`` are used when opening the file and
+have no relation to the Content-Type.

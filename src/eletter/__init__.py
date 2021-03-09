@@ -10,7 +10,7 @@ is planned for later.
 Visit <https://github.com/jwodder/eletter> for more information.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0.dev1"
 __author__ = "John Thorvald Wodder II"
 __author_email__ = "eletter@varonathe.org"
 __license__ = "MIT"
@@ -20,10 +20,15 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from email import headerregistry as hr
 from email.message import EmailMessage
+from mimetypes import guess_type
+import os
+import os.path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple, Union
 import attr
 
 __all__ = ["Address", "Attachment", "BytesAttachment", "TextAttachment", "compose"]
+
+AnyPath = Union[bytes, str, "os.PathLike[bytes]", "os.PathLike[str]"]
 
 
 @attr.s(auto_attribs=True)
@@ -99,6 +104,21 @@ class TextAttachment(Attachment):
         )
         return msg
 
+    @classmethod
+    def from_file(
+        cls,
+        path: AnyPath,
+        content_type: Optional[str] = None,
+        encoding: Optional[str] = None,
+        errors: Optional[str] = None,
+    ) -> "TextAttachment":
+        with open(path, "r", encoding=encoding, errors=errors) as fp:
+            content = fp.read()
+        filename = os.path.basename(os.fsdecode(path))
+        if content_type is None:
+            content_type = get_mime_type(filename)
+        return cls(content=content, filename=filename, content_type=content_type)
+
 
 @attr.s(auto_attribs=True)
 class BytesAttachment(Attachment):
@@ -117,6 +137,17 @@ class BytesAttachment(Attachment):
             params=self._ct.params,
         )
         return msg
+
+    @classmethod
+    def from_file(
+        cls, path: AnyPath, content_type: Optional[str] = None
+    ) -> "BytesAttachment":
+        with open(path, "rb") as fp:
+            content = fp.read()
+        filename = os.path.basename(os.fsdecode(path))
+        if content_type is None:
+            content_type = get_mime_type(filename)
+        return cls(content=content, filename=filename, content_type=content_type)
 
 
 def compose(
@@ -192,3 +223,22 @@ def parse_content_type(s: str) -> Tuple[str, str, Dict[str, Any]]:
         raise ValueError(s)
     ct = msg["Content-Type"]
     return (ct.maintype, ct.subtype, dict(ct.params))
+
+
+def get_mime_type(filename: str, strict: bool = False) -> str:
+    """
+    Like `mimetypes.guess_type()`, except that if the file is compressed, the
+    MIME type for the compression is returned.  Also, the default return value
+    is now ``'application/octet-stream'`` instead of `None`.
+    """
+    mtype, encoding = guess_type(filename, strict)
+    if encoding is None:
+        return mtype or "application/octet-stream"
+    elif encoding == "gzip":
+        # application/gzip is defined by RFC 6713
+        return "application/gzip"
+        # There is also a "+gzip" MIME structured syntax suffix defined by RFC
+        # 8460; exactly when can that be used?
+        # return mtype + '+gzip'
+    else:
+        return "application/x-" + encoding

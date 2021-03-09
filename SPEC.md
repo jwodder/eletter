@@ -57,6 +57,3 @@ Python module for simple e-mail construction
 
 - Add & export an `assemble_content_type(maintype, subtype, **params)`
   function?
-
-- Give `BytesAttachment` and `TextAttachment` a `from_file(path,
-  content_type=None)` classmethod
