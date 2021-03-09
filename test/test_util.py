@@ -14,6 +14,14 @@ from eletter import parse_content_type
             "text/markdown; charset=utf-8; variant=GFM",
             ("text", "markdown", {"charset": "utf-8", "variant": "GFM"}),
         ),
+        (
+            'text/plain; charset="utf-\u2603"',
+            ("text", "plain", {"charset": "utf-\u2603"}),
+        ),
+        (
+            "text/plain; charset*=utf-8''utf-%E2%98%83",
+            ("text", "plain", {"charset": "utf-\u2603"}),
+        ),
     ],
 )
 def test_parse_content_type(s: str, ct: Tuple[str, str, Dict[str, Any]]) -> None:
