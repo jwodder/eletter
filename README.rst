@@ -233,3 +233,14 @@ filename of the attachment will be set to the basename of ``path``.  If
 ``content_type`` is ``None``, the Content-Type is guessed based on ``path``'s
 file extension.  ``encoding`` and ``errors`` are used when opening the file and
 have no relation to the Content-Type.
+
+
+Utility Functions
+-----------------
+
+.. code:: python
+
+    eletter.assemble_content_type(maintype: str, subtype: str, **params: str) -> str
+
+Construct a Content-Type string from a maintype, subtype, and some number of
+parameters

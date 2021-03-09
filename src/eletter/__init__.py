@@ -33,6 +33,7 @@ __all__ = [
     "BytesAttachment",
     "Group",
     "TextAttachment",
+    "assemble_content_type",
     "compose",
 ]
 
@@ -251,6 +252,8 @@ def compose(
         A collection of additional headers to add to the e-mail.  A header
         value may be either a single string or an iterable of strings to add
         multiple headers with the same name.
+    :rtype: email.message.EmailMessage
+    :raises ValueError: if neither ``text`` nor ``html`` is set
     """
     msg: Optional[EmailMessage] = None
     if text is not None:
@@ -341,3 +344,21 @@ def get_mime_type(filename: str, strict: bool = False) -> str:
         # return mtype + '+gzip'
     else:
         return "application/x-" + encoding
+
+
+def assemble_content_type(maintype: str, subtype: str, **params: str) -> str:
+    """
+    Construct a :mailheader:`Content-Type` string from a maintype, subtype, and
+    some number of parameters
+
+    :raises ValueError: if ``f"{maintype}/{subtype}"`` is an invalid
+        :mailheader:`Content-Type`
+    """
+    ct = f"{maintype}/{subtype}"
+    msg = EmailMessage()
+    msg["Content-Type"] = ct
+    if msg["Content-Type"].defects:
+        raise ValueError(ct)
+    for k, v in params.items():
+        msg.set_param(k, v)
+    return str(msg["Content-Type"])

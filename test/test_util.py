@@ -1,6 +1,6 @@
 from typing import Any, Dict, Tuple
 import pytest
-from eletter import get_mime_type, parse_content_type
+from eletter import assemble_content_type, get_mime_type, parse_content_type
 
 
 @pytest.mark.parametrize(
@@ -40,6 +40,42 @@ def test_parse_content_type(s: str, ct: Tuple[str, str, Dict[str, Any]]) -> None
 def test_parse_content_type_error(s: str) -> None:
     with pytest.raises(ValueError):
         parse_content_type(s)
+
+
+@pytest.mark.parametrize(
+    "maintype,subtype,params,ct",
+    [
+        ("text", "plain", {}, "text/plain"),
+        ("TEXT", "PLAIN", {}, "TEXT/PLAIN"),
+        ("text", "plain", {"charset": "utf-8"}, 'text/plain; charset="utf-8"'),
+        ("text", "plain", {"name": "résumé.txt"}, 'text/plain; name="résumé.txt"'),
+        ("text", "plain", {"name": 'foo"bar'}, 'text/plain; name="foo\\"bar"'),
+        (
+            "text",
+            "markdown",
+            {"charset": "utf-8", "variant": "GFM"},
+            'text/markdown; charset="utf-8"; variant="GFM"',
+        ),
+    ],
+)
+def test_assemble_content_type(
+    maintype: str, subtype: str, params: Dict[str, str], ct: str
+) -> None:
+    assert assemble_content_type(maintype, subtype, **params) == ct
+
+
+@pytest.mark.parametrize(
+    "maintype,subtype",
+    [
+        ("text/plain", "plain"),
+        ("text", ""),
+        ("text/", "plain"),
+    ],
+)
+def test_assemble_content_type_error(maintype: str, subtype: str) -> None:
+    with pytest.raises(ValueError) as excinfo:
+        assemble_content_type(maintype, subtype)
+    assert str(excinfo.value) == f"{maintype}/{subtype}"
 
 
 @pytest.mark.parametrize(

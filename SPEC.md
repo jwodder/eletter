@@ -52,6 +52,3 @@ Python module for simple e-mail construction
 - Add a `decompose_simple()` function for converting an EmailMessage to a
   `SimpleELetter` object with `text`, `html`, `attachments`, `subject`,
   `from_`, etc. fields?
-
-- Add & export an `assemble_content_type(maintype, subtype, **params)`
-  function?
