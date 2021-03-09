@@ -244,3 +244,17 @@ Utility Functions
 
 Construct a Content-Type string from a maintype, subtype, and some number of
 parameters
+
+.. code:: python
+
+    eletter.reply_quote(s: str, prefix: str = "> ") -> str
+
+Quote__ a text following the *de facto* standard for replying to an e-mail;
+that is, prefix each line of the text with ``"> "`` (or a custom prefix), and
+if a line already starts with the prefix, omit any trailing whitespace from the
+newly-added prefix (so ``"> already quoted"`` becomes ``">> already quoted"``).
+
+If the resulting string does not end with a newline, one is added.  The empty
+string is treated as a single line.
+
+__ https://en.wikipedia.org/wiki/Usenet_quoting

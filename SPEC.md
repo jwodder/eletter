@@ -6,9 +6,6 @@ Python module for simple e-mail construction
     - Alternatively, add a function for converting an iterable of eletter
       addresses to an address header string?
 
-- Include a `reply_quote(text, prefix="> ")` function for prepending a prefix
-  to all lines in a string
-
 - Make message/MIME objects support combining into a multipart sequence with
   `__add__` and combining into a `multipart/alternative` with `__or__`
 

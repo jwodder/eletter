@@ -35,6 +35,7 @@ __all__ = [
     "TextAttachment",
     "assemble_content_type",
     "compose",
+    "reply_quote",
 ]
 
 AnyPath = Union[bytes, str, "os.PathLike[bytes]", "os.PathLike[str]"]
@@ -362,3 +363,27 @@ def assemble_content_type(maintype: str, subtype: str, **params: str) -> str:
     for k, v in params.items():
         msg.set_param(k, v)
     return str(msg["Content-Type"])
+
+
+def reply_quote(s: str, prefix: str = "> ") -> str:
+    """
+    Quote__ a text following the *de facto* standard for replying to an e-mail;
+    that is, prefix each line of the text with ``"> "`` (or a custom prefix),
+    and if a line already starts with the prefix, omit any trailing whitespace
+    from the newly-added prefix (so ``"> already quoted"`` becomes ``">>
+    already quoted"``).
+
+    If the resulting string does not end with a newline, one is added.  The
+    empty string is treated as a single line.
+
+    __ https://en.wikipedia.org/wiki/Usenet_quoting
+    """
+    s2 = ""
+    for ln in (s or "\n").splitlines(True):
+        if ln.startswith(prefix):
+            s2 += prefix.rstrip() + ln
+        else:
+            s2 += prefix + ln
+    if not s2.endswith(("\n", "\r")):
+        s2 += "\n"
+    return s2

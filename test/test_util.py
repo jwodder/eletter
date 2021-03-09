@@ -1,6 +1,11 @@
 from typing import Any, Dict, Tuple
 import pytest
-from eletter import assemble_content_type, get_mime_type, parse_content_type
+from eletter import (
+    assemble_content_type,
+    get_mime_type,
+    parse_content_type,
+    reply_quote,
+)
 
 
 @pytest.mark.parametrize(
@@ -101,3 +106,47 @@ def test_assemble_content_type_error(maintype: str, subtype: str) -> None:
 )
 def test_get_mime_type(filename: str, mtype: str) -> None:
     assert get_mime_type(filename) == mtype
+
+
+@pytest.mark.parametrize(
+    "inp,output",
+    [
+        ("", "> \n"),
+        ("\n", "> \n"),
+        ("Insert output here.", "> Insert output here.\n"),
+        ("Insert output here.\n", "> Insert output here.\n"),
+        (
+            "Insert output here.\nOutsert input there.",
+            "> Insert output here.\n> Outsert input there.\n",
+        ),
+        (
+            "Insert output here.\nOutsert input there.\n",
+            "> Insert output here.\n> Outsert input there.\n",
+        ),
+        (
+            "Insert output here.\r\nOutsert input there.\r\n",
+            "> Insert output here.\r\n> Outsert input there.\r\n",
+        ),
+        (
+            "Insert output here.\rOutsert input there.\r",
+            "> Insert output here.\r> Outsert input there.\r",
+        ),
+        (
+            "Insert output here.\n\nOutsert input there.\n",
+            "> Insert output here.\n> \n> Outsert input there.\n",
+        ),
+        (
+            "> Insert output here.\n> \n> Outsert input there.\n",
+            ">> Insert output here.\n>> \n>> Outsert input there.\n",
+        ),
+    ],
+)
+def test_reply_quote(inp: str, output: str) -> None:
+    assert reply_quote(inp) == output
+
+
+def test_reply_quote_custom_prefix() -> None:
+    assert (
+        reply_quote("Insert output here.\n\n: Outsert input there.\n", ": ")
+        == ": Insert output here.\n: \n:: Outsert input there.\n"
+    )
