@@ -31,10 +31,9 @@ __all__ = ["Address", "Attachment", "BytesAttachment", "TextAttachment", "compos
 AnyPath = Union[bytes, str, "os.PathLike[bytes]", "os.PathLike[str]"]
 
 
-@attr.s(auto_attribs=True)
-class Address:
-    display_name: str
-    address: str
+class Address(hr.Address):
+    def __init__(self, display_name: str, address: str) -> None:
+        super().__init__(display_name=display_name, addr_spec=address)
 
 
 @attr.s(auto_attribs=True)
@@ -152,14 +151,14 @@ class BytesAttachment(Attachment):
 
 def compose(
     subject: str,
-    from_: Union[str, Address],
-    to: Iterable[Union[str, Address]],
+    from_: Union[str, hr.Address],
+    to: Iterable[Union[str, hr.Address]],
     text: Optional[str] = None,
     html: Optional[str] = None,
-    cc: Optional[Iterable[Union[str, Address]]] = None,
-    bcc: Optional[Iterable[Union[str, Address]]] = None,
-    reply_to: Optional[Union[str, Address]] = None,
-    sender: Optional[Union[str, Address]] = None,
+    cc: Optional[Iterable[Union[str, hr.Address]]] = None,
+    bcc: Optional[Iterable[Union[str, hr.Address]]] = None,
+    reply_to: Optional[Union[str, hr.Address]] = None,
+    sender: Optional[Union[str, hr.Address]] = None,
     date: Optional[datetime] = None,
     headers: Optional[Mapping[str, Union[str, Iterable[str]]]] = None,
     attachments: Optional[Iterable[Attachment]] = None,
@@ -205,11 +204,11 @@ def compose(
     return msg
 
 
-def compile_address(addr: Union[str, Address]) -> hr.Address:
+def compile_address(addr: Union[str, hr.Address]) -> hr.Address:
     if isinstance(addr, str):
         return hr.Address(addr_spec=addr)
     else:
-        return hr.Address(display_name=addr.display_name, addr_spec=addr.address)
+        return addr
 
 
 def parse_content_type(s: str) -> Tuple[str, str, Dict[str, Any]]:

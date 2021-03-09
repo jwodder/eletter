@@ -1,8 +1,6 @@
 Python module for simple e-mail construction
 
 - Support lists for `from_` and `reply_to`?
-- Replace `Address` with the one in headerregistry?
-    - Make my `Address` a subclass or wrapper around the stdlib one?
 - Support address groups?
 - Allow `Any` as values for headers?
     - Add a function for converting an iterable of eletter addresses (and
