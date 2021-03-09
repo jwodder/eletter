@@ -10,19 +10,13 @@ Python module for simple e-mail construction
             def _compile() -> EmailMessage
 
             # All MailItems (or at least attachments and bodies) have a
-            # nullable `msgid` attribute that the user must set themselves if
-            # they want to use.
+            # nullable `content_id` attribute that the user must set themselves
+            # if they want to use.
 
         Composable(MailItem):
             compose(subject, from_, ...) -> EmailMessage
 
         Attachment(MailItem)
-        BytesAttachment(Attachment)
-            __init__(filename: str, content: bytes, filename: str, content_type: str = "application/octet-stream", inline: bool = False)
-        TextAttachment(Attachment)
-            __init__(filename: str, content: str, filename: str, content_type: str = "text/plain", inline: bool = False)
-        EmailAttachment(Attachment)
-            __init__(filename: str, content: EmailMessage, filename: str, content_type: str = "message/rfc822", inline: bool = False)
 
         TextBody(Composable)
             __init__(content: str, subtype="plain")

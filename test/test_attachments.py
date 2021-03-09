@@ -1,6 +1,8 @@
 from pathlib import Path
+import attr
+from email2dict import email2dict
 import pytest
-from eletter import BytesAttachment, ContentType, TextAttachment
+from eletter import BytesAttachment, ContentType, EmailAttachment, TextAttachment
 
 DATA_DIR = Path(__file__).with_name("data")
 
@@ -107,3 +109,72 @@ def test_text_attachment_from_file_content_type() -> None:
         content_type="text/x-fibonacci; lang=python",
         inline=False,
     )
+
+
+def test_email_attachment_from_file() -> None:
+    ea = EmailAttachment.from_file(DATA_DIR / "sample.eml")
+    assert attr.asdict(ea, filter=lambda attr, _: attr.name != "content") == {
+        "filename": "sample.eml",
+        "inline": False,
+    }
+    assert email2dict(ea.content) == {
+        "unixfrom": None,
+        "headers": {
+            "from": [
+                {
+                    "display_name": "Steven E'Nder",
+                    "address": "sender@example.nil",
+                },
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "recipient@redacted.nil",
+                },
+            ],
+            "subject": "Seeking a job",
+            "content-type": {
+                "content_type": "multipart/mixed",
+                "params": {},
+            },
+            "user-agent": [
+                "Mutt/1.5.24 (2015-08-30)",
+            ],
+        },
+        "preamble": "",
+        "content": [
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "text/plain",
+                        "params": {},
+                    },
+                    "content-disposition": {
+                        "disposition": "inline",
+                        "params": {},
+                    },
+                },
+                "preamble": None,
+                "content": "Please find my credentials attached.\n\n",
+                "epilogue": None,
+            },
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "text/plain",
+                        "params": {"name": "résumé.txt"},
+                    },
+                    "content-disposition": {
+                        "disposition": "attachment",
+                        "params": {"filename": "résumé.txt"},
+                    },
+                },
+                "preamble": None,
+                "content": "- Wrote email2dict\n- Has a pulse (sometimes)\n",
+                "epilogue": None,
+            },
+        ],
+        "epilogue": "",
+    }

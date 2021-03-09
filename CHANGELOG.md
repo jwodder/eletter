@@ -6,6 +6,7 @@ v0.2.0 (in development)
 - Support address groups
 - Added `assemble_content_type()`, `format_addresses()`, and `reply_quote()`
   utility functions
+- Added an `EmailAttachment` class
 
 v0.1.0 (2021-03-09)
 -------------------

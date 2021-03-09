@@ -1,5 +1,5 @@
 from email2dict import email2dict
-from eletter import Address, BytesAttachment, TextAttachment, compose
+from eletter import Address, BytesAttachment, EmailAttachment, TextAttachment, compose
 
 
 def test_compose_text_bytes_attachment_custom_content_type() -> None:
@@ -1061,6 +1061,148 @@ def test_compose_html_bytes_attachment_text_attachment() -> None:
                 },
                 "preamble": None,
                 "content": "This is a text document.\n",
+                "epilogue": None,
+            },
+        ],
+        "epilogue": None,
+    }
+
+
+def test_compose_email_attachment() -> None:
+    msg = compose(
+        from_="me@here.com",
+        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+        subject="Some electronic mail",
+        text="Here's that e-mail you wanted me to send.",
+        attachments=[
+            EmailAttachment(
+                compose(
+                    from_="somebody@some.where",
+                    to=["me@here.com"],
+                    subject="A pretty picture!",
+                    text="Look at the pretty picture!  ... It came through, right?",
+                    attachments=[
+                        BytesAttachment(
+                            b"\xFE\xED\xFA\xCE",
+                            filename="blob.dat",
+                            content_type="application/x-feedface",
+                        )
+                    ],
+                ),
+                filename="message.eml",
+                inline=False,
+            )
+        ],
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Some electronic mail",
+            "from": [
+                {
+                    "display_name": "",
+                    "address": "me@here.com",
+                }
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "you@there.net",
+                },
+                {
+                    "display_name": "Thaddeus Hem",
+                    "address": "them@hither.yon",
+                },
+            ],
+            "content-type": {
+                "content_type": "multipart/mixed",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": [
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "text/plain",
+                        "params": {},
+                    },
+                },
+                "preamble": None,
+                "content": "Here's that e-mail you wanted me to send.\n",
+                "epilogue": None,
+            },
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "message/rfc822",
+                        "params": {},
+                    },
+                    "content-disposition": {
+                        "disposition": "attachment",
+                        "params": {"filename": "message.eml"},
+                    },
+                },
+                "preamble": None,
+                "content": {
+                    "unixfrom": None,
+                    "headers": {
+                        "subject": "A pretty picture!",
+                        "from": [
+                            {
+                                "display_name": "",
+                                "address": "somebody@some.where",
+                            },
+                        ],
+                        "to": [
+                            {
+                                "display_name": "",
+                                "address": "me@here.com",
+                            },
+                        ],
+                        "content-type": {
+                            "content_type": "multipart/mixed",
+                            "params": {},
+                        },
+                    },
+                    "preamble": None,
+                    "content": [
+                        {
+                            "unixfrom": None,
+                            "headers": {
+                                "content-type": {
+                                    "content_type": "text/plain",
+                                    "params": {},
+                                },
+                            },
+                            "preamble": None,
+                            "content": (
+                                "Look at the pretty picture!  ... It came"
+                                " through, right?\n"
+                            ),
+                            "epilogue": None,
+                        },
+                        {
+                            "unixfrom": None,
+                            "headers": {
+                                "content-type": {
+                                    "content_type": "application/x-feedface",
+                                    "params": {},
+                                },
+                                "content-disposition": {
+                                    "disposition": "attachment",
+                                    "params": {"filename": "blob.dat"},
+                                },
+                            },
+                            "preamble": None,
+                            "content": b"\xFE\xED\xFA\xCE",
+                            "epilogue": None,
+                        },
+                    ],
+                    "epilogue": None,
+                },
                 "epilogue": None,
             },
         ],

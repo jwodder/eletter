@@ -20,6 +20,8 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterable as IterableABC
 from datetime import datetime
 from email import headerregistry as hr
+from email import message_from_binary_file
+from email import policy
 from email.message import EmailMessage
 from mimetypes import guess_type
 import os
@@ -31,6 +33,7 @@ __all__ = [
     "Address",
     "Attachment",
     "BytesAttachment",
+    "EmailAttachment",
     "Group",
     "TextAttachment",
     "assemble_content_type",
@@ -101,7 +104,7 @@ class ContentTyped:
         cache_content_type(self, None, self.content_type)
 
 
-class Attachment(ABC, ContentTyped):
+class Attachment(ABC):
     """ Base class for the attachment classes """
 
     @abstractmethod
@@ -110,7 +113,7 @@ class Attachment(ABC, ContentTyped):
 
 
 @attr.s(auto_attribs=True)
-class TextAttachment(Attachment):
+class TextAttachment(Attachment, ContentTyped):
     """
     A representation of a textual e-mail attachment.  The content type must
     have a maintype of :mimetype:`text`.
@@ -165,7 +168,7 @@ class TextAttachment(Attachment):
 
 
 @attr.s(auto_attribs=True)
-class BytesAttachment(Attachment):
+class BytesAttachment(Attachment, ContentTyped):
     """ A representation of a binary e-mail attachment """
 
     #: The body of the attachment
@@ -204,6 +207,40 @@ class BytesAttachment(Attachment):
         if content_type is None:
             content_type = get_mime_type(filename)
         return cls(content=content, filename=filename, content_type=content_type)
+
+
+@attr.s(auto_attribs=True)
+class EmailAttachment(Attachment):
+    """ A representation of a :mimetype:`message/rfc822` e-mail attachment """
+
+    #: The body of the attachment
+    content: EmailMessage
+    #: The filename of the attachment
+    filename: str
+    #: Whether the attachment should be displayed inline in clients
+    inline: bool = attr.ib(default=False, kw_only=True)
+
+    def _compile(self) -> EmailMessage:
+        msg = EmailMessage()
+        msg.set_content(
+            self.content,
+            disposition="inline" if self.inline else "attachment",
+            filename=self.filename,
+        )
+        return msg
+
+    @classmethod
+    def from_file(cls, path: AnyPath) -> "EmailAttachment":
+        """
+        Construct an `EmailAttachment` from the contents of the file at
+        ``path``.  The filename of the attachment will be set to the basename
+        of ``path``.
+        """
+        with open(path, "rb") as fp:
+            content = message_from_binary_file(fp, policy=policy.default)
+            assert isinstance(content, EmailMessage)
+        filename = os.path.basename(os.fsdecode(path))
+        return cls(content=content, filename=filename)
 
 
 def compose(

@@ -175,8 +175,11 @@ types directly, if you want to.
 Attachments
 -----------
 
-``eletter`` has two concrete attachment classes, ``TextAttachment`` and
-``BytesAttachment``:
+``eletter`` has three concrete attachment classes: ``BytesAttachment``,
+``TextAttachment``, and ``EmailAttachment``.
+
+``BytesAttachment``
+~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
@@ -204,6 +207,9 @@ Construct a ``BytesAttachment`` from the contents of the file at ``path``.  The
 filename of the attachment will be set to the basename of ``path``.  If
 ``content_type`` is ``None``, the Content-Type is guessed based on ``path``'s
 file extension.
+
+``TextAttachment``
+~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
@@ -235,6 +241,33 @@ filename of the attachment will be set to the basename of ``path``.  If
 ``content_type`` is ``None``, the Content-Type is guessed based on ``path``'s
 file extension.  ``encoding`` and ``errors`` are used when opening the file and
 have no relation to the Content-Type.
+
+``EmailAttachment``
+~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    eletter.EmailAttachment(
+        content: email.message.EmailMessage,
+        filename: str,
+        *,
+        inline: bool = False,
+    )
+
+Representation of a ``message/rfc822`` attachment.  Besides using the
+constructor, instances can also be constructed via the ``from_file()``
+classmethod:
+
+.. code:: python
+
+    @classmethod
+    eletter.EmailAttachment.from_file(
+        cls,
+        path: Union[bytes, str, os.PathLike],
+    ) -> EmailAttachment
+
+Construct an ``EmailAttachment`` from the contents of the file at ``path``.
+The filename of the attachment will be set to the basename of ``path``.
 
 
 Utility Functions
