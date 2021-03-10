@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 import attr
 from email2dict import email2dict
 import pytest
@@ -100,6 +101,17 @@ def test_bytes_attachment_from_file_inline() -> None:
     )
 
 
+def test_bytes_attachment_from_file_content_id() -> None:
+    ba = BytesAttachment.from_file(DATA_DIR / "ternary.png", content_id="cid")
+    assert ba == BytesAttachment(
+        PNG,
+        filename="ternary.png",
+        content_type="image/png",
+        inline=False,
+        content_id="cid",
+    )
+
+
 def test_text_attachment_from_file() -> None:
     ta = TextAttachment.from_file(DATA_DIR / "fibonacci.py")
     assert ta == TextAttachment(
@@ -126,13 +138,27 @@ def test_text_attachment_from_file_inline() -> None:
     )
 
 
+def test_text_attachment_from_file_content_id() -> None:
+    ta = TextAttachment.from_file(DATA_DIR / "fibonacci.py", content_id="cid")
+    assert ta == TextAttachment(
+        PY,
+        filename="fibonacci.py",
+        content_type="text/x-python",
+        inline=False,
+        content_id="cid",
+    )
+
+
 @pytest.mark.parametrize("inline", [False, True])
-def test_email_attachment_from_file(inline: bool) -> None:
-    ea = EmailAttachment.from_file(DATA_DIR / "sample.eml", inline=inline)
+@pytest.mark.parametrize("cid", [None, "cid"])
+def test_email_attachment_from_file(inline: bool, cid: Optional[None]) -> None:
+    ea = EmailAttachment.from_file(
+        DATA_DIR / "sample.eml", inline=inline, content_id=cid
+    )
     assert attr.asdict(ea, filter=lambda attr, _: attr.name != "content") == {
         "filename": "sample.eml",
         "inline": inline,
-        "content_id": None,
+        "content_id": cid,
     }
     assert email2dict(ea.content) == {
         "unixfrom": None,

@@ -193,6 +193,7 @@ class TextAttachment(Attachment, ContentTyped):
         encoding: Optional[str] = None,
         errors: Optional[str] = None,
         inline: bool = False,
+        content_id: Optional[str] = None,
     ) -> "TextAttachment":
         """
         Construct a `TextAttachment` from the contents of the file at ``path``.
@@ -208,7 +209,11 @@ class TextAttachment(Attachment, ContentTyped):
         if content_type is None:
             content_type = get_mime_type(filename)
         return cls(
-            content=content, filename=filename, content_type=content_type, inline=inline
+            content=content,
+            filename=filename,
+            content_type=content_type,
+            inline=inline,
+            content_id=content_id,
         )
 
 
@@ -238,7 +243,11 @@ class BytesAttachment(Attachment, ContentTyped):
 
     @classmethod
     def from_file(
-        cls, path: AnyPath, content_type: Optional[str] = None, inline: bool = False
+        cls,
+        path: AnyPath,
+        content_type: Optional[str] = None,
+        inline: bool = False,
+        content_id: Optional[str] = None,
     ) -> "BytesAttachment":
         """
         Construct a `BytesAttachment` from the contents of the file at
@@ -253,7 +262,11 @@ class BytesAttachment(Attachment, ContentTyped):
         if content_type is None:
             content_type = get_mime_type(filename)
         return cls(
-            content=content, filename=filename, content_type=content_type, inline=inline
+            content=content,
+            filename=filename,
+            content_type=content_type,
+            inline=inline,
+            content_id=content_id,
         )
 
 
@@ -279,7 +292,9 @@ class EmailAttachment(Attachment):
         return msg
 
     @classmethod
-    def from_file(cls, path: AnyPath, inline: bool = False) -> "EmailAttachment":
+    def from_file(
+        cls, path: AnyPath, inline: bool = False, content_id: Optional[str] = None
+    ) -> "EmailAttachment":
         """
         Construct an `EmailAttachment` from the contents of the file at
         ``path``.  The filename of the attachment will be set to the basename
@@ -289,7 +304,9 @@ class EmailAttachment(Attachment):
             content = message_from_binary_file(fp, policy=policy.default)
             assert isinstance(content, EmailMessage)
         filename = os.path.basename(os.fsdecode(path))
-        return cls(content=content, filename=filename, inline=inline)
+        return cls(
+            content=content, filename=filename, inline=inline, content_id=content_id
+        )
 
 
 def mail_item_list(xs: Iterable[MailItem]) -> List[MailItem]:
