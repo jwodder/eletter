@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from email.utils import make_msgid
-from typing import Any, Iterable, Union
+from typing import Any, Iterable, Type, Union
 from email2dict import email2dict
 import pytest
 from eletter import (
@@ -11,6 +11,7 @@ from eletter import (
     HTMLBody,
     MailItem,
     Mixed,
+    Multipart,
     Related,
     TextAttachment,
     TextBody,
@@ -462,12 +463,12 @@ def test_mailitem_compose(
     }
 
 
-def test_text_add_attachment() -> None:
+def test_text_and_attachment() -> None:
     t = TextBody("This is the text of an e-mail.")
     a = TextAttachment(
         "this,text,attachment", "attachment.csv", content_type="text/csv"
     )
-    msg = (t + a).compose(
+    msg = (t & a).compose(
         from_="me@here.com",
         to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
         subject="Some electronic mail",
@@ -537,55 +538,55 @@ def test_mixed() -> None:
     a = TextAttachment(
         "this,text,attachment", "attachment.csv", content_type="text/csv"
     )
-    mixed = t + a
+    mixed = t & a
     assert isinstance(mixed, Mixed)
     assert mixed == Mixed([t, a])
 
 
-def test_add_mixed() -> None:
+def test_and_mixed() -> None:
     t1 = TextBody("Part 1")
     t2 = TextBody("Part 2")
     t3 = TextBody("Part 3")
     t4 = TextBody("Part 4")
-    mixed1 = t1 + t2
-    mixed2 = t3 + t4
-    mixed = mixed1 + mixed2
+    mixed1 = t1 & t2
+    mixed2 = t3 & t4
+    mixed = mixed1 & mixed2
     assert mixed == Mixed([t1, t2, t3, t4])
 
 
-def test_mixed_add_eq_body() -> None:
+def test_mixed_and_eq_body() -> None:
     t1 = TextBody("Part 1")
     t2 = TextBody("Part 2")
     t3 = TextBody("Part 3")
-    mixed = t1 + t2
+    mixed = t1 & t2
     x = mixed
-    x += t3
+    x &= t3
     assert x is mixed
     assert x == Mixed([t1, t2, t3])
     assert t3 == TextBody("Part 3")
 
 
-def test_mixed_add_eq_mixed() -> None:
+def test_mixed_and_eq_mixed() -> None:
     t1 = TextBody("Part 1")
     t2 = TextBody("Part 2")
     t3 = TextBody("Part 3")
     t4 = TextBody("Part 4")
-    mixed1 = t1 + t2
-    mixed2 = t3 + t4
+    mixed1 = t1 & t2
+    mixed2 = t3 & t4
     x = mixed1
-    x += mixed2
+    x &= mixed2
     assert x is mixed1
     assert x == Mixed([t1, t2, t3, t4])
     assert mixed2 == Mixed([t3, t4])
 
 
-def test_body_add_eq() -> None:
+def test_body_and_eq() -> None:
     t = TextBody("This is the text of an e-mail.")
     a = TextAttachment(
         "this,text,attachment", "attachment.csv", content_type="text/csv"
     )
     x: Any = t
-    x += a
+    x &= a
     assert x is not t
     assert isinstance(x, Mixed)
     assert x == Mixed([t, a])
@@ -602,13 +603,13 @@ def test_compose_empty_mixed() -> None:
     assert str(excinfo.value) == "Cannot compose empty Mixed"
 
 
-def test_text_alt_html_add_attachment() -> None:
+def test_text_alt_html_and_attachment() -> None:
     t = TextBody("This is the text of an e-mail.")
     h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
     a = TextAttachment(
         "this,text,attachment", "attachment.csv", content_type="text/csv"
     )
-    msg = ((t | h) + a).compose(
+    msg = ((t | h) & a).compose(
         from_="me@here.com",
         to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
         subject="Some electronic mail",
@@ -849,7 +850,7 @@ def test_multipart_content_ids() -> None:
     text = TextBody("Here is an image:\n")
     HTML = f'<p>Here is an image:</p><img src="cid:{img_cid[1:-1]}"/>\n'
     html = HTMLBody(HTML)
-    mixed = text + img
+    mixed = text & img
     mixed_cid = make_msgid()
     mixed.content_id = mixed_cid
     related_cid = make_msgid()
@@ -979,3 +980,60 @@ def test_multipart_content_ids() -> None:
         ],
         "epilogue": None,
     }
+
+
+@pytest.mark.parametrize("cls", [Alternative, Mixed, Related])
+def test_multipart_mutable_sequences(cls: Type[Multipart]) -> None:
+    t1 = TextBody("Part 1")
+    t2 = TextBody("Part 2")
+    t3 = TextBody("Part 3")
+    t4 = TextBody("Part 4")
+    seq = cls()
+    assert len(seq) == 0
+    assert list(seq) == []
+    seq.append(t1)
+    assert len(seq) == 1
+    assert list(seq) == [t1]
+    assert seq[0] == t1
+    seq.insert(0, t2)
+    assert len(seq) == 2
+    assert list(seq) == [t2, t1]
+    assert seq[0] == t2
+    assert seq[1] == t1
+    seq[1] = t3
+    assert len(seq) == 2
+    assert list(seq) == [t2, t3]
+    assert seq[0] == t2
+    assert seq[1] == t3
+    seq.pop(0)
+    assert len(seq) == 1
+    assert list(seq) == [t3]
+    assert seq[0] == t3
+    seq.extend([t1, t4])
+    assert len(seq) == 3
+    assert list(seq) == [t3, t1, t4]
+    seq.reverse()
+    assert len(seq) == 3
+    assert list(seq) == [t4, t1, t3]
+    seq.reverse()
+    assert len(seq) == 3
+    assert list(seq) == [t3, t1, t4]
+    assert seq[1:] == cls([t1, t4])
+    seq.pop()
+    assert len(seq) == 2
+    assert list(seq) == [t3, t1]
+    seq.remove(t1)
+    assert len(seq) == 1
+    assert list(seq) == [t3]
+    seq += [t1, t2]
+    assert len(seq) == 3
+    assert list(seq) == [t3, t1, t2]
+    del seq[0]
+    assert len(seq) == 2
+    assert list(seq) == [t1, t2]
+    seq[1:] = [t3, t4]
+    assert len(seq) == 3
+    assert list(seq) == [t1, t3, t4]
+    del seq[:2]
+    assert len(seq) == 1
+    assert list(seq) == [t4]

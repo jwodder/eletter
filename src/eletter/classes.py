@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections.abc import Iterable as IterableABC
 from datetime import datetime
 from email import headerregistry as hr
 from email import message_from_binary_file
@@ -6,7 +7,16 @@ from email import policy
 from email.message import EmailMessage
 import os
 import os.path
-from typing import Iterable, List, Mapping, Optional, Union
+from typing import (
+    Iterable,
+    List,
+    Mapping,
+    MutableSequence,
+    Optional,
+    TypeVar,
+    Union,
+    overload,
+)
 import attr
 from .util import (
     AddressOrGroup,
@@ -118,7 +128,7 @@ class MailItem(ABC):
                 parts.append(mi)
         return Alternative(parts)
 
-    def __add__(self, other: "MailItem") -> "Mixed":
+    def __and__(self, other: "MailItem") -> "Mixed":
         parts: List[MailItem] = []
         for mi in [self, other]:
             if isinstance(mi, Mixed):
@@ -277,10 +287,76 @@ def mail_item_list(xs: Iterable[MailItem]) -> List[MailItem]:
     return list(xs)
 
 
-@attr.s
-class Alternative(MailItem):
-    content: List[MailItem] = attr.ib(converter=mail_item_list)
+M = TypeVar("M", bound="Multipart")
 
+
+@attr.s
+class Multipart(MailItem, MutableSequence[MailItem]):
+    content: List[MailItem] = attr.ib(factory=list, converter=mail_item_list)
+
+    @overload
+    def __getitem__(self, index: int) -> MailItem:
+        ...
+
+    @overload
+    def __getitem__(self: M, index: slice) -> M:
+        ...
+
+    def __getitem__(self: M, index: Union[int, slice]) -> Union[MailItem, M]:
+        if isinstance(index, int):
+            return self.content[index]
+        else:
+            return type(self)(self.content[index])
+
+    @overload
+    def __setitem__(self, index: int, mi: MailItem) -> None:
+        ...
+
+    @overload
+    def __setitem__(self, index: slice, mis: Iterable[MailItem]) -> None:
+        ...
+
+    def __setitem__(
+        self, index: Union[int, slice], mi: Union[MailItem, Iterable[MailItem]]
+    ) -> None:
+        if isinstance(index, int):
+            assert isinstance(mi, MailItem)
+            self.content[index] = mi
+        else:
+            assert isinstance(mi, IterableABC)
+            self.content[index] = mi
+
+    def __delitem__(self: M, index: Union[int, slice]) -> None:
+        del self.content[index]
+
+    def __len__(self) -> int:
+        return len(self.content)
+
+    def insert(self, index: int, value: MailItem) -> None:
+        self.content.insert(index, value)
+
+    def append(self, value: MailItem) -> None:
+        self.content.append(value)
+
+    def reverse(self) -> None:
+        self.content.reverse()
+
+    def extend(self, values: Iterable[MailItem]) -> None:
+        self.content.extend(values)
+
+    def pop(self, index: int = -1) -> MailItem:
+        return self.content.pop(index)
+
+    def remove(self, value: MailItem) -> None:
+        self.content.remove(value)
+
+    def __iadd__(self: M, other: Iterable[MailItem]) -> M:
+        self.content.extend(other)
+        return self
+
+
+@attr.s
+class Alternative(Multipart):
     def _compile(self) -> EmailMessage:
         if not self.content:
             raise ValueError("Cannot compose empty Alternative")
@@ -301,9 +377,7 @@ class Alternative(MailItem):
 
 
 @attr.s
-class Mixed(MailItem):
-    content: List[MailItem] = attr.ib(converter=mail_item_list)
-
+class Mixed(Multipart):
     def _compile(self) -> EmailMessage:
         if not self.content:
             raise ValueError("Cannot compose empty Mixed")
@@ -315,7 +389,7 @@ class Mixed(MailItem):
             msg["Content-ID"] = self.content_id
         return msg
 
-    def __iadd__(self, other: MailItem) -> "Mixed":
+    def __iand__(self, other: MailItem) -> "Mixed":
         if isinstance(other, Mixed):
             self.content.extend(other.content)
         else:
@@ -324,9 +398,7 @@ class Mixed(MailItem):
 
 
 @attr.s
-class Related(MailItem):
-    content: List[MailItem] = attr.ib(converter=mail_item_list)
-
+class Related(Multipart):
     def _compile(self) -> EmailMessage:
         if not self.content:
             raise ValueError("Cannot compose empty Related")

@@ -71,7 +71,7 @@ def compose(
         raise ValueError("At least one of text and html must be non-None")
     if attachments is not None:
         for a in attachments:
-            msg += a
+            msg &= a
     return msg.compose(
         subject=subject,
         from_=from_,
