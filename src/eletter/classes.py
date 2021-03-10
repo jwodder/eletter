@@ -78,6 +78,15 @@ class MailItem(ABC):
                 parts.append(mi)
         return Alternative(parts)
 
+    def __add__(self, other: "MailItem") -> "Mixed":
+        parts: List[MailItem] = []
+        for mi in [self, other]:
+            if isinstance(mi, Mixed):
+                parts.extend(mi.content)
+            else:
+                parts.append(mi)
+        return Mixed(parts)
+
 
 class Composable(MailItem):
     def compose(
@@ -273,6 +282,20 @@ class Alternative(Composable):
             raise ValueError("Cannot compose empty Alternative")
         msg = EmailMessage()
         msg.make_alternative()
+        for mi in self.content:
+            msg.attach(mi._compile())
+        return msg
+
+
+@attr.s
+class Mixed(Composable):
+    content: List[MailItem] = attr.ib(converter=mail_item_list)
+
+    def _compile(self) -> EmailMessage:
+        if not self.content:
+            raise ValueError("Cannot compose empty Mixed")
+        msg = EmailMessage()
+        msg.make_mixed()
         for mi in self.content:
             msg.attach(mi._compile())
         return msg

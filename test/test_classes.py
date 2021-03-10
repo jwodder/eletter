@@ -2,7 +2,16 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Iterable, Union
 from email2dict import email2dict
 import pytest
-from eletter import Address, Alternative, Composable, Group, HTMLBody, TextBody
+from eletter import (
+    Address,
+    Alternative,
+    Composable,
+    Group,
+    HTMLBody,
+    Mixed,
+    TextAttachment,
+    TextBody,
+)
 from eletter.util import AddressOrGroup
 
 
@@ -259,6 +268,14 @@ def test_compose_empty_alt() -> None:
                 HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>"),
             ]
         ),
+        Mixed(
+            [
+                TextBody("This is the text of an e-mail."),
+                TextAttachment(
+                    "this,text,attachment", "attachment.csv", content_type="text/csv"
+                ),
+            ]
+        ),
     ],
 )
 @pytest.mark.parametrize(
@@ -402,4 +419,216 @@ def test_composable_compose(
             "From mx.example.com",
             "From mail.sender.nil",
         ],
+    }
+
+
+def test_text_plus_attachment() -> None:
+    t = TextBody("This is the text of an e-mail.")
+    a = TextAttachment(
+        "this,text,attachment", "attachment.csv", content_type="text/csv"
+    )
+    msg = (t + a).compose(
+        from_="me@here.com",
+        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+        subject="Some electronic mail",
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Some electronic mail",
+            "from": [
+                {
+                    "display_name": "",
+                    "address": "me@here.com",
+                }
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "you@there.net",
+                },
+                {
+                    "display_name": "Thaddeus Hem",
+                    "address": "them@hither.yon",
+                },
+            ],
+            "content-type": {
+                "content_type": "multipart/mixed",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": [
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "text/plain",
+                        "params": {},
+                    },
+                },
+                "preamble": None,
+                "content": "This is the text of an e-mail.\n",
+                "epilogue": None,
+            },
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "text/csv",
+                        "params": {},
+                    },
+                    "content-disposition": {
+                        "disposition": "attachment",
+                        "params": {"filename": "attachment.csv"},
+                    },
+                },
+                "preamble": None,
+                "content": "this,text,attachment\n",
+                "epilogue": None,
+            },
+        ],
+        "epilogue": None,
+    }
+
+
+def test_mixed() -> None:
+    t = TextBody("This is the text of an e-mail.")
+    a = TextAttachment(
+        "this,text,attachment", "attachment.csv", content_type="text/csv"
+    )
+    mixed = t + a
+    assert isinstance(mixed, Mixed)
+    assert mixed == Mixed([t, a])
+
+
+def test_plus_mixed() -> None:
+    t1 = TextBody("Part 1")
+    t2 = TextBody("Part 2")
+    t3 = TextBody("Part 3")
+    t4 = TextBody("Part 4")
+    mixed1 = t1 + t2
+    mixed2 = t3 + t4
+    mixed = mixed1 + mixed2
+    assert mixed == Mixed([t1, t2, t3, t4])
+
+
+def test_body_plus_eq() -> None:
+    t = TextBody("This is the text of an e-mail.")
+    a = TextAttachment(
+        "this,text,attachment", "attachment.csv", content_type="text/csv"
+    )
+    x: Any = t
+    x += a
+    assert x is not t
+    assert isinstance(x, Mixed)
+    assert x == Mixed([t, a])
+    assert t == TextBody("This is the text of an e-mail.")
+
+
+def test_compose_empty_mixed() -> None:
+    with pytest.raises(ValueError) as excinfo:
+        Mixed([]).compose(
+            from_="me@here.com",
+            to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+            subject="Some electronic mail",
+        )
+    assert str(excinfo.value) == "Cannot compose empty Mixed"
+
+
+def test_text_alt_html_plus_attachment() -> None:
+    t = TextBody("This is the text of an e-mail.")
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    a = TextAttachment(
+        "this,text,attachment", "attachment.csv", content_type="text/csv"
+    )
+    msg = ((t | h) + a).compose(
+        from_="me@here.com",
+        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+        subject="Some electronic mail",
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Some electronic mail",
+            "from": [
+                {
+                    "display_name": "",
+                    "address": "me@here.com",
+                }
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "you@there.net",
+                },
+                {
+                    "display_name": "Thaddeus Hem",
+                    "address": "them@hither.yon",
+                },
+            ],
+            "content-type": {
+                "content_type": "multipart/mixed",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": [
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "multipart/alternative",
+                        "params": {},
+                    },
+                },
+                "preamble": None,
+                "content": [
+                    {
+                        "unixfrom": None,
+                        "headers": {
+                            "content-type": {
+                                "content_type": "text/plain",
+                                "params": {},
+                            },
+                        },
+                        "preamble": None,
+                        "content": "This is the text of an e-mail.\n",
+                        "epilogue": None,
+                    },
+                    {
+                        "unixfrom": None,
+                        "headers": {
+                            "content-type": {
+                                "content_type": "text/html",
+                                "params": {},
+                            },
+                        },
+                        "preamble": None,
+                        "content": (
+                            "<p>This is the <i>text</i> of an <b>e</b>-mail.<p>\n"
+                        ),
+                        "epilogue": None,
+                    },
+                ],
+                "epilogue": None,
+            },
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "text/csv",
+                        "params": {},
+                    },
+                    "content-disposition": {
+                        "disposition": "attachment",
+                        "params": {"filename": "attachment.csv"},
+                    },
+                },
+                "preamble": None,
+                "content": "this,text,attachment\n",
+                "epilogue": None,
+            },
+        ],
+        "epilogue": None,
     }
