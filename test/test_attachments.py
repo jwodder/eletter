@@ -2,7 +2,8 @@ from pathlib import Path
 import attr
 from email2dict import email2dict
 import pytest
-from eletter import BytesAttachment, ContentType, EmailAttachment, TextAttachment
+from eletter import BytesAttachment, EmailAttachment, TextAttachment
+from eletter.util import ContentType
 
 DATA_DIR = Path(__file__).with_name("data")
 

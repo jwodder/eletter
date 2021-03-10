@@ -5,10 +5,9 @@ from eletter import (
     Group,
     assemble_content_type,
     format_addresses,
-    get_mime_type,
-    parse_content_type,
     reply_quote,
 )
+from eletter.util import get_mime_type, parse_content_type
 
 
 @pytest.mark.parametrize(
