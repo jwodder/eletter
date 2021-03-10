@@ -25,8 +25,8 @@
 ``eletter`` provides a basic function for constructing an
 ``email.message.EmailMessage`` instance without having to touch the needlessly
 complicated ``EmailMessage`` class itself.  E-mails with text bodies and/or
-HTML bodies plus attachments are supported.  Support for more complex e-mails
-is planned for later.
+HTML bodies plus attachments are supported.  Classes are also provided for
+composing more complex multipart e-mails.
 
 
 Installation
@@ -40,6 +40,8 @@ Installation
 
 Example
 =======
+
+Constructing an e-mail with the ``compose()`` function:
 
 .. code:: python
 
@@ -82,6 +84,60 @@ Example
 outgoing_.
 
 .. _outgoing: https://github/jwodder/outgoing
+
+For more complex e-mails, a set of classes is provided.  Here is the equivalent
+of the HTML-with-image e-mail with alternative plain text version from the
+``email`` `examples page`__ in the Python docs:
+
+__ https://docs.python.org/3/library/email.examples.html
+
+.. code:: python
+
+    from email.utils import make_msgid
+    import eletter
+
+    text = eletter.TextBody(
+        "Salut!\n"
+        "\n"
+        "Cela ressemble à un excellent recipie[1] déjeuner.\n"
+        "\n"
+        "[1] http://www.yummly.com/recipe/Roasted-Asparagus-Epicurious-203718\n"
+        "\n"
+        "--Pepé\n"
+    )
+
+    asparagus_cid = make_msgid()
+
+    html = eletter.HTMLBody(
+        "<html>\n"
+        "  <head></head>\n"
+        "  <body>\n"
+        "    <p>Salut!</p>\n"
+        "    <p>Cela ressemble à un excellent\n"
+        '        <a href="http://www.yummly.com/recipe/Roasted-Asparagus-'
+        'Epicurious-203718">\n'
+        "            recipie\n"
+        "        </a> déjeuner.\n"
+        "    </p>\n"
+        f'    <img src="cid:{asparagus_cid[1:-1]}" />\n'
+        "  </body>\n"
+        "</html>\n"
+    )
+
+    image = eletter.BytesAttachment.from_file(
+        "roasted-asparagus.jpg",
+        inline=True,
+        content_id=asparagus_cid,
+    )
+
+    msg = (text | (html ^ image)).compose(
+        subject="Ayons asperges pour le déjeuner",
+        from_=eletter.Address("Pepé Le Pew", "pepe@example.com"),
+        to=[
+            eletter.Address("Penelope Pussycat", "penelope@example.com"),
+            eletter.Address("Fabrette Pussycat", "fabrette@example.com"),
+        ],
+    )
 
 
 API
