@@ -856,7 +856,7 @@ def test_text_alt_html_related() -> None:
                 "headers": {
                     "content-type": {
                         "content_type": "multipart/related",
-                        "params": {},
+                        "params": {"type": "text/html"},
                     },
                 },
                 "preamble": None,
@@ -891,6 +891,105 @@ def test_text_alt_html_related() -> None:
                         "epilogue": None,
                     },
                 ],
+                "epilogue": None,
+            },
+        ],
+        "epilogue": None,
+    }
+
+
+def test_img_html_related_start() -> None:
+    asparagus_cid = make_msgid()
+    html_cid = make_msgid()
+    HTML = (
+        "<html>\n"
+        "  <head></head>\n"
+        "  <body>\n"
+        "    <p>Salut!</p>\n"
+        "    <p>Cela ressemble à un excellent\n"
+        '        <a href="http://www.yummly.com/recipe/Roasted-Asparagus-'
+        'Epicurious-203718">\n'
+        "            recipie\n"
+        "        </a> déjeuner.\n"
+        "    </p>\n"
+        f'    <img src="cid:{asparagus_cid[1:-1]}" />\n'
+        "  </body>\n"
+        "</html>\n"
+    )
+    h = HTMLBody(HTML, content_id=html_cid)
+    IMG = b"\1\2\3\4\5"
+    img = BytesAttachment(
+        IMG,
+        "asparagus.png",
+        content_type="image/png",
+        inline=True,
+        content_id=asparagus_cid,
+    )
+    rel = img ^ h
+    rel.start = html_cid
+    msg = rel.compose(
+        subject="Ayons asperges pour le déjeuner",
+        from_=Address("Pepé Le Pew", "pepe@example.com"),
+        to=(
+            Address("Penelope Pussycat", "penelope@example.com"),
+            Address("Fabrette Pussycat", "fabrette@example.com"),
+        ),
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Ayons asperges pour le déjeuner",
+            "from": [
+                {
+                    "display_name": "Pepé Le Pew",
+                    "address": "pepe@example.com",
+                },
+            ],
+            "to": [
+                {
+                    "display_name": "Penelope Pussycat",
+                    "address": "penelope@example.com",
+                },
+                {
+                    "display_name": "Fabrette Pussycat",
+                    "address": "fabrette@example.com",
+                },
+            ],
+            "content-type": {
+                "content_type": "multipart/related",
+                "params": {"type": "text/html", "start": html_cid},
+            },
+        },
+        "preamble": None,
+        "content": [
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "image/png",
+                        "params": {},
+                    },
+                    "content-disposition": {
+                        "disposition": "inline",
+                        "params": {"filename": "asparagus.png"},
+                    },
+                    "content-id": [asparagus_cid],
+                },
+                "preamble": None,
+                "content": IMG,
+                "epilogue": None,
+            },
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "text/html",
+                        "params": {},
+                    },
+                    "content-id": [html_cid],
+                },
+                "preamble": None,
+                "content": HTML,
                 "epilogue": None,
             },
         ],
@@ -996,7 +1095,7 @@ def test_multipart_content_ids() -> None:
                 "headers": {
                     "content-type": {
                         "content_type": "multipart/related",
-                        "params": {},
+                        "params": {"type": "text/html"},
                     },
                     "content-id": [related_cid],
                 },

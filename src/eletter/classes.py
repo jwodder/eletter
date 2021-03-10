@@ -567,7 +567,7 @@ class Mixed(Multipart):
         return self
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class Related(Multipart):
     """
     A :mimetype:`multipart/related` e-mail payload.  E-mail clients will
@@ -659,15 +659,28 @@ class Related(Multipart):
         look like a sideways ``^``!
     """
 
+    #: The :mailheader:`Content-ID` of the part to display (defaults to the
+    #: first part)
+    start: Optional[str] = None
+
     def _compile(self) -> EmailMessage:
         if not self.content:
             raise ValueError("Cannot compose empty Related")
         msg = EmailMessage()
         msg.make_related()
+        ctype: Optional[str] = None
         for mi in self.content:
-            msg.attach(mi._compile())
+            obj = mi._compile()
+            if self.start is not None and mi.content_id == self.start:
+                ctype = obj.get_content_type()
+            msg.attach(obj)
         if self.content_id is not None:
             msg["Content-ID"] = self.content_id
+        if ctype is None:
+            ctype = msg.get_payload()[0].get_content_type()
+        msg.set_param("type", ctype)
+        if self.start is not None:
+            msg.set_param("start", self.start)
         return msg
 
     def __ixor__(self, other: MailItem) -> "Related":
