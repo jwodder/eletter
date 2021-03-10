@@ -21,8 +21,8 @@ def compose(
 ) -> EmailMessage:
     """
     Construct an `~email.message.EmailMessage` instance from a subject,
-    :mailheader:`From` address, :mailheader:`To` value, and a plain text and/or
-    HTML body, optionally accompanied by attachments and other headers.
+    :mailheader:`From` address, :mailheader:`To` addresses, and a plain text
+    and/or HTML body, optionally accompanied by attachments and other headers.
 
     :param str subject: The e-mail's :mailheader:`Subject` line
     :param from_:
@@ -47,7 +47,9 @@ def compose(
         The e-mail's :mailheader:`Sender` line.  The address must be a string
         or `Address`, not a `Group`.
     :param datetime date: The e-mail's :mailheader:`Date` line
-    :param attachments: A collection of attachments to append to the e-mail
+    :param attachments:
+        A collection of :ref:`attachments <attachments>` to append to the
+        e-mail
     :type attachments: iterable of attachments
     :param mapping headers:
         A collection of additional headers to add to the e-mail.  A header
@@ -129,7 +131,7 @@ def reply_quote(s: str, prefix: str = "> ") -> str:
 
 def format_addresses(addresses: Iterable[AddressOrGroup]) -> str:
     """
-    Format a sequence of addresses for use in a custom address header field
+    Format a sequence of addresses for use in a custom address header string
     """
     msg = EmailMessage()
     msg["To"] = compile_addresses(addresses)

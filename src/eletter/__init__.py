@@ -7,7 +7,8 @@ complicated `EmailMessage` class itself.  E-mails with text bodies and/or HTML
 bodies plus attachments are supported.  Classes are also provided for composing
 more complex multipart e-mails.
 
-Visit <https://github.com/jwodder/eletter> for more information.
+Visit <https://github.com/jwodder/eletter> or <https://eletter.rtfd.io> for
+more information.
 """
 
 __version__ = "0.3.0.dev1"

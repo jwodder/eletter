@@ -1,7 +1,12 @@
+.. currentmodule:: eletter
+
+Changelog
+=========
+
 v0.3.0 (in development)
 -----------------------
-- Gave the `from_file()` classmethods `inline` and `content_id` arguments
-- Gave all classes optional `content_id` attributes
+- Gave the `from_file()` classmethods ``inline`` and ``content_id`` arguments
+- Gave all classes optional ``content_id`` attributes
 - Added `TextBody`, `HTMLBody`, `Alternative`, `Mixed`, and `Related` classes
   for constructing complex e-mails
 

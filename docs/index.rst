@@ -1,33 +1,26 @@
-.. image:: http://www.repostatus.org/badges/latest/active.svg
-    :target: http://www.repostatus.org/#active
-    :alt: Project Status: Active — The project has reached a stable, usable
-          state and is being actively developed.
+.. module:: eletter
 
-.. image:: https://github.com/jwodder/eletter/workflows/Test/badge.svg?branch=master
-    :target: https://github.com/jwodder/eletter/actions?workflow=Test
-    :alt: CI Status
-
-.. image:: https://codecov.io/gh/jwodder/eletter/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/jwodder/eletter
-
-.. image:: https://img.shields.io/pypi/pyversions/eletter.svg
-    :target: https://pypi.org/project/eletter/
-
-.. image:: https://img.shields.io/github/license/jwodder/eletter.svg
-    :target: https://opensource.org/licenses/MIT
-    :alt: MIT License
+===================================
+eletter — Simple e-mail composition
+===================================
 
 `GitHub <https://github.com/jwodder/eletter>`_
 | `PyPI <https://pypi.org/project/eletter/>`_
 | `Documentation <https://eletter.readthedocs.io>`_
 | `Issues <https://github.com/jwodder/eletter/issues>`_
-| `Changelog <https://github.com/jwodder/eletter/blob/master/CHANGELOG.md>`_
+| :doc:`Changelog <changelog>`
+
+.. toctree::
+    :hidden:
+
+    api
+    changelog
 
 ``eletter`` provides a basic function for constructing an
-``email.message.EmailMessage`` instance without having to touch the needlessly
-complicated ``EmailMessage`` class itself.  E-mails with text bodies and/or
-HTML bodies plus attachments are supported.  Classes are also provided for
-composing more complex multipart e-mails.
+`email.message.EmailMessage` instance without having to touch the needlessly
+complicated `~email.message.EmailMessage` class itself.  E-mails with text
+bodies and/or HTML bodies plus attachments are supported.  Classes are also
+provided for composing more complex multipart e-mails.
 
 
 Installation
@@ -42,7 +35,7 @@ Installation
 Examples
 ========
 
-Constructing an e-mail with the ``compose()`` function:
+Constructing an e-mail with the `compose()` function:
 
 .. code:: python
 
@@ -139,3 +132,9 @@ __ https://docs.python.org/3/library/email.examples.html
             eletter.Address("Fabrette Pussycat", "fabrette@example.com"),
         ],
     )
+
+
+Indices and tables
+==================
+* :ref:`genindex`
+* :ref:`search`
