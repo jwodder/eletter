@@ -701,6 +701,62 @@ def test_text_alt_html_and_attachment() -> None:
     }
 
 
+def test_related() -> None:
+    t = TextBody("This is the text of an e-mail.")
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    rel = t ^ h
+    assert isinstance(rel, Related)
+    assert rel == Related([t, h])
+
+
+def test_xor_related() -> None:
+    t1 = TextBody("Part 1")
+    t2 = TextBody("Part 2")
+    t3 = TextBody("Part 3")
+    t4 = TextBody("Part 4")
+    rel1 = t1 ^ t2
+    rel2 = t3 ^ t4
+    rel = rel1 ^ rel2
+    assert rel == Related([t1, t2, t3, t4])
+
+
+def test_related_xor_eq_body() -> None:
+    t1 = TextBody("Part 1")
+    t2 = TextBody("Part 2")
+    t3 = TextBody("Part 3")
+    rel = t1 ^ t2
+    x = rel
+    x ^= t3
+    assert x is rel
+    assert x == Related([t1, t2, t3])
+    assert t3 == TextBody("Part 3")
+
+
+def test_related_xor_eq_related() -> None:
+    t1 = TextBody("Part 1")
+    t2 = TextBody("Part 2")
+    t3 = TextBody("Part 3")
+    t4 = TextBody("Part 4")
+    rel1 = t1 ^ t2
+    rel2 = t3 ^ t4
+    x = rel1
+    x ^= rel2
+    assert x is rel1
+    assert x == Related([t1, t2, t3, t4])
+    assert rel2 == Related([t3, t4])
+
+
+def test_body_xor_eq() -> None:
+    t = TextBody("This is the text of an e-mail.")
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    x: Any = t
+    x ^= h
+    assert x is not t
+    assert isinstance(x, Related)
+    assert x == Related([t, h])
+    assert t == TextBody("This is the text of an e-mail.")
+
+
 def test_compose_empty_related() -> None:
     with pytest.raises(ValueError) as excinfo:
         Related([]).compose(
@@ -748,7 +804,7 @@ def test_text_alt_html_related() -> None:
         inline=True,
         content_id=asparagus_cid,
     )
-    msg = (t | Related([h, img])).compose(
+    msg = (t | (h ^ img)).compose(
         subject="Ayons asperges pour le déjeuner",
         from_=Address("Pepé Le Pew", "pepe@example.com"),
         to=(
@@ -853,8 +909,9 @@ def test_multipart_content_ids() -> None:
     mixed = text & img
     mixed_cid = make_msgid()
     mixed.content_id = mixed_cid
+    related = html ^ img
     related_cid = make_msgid()
-    related = Related([html, img], content_id=related_cid)
+    related.content_id = related_cid
     alt = mixed | related
     alt_cid = make_msgid()
     alt.content_id = alt_cid

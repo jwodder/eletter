@@ -137,6 +137,15 @@ class MailItem(ABC):
                 parts.append(mi)
         return Mixed(parts)
 
+    def __xor__(self, other: "MailItem") -> "Related":
+        parts: List[MailItem] = []
+        for mi in [self, other]:
+            if isinstance(mi, Related):
+                parts.extend(mi.content)
+            else:
+                parts.append(mi)
+        return Related(parts)
+
 
 class Attachment(MailItem):
     """ Base class for the attachment classes """
@@ -409,6 +418,13 @@ class Related(Multipart):
         if self.content_id is not None:
             msg["Content-ID"] = self.content_id
         return msg
+
+    def __ixor__(self, other: MailItem) -> "Related":
+        if isinstance(other, Related):
+            self.content.extend(other.content)
+        else:
+            self.content.append(other)
+        return self
 
 
 @attr.s(auto_attribs=True)
