@@ -26,6 +26,7 @@ from .classes import (
     HTMLBody,
     MailItem,
     Mixed,
+    Related,
     TextAttachment,
     TextBody,
 )
@@ -41,6 +42,7 @@ __all__ = [
     "HTMLBody",
     "MailItem",
     "Mixed",
+    "Related",
     "TextAttachment",
     "TextBody",
     "assemble_content_type",

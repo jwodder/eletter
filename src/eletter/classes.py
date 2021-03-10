@@ -62,8 +62,11 @@ class ContentTyped:
         cache_content_type(self, None, self.content_type)
 
 
+@attr.s
 class MailItem(ABC):
     """ Base class for all ``eletter`` message components """
+
+    content_id: Optional[str] = attr.ib(default=None, kw_only=True)
 
     @abstractmethod
     def _compile(self) -> EmailMessage:
@@ -159,6 +162,7 @@ class TextAttachment(Attachment, ContentTyped):
             filename=self.filename,
             params=params,
             charset=charset,
+            cid=self.content_id,
         )
         return msg
 
@@ -209,6 +213,7 @@ class BytesAttachment(Attachment, ContentTyped):
             disposition="inline" if self.inline else "attachment",
             filename=self.filename,
             params=self._ct.params,
+            cid=self.content_id,
         )
         return msg
 
@@ -250,6 +255,7 @@ class EmailAttachment(Attachment):
             self.content,
             disposition="inline" if self.inline else "attachment",
             filename=self.filename,
+            cid=self.content_id,
         )
         return msg
 
@@ -282,6 +288,8 @@ class Alternative(MailItem):
         msg.make_alternative()
         for mi in self.content:
             msg.attach(mi._compile())
+        if self.content_id is not None:
+            msg["Content-ID"] = self.content_id
         return msg
 
     def __ior__(self, other: MailItem) -> "Alternative":
@@ -303,6 +311,8 @@ class Mixed(MailItem):
         msg.make_mixed()
         for mi in self.content:
             msg.attach(mi._compile())
+        if self.content_id is not None:
+            msg["Content-ID"] = self.content_id
         return msg
 
     def __iadd__(self, other: MailItem) -> "Mixed":
@@ -313,13 +323,29 @@ class Mixed(MailItem):
         return self
 
 
+@attr.s
+class Related(MailItem):
+    content: List[MailItem] = attr.ib(converter=mail_item_list)
+
+    def _compile(self) -> EmailMessage:
+        if not self.content:
+            raise ValueError("Cannot compose empty Related")
+        msg = EmailMessage()
+        msg.make_related()
+        for mi in self.content:
+            msg.attach(mi._compile())
+        if self.content_id is not None:
+            msg["Content-ID"] = self.content_id
+        return msg
+
+
 @attr.s(auto_attribs=True)
 class TextBody(MailItem):
     content: str
 
     def _compile(self) -> EmailMessage:
         msg = EmailMessage()
-        msg.set_content(self.content)
+        msg.set_content(self.content, cid=self.content_id)
         return msg
 
 
@@ -329,5 +355,5 @@ class HTMLBody(MailItem):
 
     def _compile(self) -> EmailMessage:
         msg = EmailMessage()
-        msg.set_content(self.content, subtype="html")
+        msg.set_content(self.content, subtype="html", cid=self.content_id)
         return msg

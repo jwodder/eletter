@@ -132,6 +132,7 @@ def test_email_attachment_from_file(inline: bool) -> None:
     assert attr.asdict(ea, filter=lambda attr, _: attr.name != "content") == {
         "filename": "sample.eml",
         "inline": inline,
+        "content_id": None,
     }
     assert email2dict(ea.content) == {
         "unixfrom": None,

@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from email.utils import make_msgid
 from typing import Any, Iterable, Union
 from email2dict import email2dict
 import pytest
@@ -10,6 +11,7 @@ from eletter import (
     HTMLBody,
     MailItem,
     Mixed,
+    Related,
     TextAttachment,
     TextBody,
 )
@@ -296,6 +298,14 @@ def test_compose_empty_alt() -> None:
             ]
         ),
         Mixed(
+            [
+                TextBody("This is the text of an e-mail."),
+                TextAttachment(
+                    "this,text,attachment", "attachment.csv", content_type="text/csv"
+                ),
+            ]
+        ),
+        Related(
             [
                 TextBody("This is the text of an e-mail."),
                 TextAttachment(
@@ -683,6 +693,287 @@ def test_text_alt_html_add_attachment() -> None:
                 },
                 "preamble": None,
                 "content": "this,text,attachment\n",
+                "epilogue": None,
+            },
+        ],
+        "epilogue": None,
+    }
+
+
+def test_compose_empty_related() -> None:
+    with pytest.raises(ValueError) as excinfo:
+        Related([]).compose(
+            from_="me@here.com",
+            to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+            subject="Some electronic mail",
+        )
+    assert str(excinfo.value) == "Cannot compose empty Related"
+
+
+def test_text_alt_html_related() -> None:
+    # Converted from <https://docs.python.org/3/library/email.examples.html>
+    TEXT = (
+        "Salut!\n"
+        "\n"
+        "Cela ressemble à un excellent recipie[1] déjeuner.\n"
+        "\n"
+        "[1] http://www.yummly.com/recipe/Roasted-Asparagus-Epicurious-203718\n"
+        "\n"
+        "--Pepé\n"
+    )
+    t = TextBody(TEXT)
+    asparagus_cid = make_msgid()
+    HTML = (
+        "<html>\n"
+        "  <head></head>\n"
+        "  <body>\n"
+        "    <p>Salut!</p>\n"
+        "    <p>Cela ressemble à un excellent\n"
+        '        <a href="http://www.yummly.com/recipe/Roasted-Asparagus-'
+        'Epicurious-203718">\n'
+        "            recipie\n"
+        "        </a> déjeuner.\n"
+        "    </p>\n"
+        f'    <img src="cid:{asparagus_cid[1:-1]}" />\n'
+        "  </body>\n"
+        "</html>\n"
+    )
+    h = HTMLBody(HTML)
+    IMG = b"\1\2\3\4\5"
+    img = BytesAttachment(
+        IMG,
+        "asparagus.png",
+        content_type="image/png",
+        inline=True,
+        content_id=asparagus_cid,
+    )
+    msg = (t | Related([h, img])).compose(
+        subject="Ayons asperges pour le déjeuner",
+        from_=Address("Pepé Le Pew", "pepe@example.com"),
+        to=(
+            Address("Penelope Pussycat", "penelope@example.com"),
+            Address("Fabrette Pussycat", "fabrette@example.com"),
+        ),
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Ayons asperges pour le déjeuner",
+            "from": [
+                {
+                    "display_name": "Pepé Le Pew",
+                    "address": "pepe@example.com",
+                },
+            ],
+            "to": [
+                {
+                    "display_name": "Penelope Pussycat",
+                    "address": "penelope@example.com",
+                },
+                {
+                    "display_name": "Fabrette Pussycat",
+                    "address": "fabrette@example.com",
+                },
+            ],
+            "content-type": {
+                "content_type": "multipart/alternative",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": [
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "text/plain",
+                        "params": {},
+                    },
+                },
+                "preamble": None,
+                "content": TEXT,
+                "epilogue": None,
+            },
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "multipart/related",
+                        "params": {},
+                    },
+                },
+                "preamble": None,
+                "content": [
+                    {
+                        "unixfrom": None,
+                        "headers": {
+                            "content-type": {
+                                "content_type": "text/html",
+                                "params": {},
+                            },
+                        },
+                        "preamble": None,
+                        "content": HTML,
+                        "epilogue": None,
+                    },
+                    {
+                        "unixfrom": None,
+                        "headers": {
+                            "content-type": {
+                                "content_type": "image/png",
+                                "params": {},
+                            },
+                            "content-disposition": {
+                                "disposition": "inline",
+                                "params": {"filename": "asparagus.png"},
+                            },
+                            "content-id": [asparagus_cid],
+                        },
+                        "preamble": None,
+                        "content": IMG,
+                        "epilogue": None,
+                    },
+                ],
+                "epilogue": None,
+            },
+        ],
+        "epilogue": None,
+    }
+
+
+def test_multipart_content_ids() -> None:
+    img_cid = make_msgid()
+    img = BytesAttachment(
+        b"\1\2\3\4\5", filename="blob.png", content_type="image/png", content_id=img_cid
+    )
+    text = TextBody("Here is an image:\n")
+    HTML = f'<p>Here is an image:</p><img src="cid:{img_cid[1:-1]}"/>\n'
+    html = HTMLBody(HTML)
+    mixed = text + img
+    mixed_cid = make_msgid()
+    mixed.content_id = mixed_cid
+    related_cid = make_msgid()
+    related = Related([html, img], content_id=related_cid)
+    alt = mixed | related
+    alt_cid = make_msgid()
+    alt.content_id = alt_cid
+    msg = alt.compose(
+        from_="me@here.com",
+        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+        subject="Some electronic mail",
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Some electronic mail",
+            "from": [
+                {
+                    "display_name": "",
+                    "address": "me@here.com",
+                }
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "you@there.net",
+                },
+                {
+                    "display_name": "Thaddeus Hem",
+                    "address": "them@hither.yon",
+                },
+            ],
+            "content-type": {
+                "content_type": "multipart/alternative",
+                "params": {},
+            },
+            "content-id": [alt_cid],
+        },
+        "preamble": None,
+        "content": [
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "multipart/mixed",
+                        "params": {},
+                    },
+                    "content-id": [mixed_cid],
+                },
+                "preamble": None,
+                "content": [
+                    {
+                        "unixfrom": None,
+                        "headers": {
+                            "content-type": {
+                                "content_type": "text/plain",
+                                "params": {},
+                            },
+                        },
+                        "preamble": None,
+                        "content": "Here is an image:\n",
+                        "epilogue": None,
+                    },
+                    {
+                        "unixfrom": None,
+                        "headers": {
+                            "content-type": {
+                                "content_type": "image/png",
+                                "params": {},
+                            },
+                            "content-disposition": {
+                                "disposition": "attachment",
+                                "params": {"filename": "blob.png"},
+                            },
+                            "content-id": [img_cid],
+                        },
+                        "preamble": None,
+                        "content": b"\1\2\3\4\5",
+                        "epilogue": None,
+                    },
+                ],
+                "epilogue": None,
+            },
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "multipart/related",
+                        "params": {},
+                    },
+                    "content-id": [related_cid],
+                },
+                "preamble": None,
+                "content": [
+                    {
+                        "unixfrom": None,
+                        "headers": {
+                            "content-type": {
+                                "content_type": "text/html",
+                                "params": {},
+                            },
+                        },
+                        "preamble": None,
+                        "content": HTML,
+                        "epilogue": None,
+                    },
+                    {
+                        "unixfrom": None,
+                        "headers": {
+                            "content-type": {
+                                "content_type": "image/png",
+                                "params": {},
+                            },
+                            "content-disposition": {
+                                "disposition": "attachment",
+                                "params": {"filename": "blob.png"},
+                            },
+                            "content-id": [img_cid],
+                        },
+                        "preamble": None,
+                        "content": b"\1\2\3\4\5",
+                        "epilogue": None,
+                    },
+                ],
                 "epilogue": None,
             },
         ],
