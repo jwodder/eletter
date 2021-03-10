@@ -1,8 +1,8 @@
 from datetime import datetime
 from email.message import EmailMessage
-from typing import Iterable, List, Mapping, Optional, Union
-from .classes import Attachment
-from .util import AddressOrGroup, SingleAddress, compile_address, compile_addresses
+from typing import Iterable, Mapping, Optional, Union
+from .classes import Attachment, HTMLBody, MailItem, TextBody
+from .util import AddressOrGroup, SingleAddress, compile_addresses
 
 
 def compose(
@@ -59,45 +59,30 @@ def compose(
     :rtype: email.message.EmailMessage
     :raises ValueError: if neither ``text`` nor ``html`` is set
     """
-    msg: Optional[EmailMessage] = None
+    msg: Optional[MailItem] = None
     if text is not None:
-        msg = EmailMessage()
-        msg.set_content(text)
+        msg = TextBody(text)
     if html is not None:
         if msg is None:
-            msg = EmailMessage()
-            msg.set_content(html, subtype="html")
+            msg = HTMLBody(html)
         else:
-            msg.add_alternative(html, subtype="html")
+            msg |= HTMLBody(html)
     if msg is None:
         raise ValueError("At least one of text and html must be non-None")
     if attachments is not None:
-        msg.make_mixed()
         for a in attachments:
-            msg.attach(a._compile())
-    msg["Subject"] = subject
-    msg["From"] = compile_addresses(from_)
-    msg["To"] = compile_addresses(to)
-    if cc is not None:
-        msg["CC"] = compile_addresses(cc)
-    if bcc is not None:
-        msg["BCC"] = compile_addresses(bcc)
-    if reply_to is not None:
-        msg["Reply-To"] = compile_addresses(reply_to)
-    if sender is not None:
-        msg["Sender"] = compile_address(sender)
-    if date is not None:
-        msg["Date"] = date
-    if headers is not None:
-        for k, v in headers.items():
-            values: List[str]
-            if isinstance(v, str):
-                values = [v]
-            else:
-                values = list(v)
-            for v2 in values:
-                msg[k] = v2
-    return msg
+            msg += a
+    return msg.compose(
+        subject=subject,
+        from_=from_,
+        to=to,
+        cc=cc,
+        bcc=bcc,
+        reply_to=reply_to,
+        sender=sender,
+        date=date,
+        headers=headers,
+    )
 
 
 def assemble_content_type(maintype: str, subtype: str, **params: str) -> str:
