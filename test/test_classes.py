@@ -5,9 +5,10 @@ import pytest
 from eletter import (
     Address,
     Alternative,
-    Composable,
+    BytesAttachment,
     Group,
     HTMLBody,
+    MailItem,
     Mixed,
     TextAttachment,
     TextBody,
@@ -284,7 +285,7 @@ def test_compose_empty_alt() -> None:
 
 
 @pytest.mark.parametrize(
-    "comp",
+    "mi",
     [
         TextBody("This is the text of an e-mail."),
         HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>"),
@@ -302,6 +303,8 @@ def test_compose_empty_alt() -> None:
                 ),
             ]
         ),
+        TextAttachment("This is an attachment.", filename="foo.txt"),
+        BytesAttachment(b"This is an attachment.\n", filename="foo.blob"),
     ],
 )
 @pytest.mark.parametrize(
@@ -373,8 +376,8 @@ def test_compose_empty_alt() -> None:
         ),
     ],
 )
-def test_composable_compose(
-    comp: Composable,
+def test_mailitem_compose(
+    mi: MailItem,
     from_input: Union[AddressOrGroup, Iterable[AddressOrGroup]],
     from_output: Any,
     to_input: Iterable[AddressOrGroup],
@@ -383,7 +386,7 @@ def test_composable_compose(
     reply_to_output: Any,
 ) -> None:
     when = datetime(2021, 3, 8, 18, 14, 29, tzinfo=timezone(timedelta(hours=-5)))
-    msg = comp.compose(
+    msg = mi.compose(
         subject="To: Everyone",
         from_=from_input,
         to=to_input,
@@ -406,6 +409,7 @@ def test_composable_compose(
     )
     headers = email2dict(msg)["headers"]
     headers.pop("content-type")
+    headers.pop("content-disposition", None)
     assert headers == {
         "subject": "To: Everyone",
         "from": from_output,

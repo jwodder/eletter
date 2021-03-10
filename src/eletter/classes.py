@@ -69,26 +69,6 @@ class MailItem(ABC):
     def _compile(self) -> EmailMessage:
         ...
 
-    def __or__(self, other: "MailItem") -> "Alternative":
-        parts: List[MailItem] = []
-        for mi in [self, other]:
-            if isinstance(mi, Alternative):
-                parts.extend(mi.content)
-            else:
-                parts.append(mi)
-        return Alternative(parts)
-
-    def __add__(self, other: "MailItem") -> "Mixed":
-        parts: List[MailItem] = []
-        for mi in [self, other]:
-            if isinstance(mi, Mixed):
-                parts.extend(mi.content)
-            else:
-                parts.append(mi)
-        return Mixed(parts)
-
-
-class Composable(MailItem):
     def compose(
         self,
         subject: str,
@@ -125,6 +105,24 @@ class Composable(MailItem):
                 for v2 in values:
                     msg[k] = v2
         return msg
+
+    def __or__(self, other: "MailItem") -> "Alternative":
+        parts: List[MailItem] = []
+        for mi in [self, other]:
+            if isinstance(mi, Alternative):
+                parts.extend(mi.content)
+            else:
+                parts.append(mi)
+        return Alternative(parts)
+
+    def __add__(self, other: "MailItem") -> "Mixed":
+        parts: List[MailItem] = []
+        for mi in [self, other]:
+            if isinstance(mi, Mixed):
+                parts.extend(mi.content)
+            else:
+                parts.append(mi)
+        return Mixed(parts)
 
 
 class Attachment(MailItem):
@@ -274,7 +272,7 @@ def mail_item_list(xs: Iterable[MailItem]) -> List[MailItem]:
 
 
 @attr.s
-class Alternative(Composable):
+class Alternative(MailItem):
     content: List[MailItem] = attr.ib(converter=mail_item_list)
 
     def _compile(self) -> EmailMessage:
@@ -295,7 +293,7 @@ class Alternative(Composable):
 
 
 @attr.s
-class Mixed(Composable):
+class Mixed(MailItem):
     content: List[MailItem] = attr.ib(converter=mail_item_list)
 
     def _compile(self) -> EmailMessage:
@@ -316,7 +314,7 @@ class Mixed(Composable):
 
 
 @attr.s(auto_attribs=True)
-class TextBody(Composable):
+class TextBody(MailItem):
     content: str
 
     def _compile(self) -> EmailMessage:
@@ -326,7 +324,7 @@ class TextBody(Composable):
 
 
 @attr.s(auto_attribs=True)
-class HTMLBody(Composable):
+class HTMLBody(MailItem):
     content: str
 
     def _compile(self) -> EmailMessage:
