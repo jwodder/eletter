@@ -18,21 +18,31 @@ __url__ = "https://github.com/jwodder/eletter"
 
 from .classes import (
     Address,
+    Alternative,
     Attachment,
     BytesAttachment,
+    Composable,
     EmailAttachment,
     Group,
+    HTMLBody,
+    MailItem,
     TextAttachment,
+    TextBody,
 )
 from .core import assemble_content_type, compose, format_addresses, reply_quote
 
 __all__ = [
     "Address",
+    "Alternative",
     "Attachment",
     "BytesAttachment",
+    "Composable",
     "EmailAttachment",
     "Group",
+    "HTMLBody",
+    "MailItem",
     "TextAttachment",
+    "TextBody",
     "assemble_content_type",
     "compose",
     "format_addresses",

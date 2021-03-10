@@ -1,13 +1,22 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from email import headerregistry as hr
 from email import message_from_binary_file
 from email import policy
 from email.message import EmailMessage
 import os
 import os.path
-from typing import Iterable, Optional
+from typing import Iterable, List, Mapping, Optional, Union
 import attr
-from .util import AnyPath, ContentType, SingleAddress, compile_address, get_mime_type
+from .util import (
+    AddressOrGroup,
+    AnyPath,
+    ContentType,
+    SingleAddress,
+    compile_address,
+    compile_addresses,
+    get_mime_type,
+)
 
 
 class Address(hr.Address):
@@ -53,12 +62,66 @@ class ContentTyped:
         cache_content_type(self, None, self.content_type)
 
 
-class Attachment(ABC):
-    """ Base class for the attachment classes """
+class MailItem(ABC):
+    """ Base class for all ``eletter`` message components """
 
     @abstractmethod
     def _compile(self) -> EmailMessage:
         ...
+
+    def __or__(self, other: "MailItem") -> "Alternative":
+        parts: List[MailItem] = []
+        for mi in [self, other]:
+            if isinstance(mi, Alternative):
+                parts.extend(mi.content)
+            else:
+                parts.append(mi)
+        return Alternative(parts)
+
+
+class Composable(MailItem):
+    def compose(
+        self,
+        subject: str,
+        from_: Union[AddressOrGroup, Iterable[AddressOrGroup]],
+        to: Iterable[AddressOrGroup],
+        cc: Optional[Iterable[AddressOrGroup]] = None,
+        bcc: Optional[Iterable[AddressOrGroup]] = None,
+        reply_to: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,
+        sender: Optional[SingleAddress] = None,
+        date: Optional[datetime] = None,
+        headers: Optional[Mapping[str, Union[str, Iterable[str]]]] = None,
+    ) -> EmailMessage:
+        msg = self._compile()
+        msg["Subject"] = subject
+        msg["From"] = compile_addresses(from_)
+        msg["To"] = compile_addresses(to)
+        if cc is not None:
+            msg["CC"] = compile_addresses(cc)
+        if bcc is not None:
+            msg["BCC"] = compile_addresses(bcc)
+        if reply_to is not None:
+            msg["Reply-To"] = compile_addresses(reply_to)
+        if sender is not None:
+            msg["Sender"] = compile_address(sender)
+        if date is not None:
+            msg["Date"] = date
+        if headers is not None:
+            for k, v in headers.items():
+                values: List[str]
+                if isinstance(v, str):
+                    values = [v]
+                else:
+                    values = list(v)
+                for v2 in values:
+                    msg[k] = v2
+        return msg
+
+
+class Attachment(MailItem):
+    """ Base class for the attachment classes """
+
+    pass
 
 
 @attr.s(auto_attribs=True)
@@ -195,3 +258,44 @@ class EmailAttachment(Attachment):
             assert isinstance(content, EmailMessage)
         filename = os.path.basename(os.fsdecode(path))
         return cls(content=content, filename=filename, inline=inline)
+
+
+def mail_item_list(xs: Iterable[MailItem]) -> List[MailItem]:
+    return list(xs)
+
+
+@attr.s
+class Alternative(Composable):
+    content: List[MailItem] = attr.ib(converter=mail_item_list)
+
+    def _compile(self) -> EmailMessage:
+        if not self.content:
+            raise ValueError("Cannot compose empty Alternative")
+        elif len(self.content) == 1:
+            return self.content[0]._compile()
+        else:
+            msg = EmailMessage()
+            msg.make_alternative()
+            for mi in self.content:
+                msg.attach(mi._compile())
+            return msg
+
+
+@attr.s(auto_attribs=True)
+class TextBody(Composable):
+    content: str
+
+    def _compile(self) -> EmailMessage:
+        msg = EmailMessage()
+        msg.set_content(self.content)
+        return msg
+
+
+@attr.s(auto_attribs=True)
+class HTMLBody(Composable):
+    content: str
+
+    def _compile(self) -> EmailMessage:
+        msg = EmailMessage()
+        msg.set_content(self.content, subtype="html")
+        return msg
