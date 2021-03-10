@@ -248,22 +248,6 @@ def test_compose_empty_alt() -> None:
     assert str(excinfo.value) == "Cannot compose empty Alternative"
 
 
-def test_compose_singleton_alt() -> None:
-    t = TextBody("This is the text of an e-mail.")
-    alt = Alternative([t])
-    t_msg = t.compose(
-        from_="me@here.com",
-        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
-        subject="Some electronic mail",
-    )
-    alt_msg = alt.compose(
-        from_="me@here.com",
-        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
-        subject="Some electronic mail",
-    )
-    assert email2dict(t_msg) == email2dict(alt_msg)
-
-
 @pytest.mark.parametrize(
     "comp",
     [

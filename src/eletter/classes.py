@@ -271,14 +271,11 @@ class Alternative(Composable):
     def _compile(self) -> EmailMessage:
         if not self.content:
             raise ValueError("Cannot compose empty Alternative")
-        elif len(self.content) == 1:
-            return self.content[0]._compile()
-        else:
-            msg = EmailMessage()
-            msg.make_alternative()
-            for mi in self.content:
-                msg.attach(mi._compile())
-            return msg
+        msg = EmailMessage()
+        msg.make_alternative()
+        for mi in self.content:
+            msg.attach(mi._compile())
+        return msg
 
 
 @attr.s(auto_attribs=True)
