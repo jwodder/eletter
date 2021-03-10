@@ -44,32 +44,50 @@ Attachments
 
 .. autoclass:: Attachment()
     :no-members:
+
 .. autoclass:: BytesAttachment
     :exclude-members: DEFAULT_CONTENT_TYPE, compose
-    :inherited-members: content_type
+    :inherited-members:
+
 .. autoclass:: EmailAttachment
+    :exclude-members: compose
+    :inherited-members:
+
 .. autoclass:: TextAttachment
     :exclude-members: DEFAULT_CONTENT_TYPE, compose
-    :inherited-members: content_type
+    :inherited-members:
+
 
 Body Classes
 ~~~~~~~~~~~~
 
 .. autoclass:: HTMLBody
     :exclude-members: compose
-    :inherited-members: content_id
+    :inherited-members:
+
 .. autoclass:: TextBody
     :exclude-members: compose
-    :inherited-members: content_id
+    :inherited-members:
+
 
 Multipart Classes
 ~~~~~~~~~~~~~~~~~
 
 .. autoclass:: Multipart()
     :no-members:
+
 .. autoclass:: Alternative
+    :exclude-members: compose, clear, count, index
+    :inherited-members:
+
 .. autoclass:: Mixed
+    :exclude-members: compose, clear, count, index
+    :inherited-members:
+
 .. autoclass:: Related
+    :exclude-members: compose, clear, count, index
+    :inherited-members:
+
 
 Utility Functions
 -----------------
