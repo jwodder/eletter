@@ -286,6 +286,13 @@ class Alternative(Composable):
             msg.attach(mi._compile())
         return msg
 
+    def __ior__(self, other: MailItem) -> "Alternative":
+        if isinstance(other, Alternative):
+            self.content.extend(other.content)
+        else:
+            self.content.append(other)
+        return self
+
 
 @attr.s
 class Mixed(Composable):
@@ -299,6 +306,13 @@ class Mixed(Composable):
         for mi in self.content:
             msg.attach(mi._compile())
         return msg
+
+    def __iadd__(self, other: MailItem) -> "Mixed":
+        if isinstance(other, Mixed):
+            self.content.extend(other.content)
+        else:
+            self.content.append(other)
+        return self
 
 
 @attr.s(auto_attribs=True)

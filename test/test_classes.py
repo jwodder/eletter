@@ -236,6 +236,32 @@ def test_or_alt() -> None:
     assert alt == Alternative([t1, t2, t3, t4])
 
 
+def test_alt_or_eq_body() -> None:
+    t1 = TextBody("Part 1")
+    t2 = TextBody("Part 2")
+    t3 = TextBody("Part 3")
+    alt = t1 | t2
+    x = alt
+    x |= t3
+    assert x is alt
+    assert x == Alternative([t1, t2, t3])
+    assert t3 == TextBody("Part 3")
+
+
+def test_alt_or_eq_alt() -> None:
+    t1 = TextBody("Part 1")
+    t2 = TextBody("Part 2")
+    t3 = TextBody("Part 3")
+    t4 = TextBody("Part 4")
+    alt1 = t1 | t2
+    alt2 = t3 | t4
+    x = alt1
+    x |= alt2
+    assert x is alt1
+    assert x == Alternative([t1, t2, t3, t4])
+    assert alt2 == Alternative([t3, t4])
+
+
 def test_body_or_eq() -> None:
     t = TextBody("This is the text of an e-mail.")
     h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
@@ -422,7 +448,7 @@ def test_composable_compose(
     }
 
 
-def test_text_plus_attachment() -> None:
+def test_text_add_attachment() -> None:
     t = TextBody("This is the text of an e-mail.")
     a = TextAttachment(
         "this,text,attachment", "attachment.csv", content_type="text/csv"
@@ -502,7 +528,7 @@ def test_mixed() -> None:
     assert mixed == Mixed([t, a])
 
 
-def test_plus_mixed() -> None:
+def test_add_mixed() -> None:
     t1 = TextBody("Part 1")
     t2 = TextBody("Part 2")
     t3 = TextBody("Part 3")
@@ -513,7 +539,33 @@ def test_plus_mixed() -> None:
     assert mixed == Mixed([t1, t2, t3, t4])
 
 
-def test_body_plus_eq() -> None:
+def test_mixed_add_eq_body() -> None:
+    t1 = TextBody("Part 1")
+    t2 = TextBody("Part 2")
+    t3 = TextBody("Part 3")
+    mixed = t1 + t2
+    x = mixed
+    x += t3
+    assert x is mixed
+    assert x == Mixed([t1, t2, t3])
+    assert t3 == TextBody("Part 3")
+
+
+def test_mixed_add_eq_mixed() -> None:
+    t1 = TextBody("Part 1")
+    t2 = TextBody("Part 2")
+    t3 = TextBody("Part 3")
+    t4 = TextBody("Part 4")
+    mixed1 = t1 + t2
+    mixed2 = t3 + t4
+    x = mixed1
+    x += mixed2
+    assert x is mixed1
+    assert x == Mixed([t1, t2, t3, t4])
+    assert mixed2 == Mixed([t3, t4])
+
+
+def test_body_add_eq() -> None:
     t = TextBody("This is the text of an e-mail.")
     a = TextAttachment(
         "this,text,attachment", "attachment.csv", content_type="text/csv"
@@ -536,7 +588,7 @@ def test_compose_empty_mixed() -> None:
     assert str(excinfo.value) == "Cannot compose empty Mixed"
 
 
-def test_text_alt_html_plus_attachment() -> None:
+def test_text_alt_html_add_attachment() -> None:
     t = TextBody("This is the text of an e-mail.")
     h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
     a = TextAttachment(
