@@ -86,8 +86,8 @@ class MailItem(ABC):
     def compose(
         self,
         subject: str,
-        from_: Union[AddressOrGroup, Iterable[AddressOrGroup]],
         to: Iterable[AddressOrGroup],
+        from_: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,
         cc: Optional[Iterable[AddressOrGroup]] = None,
         bcc: Optional[Iterable[AddressOrGroup]] = None,
         reply_to: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,
@@ -101,13 +101,15 @@ class MailItem(ABC):
         :mailheader:`From` address, :mailheader:`To` addresses, and optional
         other headers.
 
+        All parameters other than ``subject`` and ``to`` are optional.
+
         :param str subject: The e-mail's :mailheader:`Subject` line
+        :param to: The e-mail's :mailheader:`To` line
+        :type to: iterable of addresses
         :param from_:
             The e-mail's :mailheader:`From` line.  Note that this argument is
             spelled with an underscore, as "``from``" is a keyword in Python.
         :type from_: address or iterable of addresses
-        :param to: The e-mail's :mailheader:`To` line
-        :type to: iterable of addresses
         :param cc: The e-mail's :mailheader:`CC` line
         :type cc: iterable of addresses
         :param bcc: The e-mail's :mailheader:`BCC` line
@@ -129,8 +131,9 @@ class MailItem(ABC):
         """
         msg = self._compile()
         msg["Subject"] = subject
-        msg["From"] = compile_addresses(from_)
         msg["To"] = compile_addresses(to)
+        if from_ is not None:
+            msg["From"] = compile_addresses(from_)
         if cc is not None:
             msg["CC"] = compile_addresses(cc)
         if bcc is not None:

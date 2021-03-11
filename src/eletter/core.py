@@ -7,8 +7,8 @@ from .util import AddressOrGroup, SingleAddress, compile_addresses
 
 def compose(
     subject: str,
-    from_: Union[AddressOrGroup, Iterable[AddressOrGroup]],
     to: Iterable[AddressOrGroup],
+    from_: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,
     text: Optional[str] = None,
     html: Optional[str] = None,
     cc: Optional[Iterable[AddressOrGroup]] = None,
@@ -24,13 +24,16 @@ def compose(
     :mailheader:`From` address, :mailheader:`To` addresses, and a plain text
     and/or HTML body, optionally accompanied by attachments and other headers.
 
+    All parameters other than ``subject``, ``to``, and at least one of ``text``
+    and ``html`` are optional.
+
     :param str subject: The e-mail's :mailheader:`Subject` line
+    :param to: The e-mail's :mailheader:`To` line
+    :type to: iterable of addresses
     :param from_:
         The e-mail's :mailheader:`From` line.  Note that this argument is
         spelled with an underscore, as "``from``" is a keyword in Python.
     :type from_: address or iterable of addresses
-    :param to: The e-mail's :mailheader:`To` line
-    :type to: iterable of addresses
     :param str text:
         The contents of a :mimetype:`text/plain` body for the e-mail.  At least
         one of ``text`` and ``html`` must be specified.

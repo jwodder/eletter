@@ -321,6 +321,7 @@ def test_compose_empty_alt() -> None:
 @pytest.mark.parametrize(
     "from_input,from_output",
     [
+        (None, None),
         (
             Address("Mme E.", "me@here.com"),
             [{"display_name": "Mme E.", "address": "me@here.com"}],
@@ -421,7 +422,7 @@ def test_mailitem_compose(
     headers = email2dict(msg)["headers"]
     headers.pop("content-type")
     headers.pop("content-disposition", None)
-    assert headers == {
+    expected = {
         "subject": "To: Everyone",
         "from": from_output,
         "to": to_output,
@@ -461,6 +462,9 @@ def test_mailitem_compose(
             "From mail.sender.nil",
         ],
     }
+    if from_output is None:
+        expected.pop("from")
+    assert headers == expected
 
 
 def test_text_and_attachment() -> None:
