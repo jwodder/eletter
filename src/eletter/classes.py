@@ -76,7 +76,7 @@ class ContentTyped:
 class MailItem(ABC):
     """ Base class for all ``eletter`` message components """
 
-    #: Optional value for the item's :mailheader:`Content-ID` header
+    #: :mailheader:`Content-ID` header value for the item
     content_id: Optional[str] = attr.ib(default=None, kw_only=True)
 
     @abstractmethod
@@ -593,7 +593,7 @@ class Related(Multipart):
 
         html = HTMLBody(
             "<p>Look at the pretty kitty!</p>"
-            f'<img src="{img_cid[1:-1]}"/>"
+            f'<img src="cid:{img_cid[1:-1]}"/>"
             "<p>Isn't he <em>darling</em>?</p>"
         )
 
@@ -614,7 +614,7 @@ class Related(Multipart):
 
         related ^= HTMLBody(
             "<p>Look at the pretty kitty!</p>"
-            f'<img src="{img_cid[1:-1]}"/>"
+            f'<img src="cid:{img_cid[1:-1]}"/>"
             "<p>Isn't he <em>darling</em>?</p>"
         )
 
@@ -632,7 +632,7 @@ class Related(Multipart):
         htmlrel = Related([
             HTMLBody(
                 "<p>Look at the pretty kitty!</p>"
-                f'<img src="{img_cid[1:-1]}"/>"
+                f'<img src="cid:{img_cid[1:-1]}"/>"
                 "<p>Isn't he <em>darling</em>?</p>"
             )
         ])
@@ -646,17 +646,11 @@ class Related(Multipart):
         assert related.contents == [
             HTMLBody(
                 "<p>Look at the pretty kitty!</p>"
-                f'<img src="{img_cid[1:-1]}"/>"
+                f'<img src="cid:{img_cid[1:-1]}"/>"
                 "<p>Isn't he <em>darling</em>?</p>"
             ),
             BytesAttachment.from_file("snuffles.jpeg", content_id=img_cid),
         ]
-
-    .. tip::
-
-        You can remember the fact that `Related` uses ``^`` by association with
-        :mailheader:`Content-ID`\\s, which are enclosed in ``<...>``, which
-        look like a sideways ``^``!
     """
 
     #: The :mailheader:`Content-ID` of the part to display (defaults to the

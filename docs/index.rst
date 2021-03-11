@@ -13,6 +13,7 @@ eletter — Simple e-mail composition
 .. toctree::
     :hidden:
 
+    tutorial
     api
     changelog
 
