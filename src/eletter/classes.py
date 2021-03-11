@@ -152,31 +152,70 @@ class MailItem(ABC):
                     msg[k] = v2
         return msg
 
-    def __or__(self, other: "MailItem") -> "Alternative":
+    def __or__(self, other: Union["MailItem", str]) -> "Alternative":
         parts: List[MailItem] = []
         for mi in [self, other]:
             if isinstance(mi, Alternative):
                 parts.extend(mi.content)
+            elif isinstance(mi, str):
+                parts.append(TextBody(mi))
             else:
                 parts.append(mi)
         return Alternative(parts)
 
-    def __and__(self, other: "MailItem") -> "Mixed":
+    def __ror__(self, other: Union["MailItem", str]) -> "Alternative":
+        parts: List[MailItem] = []
+        for mi in [other, self]:
+            if isinstance(mi, Alternative):
+                parts.extend(mi.content)  # pragma: no cover
+            elif isinstance(mi, str):
+                parts.append(TextBody(mi))
+            else:
+                parts.append(mi)  # pragma: no cover
+        return Alternative(parts)
+
+    def __and__(self, other: Union["MailItem", str]) -> "Mixed":
         parts: List[MailItem] = []
         for mi in [self, other]:
             if isinstance(mi, Mixed):
                 parts.extend(mi.content)
+            elif isinstance(mi, str):
+                parts.append(TextBody(mi))
             else:
                 parts.append(mi)
         return Mixed(parts)
 
-    def __xor__(self, other: "MailItem") -> "Related":
+    def __rand__(self, other: Union["MailItem", str]) -> "Mixed":
+        parts: List[MailItem] = []
+        for mi in [other, self]:
+            if isinstance(mi, Mixed):
+                parts.extend(mi.content)  # pragma: no cover
+            elif isinstance(mi, str):
+                parts.append(TextBody(mi))
+            else:
+                parts.append(mi)  # pragma: no cover
+        return Mixed(parts)
+
+    def __xor__(self, other: Union["MailItem", str]) -> "Related":
         parts: List[MailItem] = []
         for mi in [self, other]:
             if isinstance(mi, Related):
                 parts.extend(mi.content)
+            elif isinstance(mi, str):
+                parts.append(TextBody(mi))
             else:
                 parts.append(mi)
+        return Related(parts)
+
+    def __rxor__(self, other: Union["MailItem", str]) -> "Related":
+        parts: List[MailItem] = []
+        for mi in [other, self]:
+            if isinstance(mi, Related):
+                parts.extend(mi.content)  # pragma: no cover
+            elif isinstance(mi, str):
+                parts.append(TextBody(mi))
+            else:
+                parts.append(mi)  # pragma: no cover
         return Related(parts)
 
 
@@ -456,6 +495,23 @@ class Alternative(Multipart):
         alternative |= TextBody("This is displayed on plain text clients.\\n")
         alternative |= HTMLBody("<p>This is displayed on graphical clients.<p>\\n")
 
+    Using ``|`` to combine a `MailItem` with a `str` automatically converts the
+    `str` to a `TextBody`:
+
+    .. code:: python
+
+        # Same as above:
+
+        text = "This is displayed on plain text clients.\\n"
+        html = HTMLBody("<p>This is displayed on graphical clients.<p>\\n")
+
+        alternative = text | html
+
+        assert alternative.contents == [
+            TextBody("This is displayed on plain text clients.\\n"),
+            HTMLBody("<p>This is displayed on graphical clients.<p>\\n"),
+        ]
+
     When combining two `Alternative` instances with ``|`` or ``|=``, the
     contents are "flattened":
 
@@ -486,9 +542,11 @@ class Alternative(Multipart):
             msg["Content-ID"] = self.content_id
         return msg
 
-    def __ior__(self, other: MailItem) -> "Alternative":
+    def __ior__(self, other: Union[MailItem, str]) -> "Alternative":
         if isinstance(other, Alternative):
             self.content.extend(other.content)
+        elif isinstance(other, str):
+            self.content.append(TextBody(other))
         else:
             self.content.append(other)
         return self
@@ -522,6 +580,22 @@ class Mixed(Multipart):
         mixed &= TextBody("Look at the pretty kitty!\\n")
         mixed &= BytesAttachment.from_file("snuffles.jpeg", inline=True)
         mixed &= TextBody("Sincerely, Me\\n")
+
+    Using ``&`` to combine a `MailItem` with a `str` automatically converts the
+    `str` to a `TextBody`:
+
+    .. code:: python
+
+        # Same as above:
+        image = BytesAttachment.from_file("snuffles.jpeg", inline=True)
+
+        mixed = "Look at the pretty kitty!\\n" & image & "Sincerely, Me\\n"
+
+        assert mixed.contents == [
+            TextBody("Look at the pretty kitty!\\n"),
+            BytesAttachment.from_file("snuffles.jpeg", inline=True),
+            TextBody("Sincerely, Me\\n"),
+        ]
 
     When combining two `Mixed` instances with ``&`` or ``&=``, the contents are
     "flattened":
@@ -559,9 +633,11 @@ class Mixed(Multipart):
             msg["Content-ID"] = self.content_id
         return msg
 
-    def __iand__(self, other: MailItem) -> "Mixed":
+    def __iand__(self, other: Union[MailItem, str]) -> "Mixed":
         if isinstance(other, Mixed):
             self.content.extend(other.content)
+        elif isinstance(other, str):
+            self.content.append(TextBody(other))
         else:
             self.content.append(other)
         return self
@@ -620,6 +696,11 @@ class Related(Multipart):
 
         related ^= BytesAttachment.from_file("snuffles.jpeg", content_id=img_cid)
 
+    Using ``^`` to combine a `MailItem` with a `str` automatically converts the
+    `str` to a `TextBody`, though this is generally not all that useful, as
+    you'll usually want to create `Related` instances from `HTMLBody`\\s
+    instead.
+
     When combining two `Related` instances with ``^`` or ``^=``, the contents
     are "flattened":
 
@@ -677,9 +758,11 @@ class Related(Multipart):
             msg.set_param("start", self.start)
         return msg
 
-    def __ixor__(self, other: MailItem) -> "Related":
+    def __ixor__(self, other: Union[MailItem, str]) -> "Related":
         if isinstance(other, Related):
             self.content.extend(other.content)
+        elif isinstance(other, str):
+            self.content.append(TextBody(other))
         else:
             self.content.append(other)
         return self

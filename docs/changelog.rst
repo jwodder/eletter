@@ -3,6 +3,11 @@
 Changelog
 =========
 
+v0.4.0 (in development)
+-----------------------
+- Using ``|``, ``&``, or ``^`` on a `MailItem` and a `str` now automatically
+  converts the `str` to a `TextBody`
+
 v0.3.0 (2021-03-11)
 -------------------
 - Gave the `from_file()` classmethods ``inline`` and ``content_id`` arguments

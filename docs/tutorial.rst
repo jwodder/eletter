@@ -311,6 +311,29 @@ its `~MailItem.compose()` method, which takes the same arguments as the
 When the resulting e-mail is viewed in a client, you'll see three lines of text
 with images between them.
 
+.. tip::
+
+    As a shortcut, you can combine a bare `str` with an ``eletter`` object
+    using ``|`` or the other overloaded operators described below (``&`` and
+    ``^``), and that `str` will be automatically converted to a `TextBody`.
+    The example above could thus be rewritten:
+
+    .. code:: python
+
+        from eletter import BytesAttachment, TextBody
+
+        snuffles = BytesAttachment.from_file("snuffles.jpeg", inline=True)
+
+        rags = BytesAttachment.from_file("rags.jpeg", inline=True)
+
+        mixed = (
+            "Look at the pretty kitty!\n"
+            & snuffles
+            & "Now look at this dog.\n"
+            & rags
+            & "Which one is cuter?\n"
+        )
+
 
 :mimetype:`multipart/alternative` Messages
 ------------------------------------------

@@ -1193,3 +1193,160 @@ def test_multipart_mutable_sequences(cls: Type[Multipart]) -> None:
     del seq[:2]
     assert len(seq) == 1
     assert list(seq) == [t4]
+
+
+def test_str_or_html() -> None:
+    t = "This is the text of an e-mail."
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    alt = t | h
+    assert isinstance(alt, Alternative)
+    assert alt == Alternative([TextBody(t), h])
+
+
+def test_html_or_str() -> None:
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    t = "This is the text of an e-mail."
+    alt = h | t
+    assert isinstance(alt, Alternative)
+    assert alt == Alternative([h, TextBody(t)])
+
+
+def test_alt_or_eq_str() -> None:
+    t1 = TextBody("Part 1")
+    t2 = TextBody("Part 2")
+    t3 = "Part 3"
+    alt = t1 | t2
+    x = alt
+    x |= t3
+    assert x is alt
+    assert x == Alternative([t1, t2, TextBody(t3)])
+    assert t3 == "Part 3"
+
+
+def test_str_or_eq_body() -> None:
+    t = "This is the text of an e-mail."
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    x: Any = t
+    x |= h
+    assert x is not t
+    assert isinstance(x, Alternative)
+    assert x == Alternative([TextBody(t), h])
+    assert t == "This is the text of an e-mail."
+
+
+def test_body_or_eq_str() -> None:
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    t = "This is the text of an e-mail."
+    x: Any = h
+    x |= t
+    assert x is not h
+    assert isinstance(x, Alternative)
+    assert x == Alternative([h, TextBody(t)])
+    assert h == HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    assert t == "This is the text of an e-mail."
+
+
+def test_str_and_attachment() -> None:
+    t = "This is the text of an e-mail."
+    a = TextAttachment(
+        "this,text,attachment", "attachment.csv", content_type="text/csv"
+    )
+    mixed = t & a
+    assert isinstance(mixed, Mixed)
+    assert mixed == Mixed([TextBody(t), a])
+
+
+def test_attachment_and_str() -> None:
+    a = TextAttachment(
+        "this,text,attachment", "attachment.csv", content_type="text/csv"
+    )
+    t = "This is the text of an e-mail."
+    mixed = a & t
+    assert isinstance(mixed, Mixed)
+    assert mixed == Mixed([a, TextBody(t)])
+
+
+def test_mixed_and_eq_str() -> None:
+    t1 = TextBody("Part 1")
+    t2 = TextBody("Part 2")
+    t3 = "Part 3"
+    mixed = t1 & t2
+    x = mixed
+    x &= t3
+    assert x is mixed
+    assert x == Mixed([t1, t2, TextBody(t3)])
+    assert t3 == "Part 3"
+
+
+def test_str_and_eq_body() -> None:
+    t = "This is the text of an e-mail."
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    x: Any = t
+    x &= h
+    assert x is not t
+    assert isinstance(x, Mixed)
+    assert x == Mixed([TextBody(t), h])
+    assert t == "This is the text of an e-mail."
+
+
+def test_body_and_eq_str() -> None:
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    t = "This is the text of an e-mail."
+    x: Any = h
+    x &= t
+    assert x is not h
+    assert isinstance(x, Mixed)
+    assert x == Mixed([h, TextBody(t)])
+    assert h == HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    assert t == "This is the text of an e-mail."
+
+
+def test_str_xor_body() -> None:
+    t = "This is the text of an e-mail."
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    rel = t ^ h
+    assert isinstance(rel, Related)
+    assert rel == Related([TextBody(t), h])
+
+
+def test_body_xor_str() -> None:
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    t = "This is the text of an e-mail."
+    rel = h ^ t
+    assert isinstance(rel, Related)
+    assert rel == Related([h, TextBody(t)])
+
+
+def test_related_xor_eq_str() -> None:
+    t1 = TextBody("Part 1")
+    t2 = TextBody("Part 2")
+    t3 = "Part 3"
+    rel = t1 ^ t2
+    x = rel
+    x ^= t3
+    assert x is rel
+    assert x == Related([t1, t2, TextBody(t3)])
+    assert t3 == "Part 3"
+
+
+def test_str_xor_eq_body() -> None:
+    t = "This is the text of an e-mail."
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    x: Any = t
+    x ^= h
+    assert x is not t
+    assert isinstance(x, Related)
+    assert x == Related([TextBody(t), h])
+    assert t == "This is the text of an e-mail."
+
+
+def test_body_xor_eq_str() -> None:
+    h = HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    t = "This is the text of an e-mail."
+    x: Any = h
+    x ^= t
+    assert x is not h
+    assert isinstance(x, Related)
+    assert x == Related([h, TextBody(t)])
+    assert h == HTMLBody("<p>This is the <i>text</i> of an <b>e</b>-mail.<p>")
+    assert t == "This is the text of an e-mail."
