@@ -3,8 +3,8 @@
 Changelog
 =========
 
-v0.3.0 (in development)
------------------------
+v0.3.0 (2021-03-11)
+-------------------
 - Gave the `from_file()` classmethods ``inline`` and ``content_id`` arguments
 - Gave all classes optional ``content_id`` attributes
 - Added `TextBody`, `HTMLBody`, `Alternative`, `Mixed`, and `Related` classes
