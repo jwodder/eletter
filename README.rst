@@ -84,7 +84,7 @@ Constructing an e-mail with the ``compose()`` function:
 ``msg`` can then be sent like any other ``EmailMessage``, say, by using
 outgoing_.
 
-.. _outgoing: https://github/jwodder/outgoing
+.. _outgoing: https://github.com/jwodder/outgoing
 
 For more complex e-mails, a set of classes is provided.  Here is the equivalent
 of the HTML-with-image e-mail with alternative plain text version from the

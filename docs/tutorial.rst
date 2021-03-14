@@ -449,4 +449,4 @@ Once you've constructed your e-mail and turned it into an
 Actually doing this is beyond the scope of this tutorial & library, but may I
 suggest outgoing_, by yours truly?
 
-.. _outgoing: https://github/jwodder/outgoing
+.. _outgoing: https://github.com/jwodder/outgoing
