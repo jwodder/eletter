@@ -7,6 +7,7 @@ from .util import AddressOrGroup, SingleAddress
 
 
 def compose(
+    *,
     subject: str,
     to: Iterable[AddressOrGroup],
     from_: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,

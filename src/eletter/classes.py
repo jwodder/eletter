@@ -85,6 +85,7 @@ class MailItem(ABC):
 
     def compose(
         self,
+        *,
         subject: str,
         to: Iterable[AddressOrGroup],
         from_: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,

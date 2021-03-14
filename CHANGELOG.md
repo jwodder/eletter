@@ -7,6 +7,8 @@ v0.4.0 (in development)
 - `format_addresses()` has been moved to
   [mailbits](https://github.com/jwodder/mailbits) but is still re-exported from
   this library for the time being.
+- **Breaking**: All arguments to the `compose()` function & method are now
+  keyword-only
 
 v0.3.0 (2021-03-11)
 -------------------
