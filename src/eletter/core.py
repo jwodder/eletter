@@ -1,8 +1,9 @@
 from datetime import datetime
 from email.message import EmailMessage
 from typing import Iterable, Mapping, Optional, Union
+from mailbits import ContentType
 from .classes import Attachment, HTMLBody, MailItem, TextBody
-from .util import AddressOrGroup, SingleAddress, compile_addresses
+from .util import AddressOrGroup, SingleAddress
 
 
 def compose(
@@ -98,14 +99,7 @@ def assemble_content_type(maintype: str, subtype: str, **params: str) -> str:
     :raises ValueError: if ``f"{maintype}/{subtype}"`` is an invalid
         :mailheader:`Content-Type`
     """
-    ct = f"{maintype}/{subtype}"
-    msg = EmailMessage()
-    msg["Content-Type"] = ct
-    if msg["Content-Type"].defects:
-        raise ValueError(ct)
-    for k, v in params.items():
-        msg.set_param(k, v)
-    return str(msg["Content-Type"])
+    return str(ContentType(maintype, subtype, params))
 
 
 def reply_quote(s: str, prefix: str = "> ") -> str:
@@ -130,12 +124,3 @@ def reply_quote(s: str, prefix: str = "> ") -> str:
     if not s2.endswith(("\n", "\r")):
         s2 += "\n"
     return s2
-
-
-def format_addresses(addresses: Iterable[AddressOrGroup]) -> str:
-    """
-    Format a sequence of addresses for use in a custom address header string
-    """
-    msg = EmailMessage()
-    msg["To"] = compile_addresses(addresses)
-    return str(msg["To"])

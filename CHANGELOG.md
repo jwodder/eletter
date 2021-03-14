@@ -4,6 +4,9 @@ v0.4.0 (in development)
   the `str` to a `TextBody`
 - The `from_` argument to the `compose()` function & method can now be
   `None`/omitted
+- `format_addresses()` has been moved to
+  [mailbits](https://github.com/jwodder/mailbits) but is still re-exported from
+  this library for the time being.
 
 v0.3.0 (2021-03-11)
 -------------------

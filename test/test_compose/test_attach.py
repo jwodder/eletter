@@ -1,4 +1,4 @@
-from email2dict import email2dict
+from mailbits import email2dict
 from eletter import Address, BytesAttachment, EmailAttachment, TextAttachment, compose
 
 

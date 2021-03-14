@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from email.utils import make_msgid
 from typing import Any, Iterable, Type, Union
-from email2dict import email2dict
+from mailbits import email2dict
 import pytest
 from eletter import (
     Address,

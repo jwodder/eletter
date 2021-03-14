@@ -18,10 +18,10 @@ from typing import (
     overload,
 )
 import attr
+from mailbits import ContentType
 from .util import (
     AddressOrGroup,
     AnyPath,
-    ContentType,
     SingleAddress,
     compile_address,
     compile_addresses,

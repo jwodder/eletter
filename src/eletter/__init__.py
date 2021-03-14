@@ -17,6 +17,7 @@ __author_email__ = "eletter@varonathe.org"
 __license__ = "MIT"
 __url__ = "https://github.com/jwodder/eletter"
 
+from mailbits import format_addresses
 from .classes import (
     Address,
     Alternative,
@@ -32,7 +33,7 @@ from .classes import (
     TextAttachment,
     TextBody,
 )
-from .core import assemble_content_type, compose, format_addresses, reply_quote
+from .core import assemble_content_type, compose, reply_quote
 
 __all__ = [
     "Address",
