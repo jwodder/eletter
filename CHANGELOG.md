@@ -1,5 +1,5 @@
-v0.4.0 (in development)
------------------------
+v0.4.0 (2021-03-13)
+-------------------
 - Using `|`, `&`, or `^` on a `MailItem` and a `str` now automatically converts
   the `str` to a `TextBody`
 - The `from_` argument to the `compose()` function & method can now be
