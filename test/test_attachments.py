@@ -5,7 +5,7 @@ from mailbits import ContentType, email2dict
 import pytest
 from eletter import BytesAttachment, EmailAttachment, TextAttachment
 
-DATA_DIR = Path(__file__).with_name("data")
+ATTACH_DIR = Path(__file__).with_name("data") / "attachments"
 
 PNG = bytes.fromhex(
     "89 50 4e 47 0d 0a 1a 0a  00 00 00 0d 49 48 44 52"
@@ -78,7 +78,7 @@ def test_bytes_attachment_set_bad_content_type() -> None:
 
 
 def test_bytes_attachment_from_file() -> None:
-    ba = BytesAttachment.from_file(DATA_DIR / "ternary.png")
+    ba = BytesAttachment.from_file(ATTACH_DIR / "ternary.png")
     assert ba == BytesAttachment(
         PNG, filename="ternary.png", content_type="image/png", inline=False
     )
@@ -86,7 +86,7 @@ def test_bytes_attachment_from_file() -> None:
 
 def test_bytes_attachment_from_file_content_type() -> None:
     ba = BytesAttachment.from_file(
-        DATA_DIR / "ternary.png", content_type="application/x-ternary"
+        ATTACH_DIR / "ternary.png", content_type="application/x-ternary"
     )
     assert ba == BytesAttachment(
         PNG, filename="ternary.png", content_type="application/x-ternary", inline=False
@@ -94,14 +94,14 @@ def test_bytes_attachment_from_file_content_type() -> None:
 
 
 def test_bytes_attachment_from_file_inline() -> None:
-    ba = BytesAttachment.from_file(DATA_DIR / "ternary.png", inline=True)
+    ba = BytesAttachment.from_file(ATTACH_DIR / "ternary.png", inline=True)
     assert ba == BytesAttachment(
         PNG, filename="ternary.png", content_type="image/png", inline=True
     )
 
 
 def test_bytes_attachment_from_file_content_id() -> None:
-    ba = BytesAttachment.from_file(DATA_DIR / "ternary.png", content_id="cid")
+    ba = BytesAttachment.from_file(ATTACH_DIR / "ternary.png", content_id="cid")
     assert ba == BytesAttachment(
         PNG,
         filename="ternary.png",
@@ -112,7 +112,7 @@ def test_bytes_attachment_from_file_content_id() -> None:
 
 
 def test_text_attachment_from_file() -> None:
-    ta = TextAttachment.from_file(DATA_DIR / "fibonacci.py")
+    ta = TextAttachment.from_file(ATTACH_DIR / "fibonacci.py")
     assert ta == TextAttachment(
         PY, filename="fibonacci.py", content_type="text/x-python", inline=False
     )
@@ -120,7 +120,7 @@ def test_text_attachment_from_file() -> None:
 
 def test_text_attachment_from_file_content_type() -> None:
     ta = TextAttachment.from_file(
-        DATA_DIR / "fibonacci.py", content_type="text/x-fibonacci; lang=python"
+        ATTACH_DIR / "fibonacci.py", content_type="text/x-fibonacci; lang=python"
     )
     assert ta == TextAttachment(
         PY,
@@ -131,14 +131,14 @@ def test_text_attachment_from_file_content_type() -> None:
 
 
 def test_text_attachment_from_file_inline() -> None:
-    ta = TextAttachment.from_file(DATA_DIR / "fibonacci.py", inline=True)
+    ta = TextAttachment.from_file(ATTACH_DIR / "fibonacci.py", inline=True)
     assert ta == TextAttachment(
         PY, filename="fibonacci.py", content_type="text/x-python", inline=True
     )
 
 
 def test_text_attachment_from_file_content_id() -> None:
-    ta = TextAttachment.from_file(DATA_DIR / "fibonacci.py", content_id="cid")
+    ta = TextAttachment.from_file(ATTACH_DIR / "fibonacci.py", content_id="cid")
     assert ta == TextAttachment(
         PY,
         filename="fibonacci.py",
@@ -152,7 +152,7 @@ def test_text_attachment_from_file_content_id() -> None:
 @pytest.mark.parametrize("cid", [None, "cid"])
 def test_email_attachment_from_file(inline: bool, cid: Optional[None]) -> None:
     ea = EmailAttachment.from_file(
-        DATA_DIR / "sample.eml", inline=inline, content_id=cid
+        ATTACH_DIR / "sample.eml", inline=inline, content_id=cid
     )
     assert attr.asdict(ea, filter=lambda attr, _: attr.name != "content") == {
         "filename": "sample.eml",
