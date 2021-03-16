@@ -89,6 +89,14 @@ Multipart Classes
     :inherited-members:
 
 
+Decomposition
+-------------
+
+.. autofunction:: decompose
+.. autoclass:: Eletter()
+    :member-order: bysource
+
+
 Utility Functions
 -----------------
 

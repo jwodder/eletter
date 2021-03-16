@@ -1,0 +1,49 @@
+Content-Type: multipart/mixed; boundary="===============2315406034078692992=="
+Subject: That data you wanted
+To: recipient@domain.com
+From: sender@domain.com
+
+--===============2315406034078692992==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+Here's that data you wanted, sir.  And also the ... other thing.
+
+--===============2315406034078692992==
+Content-Type: text/csv; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="income.csv"
+MIME-Version: 1.0
+
+date,item,price
+2021-01-01,diamonds,500
+2021-02-02,gold,1000
+2021-03-03,dirt,1000000
+
+--===============2315406034078692992==
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="cat.png"
+MIME-Version: 1.0
+
+iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJ
+bWFnZVJlYWR5ccllPAAAA3pJREFUeNq0V0tME1EUvf3QaWmhLQp+UJlijEQgUoXEuECILkg0EV24
+IgombBUXxqW4M3FRXLgysSzYGQO4YmG0aliB0rggIaIdNYSPCgNY+me8bzodpsNMO7TTm7y84c7t
+3PPO/T0AihRuAuhifm/MZ5B4YqRxcbh6FZz7cQvh3l0yACh3hd2PILolzgdwy4B6WEoALZJnn+Cc
+6HxcJfp33OBtCg2FFgAdkmdaCIUPLI0A5ZeBs7Yp2WkWc14LE6Ks4cDo5vhnEgqeBZvgzywenNYd
+ANLqgvg2gEWJO7tcc6EUIfArOkcxrD8DiASkKlchAAyqJ09nuC+jm/puh4bDUaiwprKNy5D5BJP+
+WJfq92jhPZOXgSZv08Dt55618U9u0fnb2UpAHYxM7lNoFIzUUYuCc1KuIaFfhOQ2Yg48HrxHTkyP
+v5m8NfU9rbt6do3f5xat/N7qCedjNF8YCBPvEIQH2WDlDJCjOMttFP3gyiK86A/xyliKgvZmG7y8
+Mw9t9eG9x7gLhnBz4xqWgOxVqgJSV65Kh51F+l2bURN0ntqAKmcFfFy4BE5qA2aQkOsnXwNliqn5
+Y1VAEH0fnrxXzpSUgTFC0fmmqqfH9sfYhTUL1LoTsByuBsocgygy0Xrocy7nAXQU3OvQUstakiij
+BND0khemF8/ARToA0SQFzdWzaifvhF9eRmjdrKF/JihzPipp630IdlgVgKQUyZAZWNmq5nU15b+V
+jVfrxiBcRYNzqQXWDwJQ/9D4KyuwSqRbQjuDzj05GVBgwy8bStmycgKz1YEpvAQSAKpMSUNl1JDF
+xDgAxUtA7lzbMNo9khUmShwZIGiTwrFScgsx5nufhlqkYgVb8hbumCNWpN8Ul1swhY9jLVIWSa/M
+s84XEiJBKJEYtBgJdRwq0AeL8XcXxQAZo7GIZbhAAEE9QgCBV+d+fPtSl62Mi+VF1tjPuVpm5n2j
+zndCicwjALMlCXUNC/zf26wBTDe5zsz7iZ7jg6R7RsJWsNmjuiahKMn4DmaDnf/HZVeP2Fy16x8C
+clfg2/6yK9cl5DR/SUpkEbteNICJnnY6c4moOfonl00HCdGBI3917wPiNKutX97RprIuIQSAi7wn
+IPQGQEqwD9cj/Lh46+FiwJbd3+Zj3DXygVSC1+HcuiapDPK7Id27FzamDqUbcCHyX4ABALC+G6F9
+hKj3AAAAAElFTkSuQmCC
+
+--===============2315406034078692992==--

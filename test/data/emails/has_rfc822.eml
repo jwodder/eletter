@@ -1,0 +1,38 @@
+Date: Sat, 18 Aug 2018 03:11:52 +0000
+From: "Steven E'Nder" <sender@example.nil>
+To: recipient@redacted.nil
+Subject: Fwd: Your confirmed booking
+Message-ID: <20180818031152.GA7082@example.nil>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="cWoXeonUoKmBZSoM"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.24 (2015-08-30)
+
+
+--cWoXeonUoKmBZSoM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Here's that e-mail you wanted:
+
+
+--cWoXeonUoKmBZSoM
+Content-Type: message/rfc822
+Content-Disposition: inline
+
+Delivered-To: sender@example.nil
+Date: Sat, 18 Aug 2018 03:08:20 +0000
+Sender: hi.booker.com@company.out.foobar.qq
+Message-Id: <abcdefghijklmnopqrstuv@smtpd.sendgrid.net>
+To: sender@example.nil
+From: Booking Company <hi.booker.com@company.out.foobar.qq>
+Subject: Your confirmed booking
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+We have great news! Your booking has been finalized and confirmed. Enjoy yo=
+ur trip, and please let us know if we can be helpful in any way.=20
+
+--cWoXeonUoKmBZSoM--
+

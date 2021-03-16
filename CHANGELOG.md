@@ -1,3 +1,9 @@
+v0.5.0 (in development)
+-----------------------
+- Attachments' filenames can now be `None`
+- Added a `decompose()` function for decomposing `EmailMessage`s into
+  `MailItem`s plus headers
+
 v0.4.0 (2021-03-13)
 -------------------
 - Using `|`, `&`, or `^` on a `MailItem` and a `str` now automatically converts

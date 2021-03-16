@@ -1,0 +1,63 @@
+From: Brian Rutledge <bhrutledge@gmail.com>
+Date: Thu, 24 Dec 2020 06:11:59 -0500
+Message-ID: <CAKQj8i4mZQGGtmLe+rHAZNBXNv2Hw6dg5cHtzQL6e71mnZkanA@mail.gmail.com>
+To: distutils-sig@python.org
+MIME-Version: 1.0
+X-MailFrom: bhrutledge@gmail.com
+X-Mailman-Rule-Hits: member-moderation
+X-Mailman-Rule-Misses: dmarc-mitigation; no-senders; approved; emergency; loop; banned-address
+Message-ID-Hash: 5FC6OKCCVOJZGRYTKAK7CA5RC2XVX24Z
+X-Message-ID-Hash: 5FC6OKCCVOJZGRYTKAK7CA5RC2XVX24Z
+X-Mailman-Approved-At: Mon, 28 Dec 2020 10:06:20 -0500
+X-Mailman-Version: 3.3.3b1
+Precedence: list
+Subject: [Distutils] Twine 3.3.0 released
+List-Id: "Python packaging ecosystem SIG (PyPI/pip/twine/wheel/setuptools/distutils/etc)" <distutils-sig.python.org>
+Archived-At: <https://mail.python.org/archives/list/distutils-sig@python.org/message/5FC6OKCCVOJZGRYTKAK7CA5RC2XVX24Z/>
+List-Archive: <https://mail.python.org/archives/list/distutils-sig@python.org/>
+List-Help: <mailto:distutils-sig-request@python.org?subject=help>
+List-Post: <mailto:distutils-sig@python.org>
+List-Subscribe: <mailto:distutils-sig-join@python.org>
+List-Unsubscribe: <mailto:distutils-sig-leave@python.org>
+Content-Type: multipart/mixed; boundary="===============5457169869532207506=="
+
+--===============5457169869532207506==
+Content-Type: multipart/alternative; boundary="00000000000008a9d405b733e1f4"
+
+--00000000000008a9d405b733e1f4
+Content-Type: text/plain; charset="UTF-8"
+
+https://pypi.org/project/twine/3.3.0/
+
+Changelog (now via towncrier):
+https://twine.readthedocs.io/en/latest/changelog.html
+
+Notable improvements include more `twine upload --verbose` output, and a
+`--strict` option for `twine check`.
+
+--00000000000008a9d405b733e1f4
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div><a href=3D"https://pypi.org/project/twine/3.3.0/">htt=
+ps://pypi.org/project/twine/3.3.0/</a></div><div><br></div><div>Changelog (=
+now via towncrier): <a href=3D"https://twine.readthedocs.io/en/latest/chang=
+elog.html">https://twine.readthedocs.io/en/latest/changelog.html</a></div><=
+div><br></div><div>Notable improvements include more `twine upload --verbos=
+e` output, and a `--strict` option for `twine check`.</div></div>
+
+--00000000000008a9d405b733e1f4--
+
+--===============5457169869532207506==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+--
+Distutils-SIG mailing list -- distutils-sig@python.org
+To unsubscribe send an email to distutils-sig-leave@python.org
+https://mail.python.org/mailman3/lists/distutils-sig.python.org/
+Message archived at https://mail.python.org/archives/list/distutils-sig@python.org/message/5FC6OKCCVOJZGRYTKAK7CA5RC2XVX24Z/
+
+--===============5457169869532207506==--

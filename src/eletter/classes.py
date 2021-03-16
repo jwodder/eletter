@@ -241,7 +241,7 @@ class TextAttachment(Attachment, ContentTyped):
     #: The body of the attachment
     content: str
     #: The filename of the attachment
-    filename: str
+    filename: Optional[str]
     #: Whether the attachment should be displayed inline in clients
     inline: bool = attr.ib(default=False, kw_only=True)
 
@@ -303,7 +303,7 @@ class BytesAttachment(Attachment, ContentTyped):
     #: The body of the attachment
     content: bytes
     #: The filename of the attachment
-    filename: str
+    filename: Optional[str]
     #: Whether the attachment should be displayed inline in clients
     inline: bool = attr.ib(default=False, kw_only=True)
 
@@ -356,7 +356,7 @@ class EmailAttachment(Attachment):
     #: The body of the attachment
     content: EmailMessage
     #: The filename of the attachment
-    filename: str
+    filename: Optional[str]
     #: Whether the attachment should be displayed inline in clients
     inline: bool = attr.ib(default=False, kw_only=True)
 

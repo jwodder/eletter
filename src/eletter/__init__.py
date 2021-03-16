@@ -11,7 +11,7 @@ Visit <https://github.com/jwodder/eletter> or <https://eletter.rtfd.io> for
 more information.
 """
 
-__version__ = "0.4.0"
+__version__ = "0.5.0.dev1"
 __author__ = "John Thorvald Wodder II"
 __author_email__ = "eletter@varonathe.org"
 __license__ = "MIT"
@@ -34,12 +34,14 @@ from .classes import (
     TextBody,
 )
 from .core import assemble_content_type, compose, reply_quote
+from .decompose import Eletter, decompose
 
 __all__ = [
     "Address",
     "Alternative",
     "Attachment",
     "BytesAttachment",
+    "Eletter",
     "EmailAttachment",
     "Group",
     "HTMLBody",
@@ -51,6 +53,7 @@ __all__ = [
     "TextBody",
     "assemble_content_type",
     "compose",
+    "decompose",
     "format_addresses",
     "reply_quote",
 ]

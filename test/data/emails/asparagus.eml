@@ -1,0 +1,85 @@
+Content-Type: multipart/alternative;
+ boundary="===============6890937346218778654=="
+Subject: Ayons asperges pour le déjeuner
+To: Penelope Pussycat <penelope@example.com>,
+ Fabrette Pussycat <fabrette@example.com>
+From: Pepé Le Pew <pepe@example.com>
+
+--===============6890937346218778654==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+
+U2FsdXQhCgpDZWxhIHJlc3NlbWJsZSDDoCB1biBleGNlbGxlbnQgcmVjaXBpZVsxXSBkw6lqZXVu
+ZXIuCgpbMV0gaHR0cDovL3d3dy55dW1tbHkuY29tL3JlY2lwZS9Sb2FzdGVkLUFzcGFyYWd1cy1F
+cGljdXJpb3VzLTIwMzcxOAoKLS1QZXDDqQo=
+
+--===============6890937346218778654==
+Content-Type: multipart/related; type="text/html";
+ boundary="===============8212651251405628253=="
+
+--===============8212651251405628253==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html>
+  <head></head>
+  <body>
+    <p>Salut!</p>
+    <p>Cela ressemble =C3=A0 un excellent
+        <a href=3D"http://www.yummly.com/recipe/Roasted-Asparagus-Epicurious-=
+203718">
+            recipie
+        </a> d=C3=A9jeuner.
+    </p>
+    <img src=3D"cid:161590180540.18149.10562777424476183580@example.nil" />
+  </body>
+</html>
+
+--===============8212651251405628253==
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename="asparagus.png"
+Content-ID: <161590180540.18149.10562777424476183580@example.nil>
+MIME-Version: 1.0
+
+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
+rkJggg==
+
+--===============8212651251405628253==--
+
+--===============6890937346218778654==--

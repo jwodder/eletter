@@ -1,0 +1,9 @@
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: The subject of the e-mail
+To: recipient@domain.com, another.recipient@example.nil
+From: sender@domain.com
+
+<p>This is the <strong>body</strong> of the <em>e</em>-mail.  <span style=3D'=
+color: red;'>Write what you want here!</span></p>
