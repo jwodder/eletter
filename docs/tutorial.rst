@@ -371,6 +371,15 @@ The ``alternative`` object can then be converted to an e-mail with the same
 
 .. tip::
 
+    In this specific example, we can save on e-mail size by instead creating a
+    mixed message containing alternative parts, like so:
+
+    .. code:: python
+
+        mixed = (text1 | html1) & snuffles & (text2 | html2) & rags & (text3 | html3)
+
+.. tip::
+
     The parts of a :mimetype:`multipart/alternative` message should generally
     be placed in increasing order of preference, which means that the text part
     should be on the left of the ``|`` and the HTML part should be on the
