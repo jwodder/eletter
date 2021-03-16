@@ -49,7 +49,7 @@ class Eletter:
     #: The message's :mailheader:`Date` header, if set
     date: Optional[datetime] = attr.ib(default=None)
 
-    #: Any additional headers on the message
+    #: Any additional headers on the message.  The header names are lowercase.
     headers: Dict[str, List[str]] = attr.ib(factory=dict)
 
 
