@@ -1,7 +1,3 @@
-- Add a `decompose()` function for converting an EmailMessage to an OO
-  representation (as an `Eletter` object with `content: MailItem`, `subject`,
-  `from_`, etc. fields)
-
 - Add a `decompose_simple()` function for converting an EmailMessage to a
   `SimpleEletter` object with `text`, `html`, `attachments`, `subject`,
   `from_`, etc. fields?

@@ -1,18 +1,17 @@
 from datetime import datetime, timedelta, timezone
 import email
 from email import policy
+from email.headerregistry import Address, Group
 from email.message import EmailMessage
 from pathlib import Path
 from unittest.mock import ANY
 from mailbits import email2dict
 import pytest
 from eletter import (
-    Address,
     Alternative,
     BytesAttachment,
     Eletter,
     EmailAttachment,
-    Group,
     HTMLBody,
     Mixed,
     Related,
@@ -43,21 +42,21 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             Eletter(
                 subject="To: Everyone",
                 to=[
-                    Address("", "you@there.net"),
-                    Address("Thaddeus Hem", "them@hither.yon"),
+                    Address("", addr_spec="you@there.net"),
+                    Address("Thaddeus Hem", addr_spec="them@hither.yon"),
                 ],
-                from_=[Address("Mme E.", "me@here.com")],
+                from_=[Address("Mme E.", addr_spec="me@here.com")],
                 cc=[
-                    Address("Cee Cee Cecil", "ccc@seesaws.cc"),
-                    Address("", "coco@nu.tz"),
+                    Address("Cee Cee Cecil", addr_spec="ccc@seesaws.cc"),
+                    Address("", addr_spec="coco@nu.tz"),
                 ],
                 bcc=[
-                    Address("", "eletter@depository.nil"),
-                    Address("Secret Cabal", "illuminati@new.world.order"),
-                    Address("", "mom@house.home"),
+                    Address("", addr_spec="eletter@depository.nil"),
+                    Address("Secret Cabal", addr_spec="illuminati@new.world.order"),
+                    Address("", addr_spec="mom@house.home"),
                 ],
-                reply_to=[Address("", "replyee@some.where")],
-                sender=Address("", "steven.ender@big.senders"),
+                reply_to=[Address("", addr_spec="replyee@some.where")],
+                sender=Address("", addr_spec="steven.ender@big.senders"),
                 content=TextBody(
                     "Meeting tonight!  You know the place.  Bring pizza.\n"
                 ),
@@ -68,10 +67,10 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             Eletter(
                 subject="The subject of the e-mail",
                 to=[
-                    Address("", "recipient@domain.com"),
-                    Address("", "another.recipient@example.nil"),
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
                 ],
-                from_=[Address("", "sender@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
                 content=BytesAttachment(
                     CAT, "snuffles.png", content_type="image/png", inline=True
                 ),
@@ -82,10 +81,10 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             Eletter(
                 subject="The subject of the e-mail",
                 to=[
-                    Address("", "recipient@domain.com"),
-                    Address("", "another.recipient@example.nil"),
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
                 ],
-                from_=[Address("", "sender@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
                 content=Alternative(
                     [
                         Mixed(
@@ -140,10 +139,10 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             Eletter(
                 subject="The subject of the e-mail",
                 to=[
-                    Address("", "recipient@domain.com"),
-                    Address("", "another.recipient@example.nil"),
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
                 ],
-                from_=[Address("", "sender@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
                 content=Alternative(
                     [
                         TextBody("This is displayed on plain text clients.\n"),
@@ -156,10 +155,10 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             "asparagus.eml",
             Eletter(
                 subject="Ayons asperges pour le déjeuner",
-                from_=[Address("Pepé Le Pew", "pepe@example.com")],
+                from_=[Address("Pepé Le Pew", addr_spec="pepe@example.com")],
                 to=[
-                    Address("Penelope Pussycat", "penelope@example.com"),
-                    Address("Fabrette Pussycat", "fabrette@example.com"),
+                    Address("Penelope Pussycat", addr_spec="penelope@example.com"),
+                    Address("Fabrette Pussycat", addr_spec="fabrette@example.com"),
                 ],
                 content=Alternative(
                     [
@@ -211,8 +210,8 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             "attachments.eml",
             Eletter(
                 subject="That data you wanted",
-                to=[Address("", "recipient@domain.com")],
-                from_=[Address("", "sender@domain.com")],
+                to=[Address("", addr_spec="recipient@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
                 content=Mixed(
                     [
                         TextBody(
@@ -239,18 +238,18 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             "groups.eml",
             Eletter(
                 subject=None,
-                from_=[Address("Pete", "pete@silly.example")],
+                from_=[Address("Pete", addr_spec="pete@silly.example")],
                 to=[
                     Group(
                         "A Group",
-                        [
-                            Address("Ed Jones", "c@a.test"),
-                            Address("", "joe@where.test"),
-                            Address("John", "jdoe@one.test"),
-                        ],
+                        (
+                            Address("Ed Jones", addr_spec="c@a.test"),
+                            Address("", addr_spec="joe@where.test"),
+                            Address("John", addr_spec="jdoe@one.test"),
+                        ),
                     )
                 ],
-                cc=[Group("Undisclosed recipients", [])],
+                cc=[Group("Undisclosed recipients", ())],
                 date=datetime(
                     1969,
                     2,
@@ -271,10 +270,10 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             Eletter(
                 subject="The subject of the e-mail",
                 to=[
-                    Address("", "recipient@domain.com"),
-                    Address("", "another.recipient@example.nil"),
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
                 ],
-                from_=[Address("", "sender@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
                 date=datetime(
                     2021, 3, 10, 17, 56, 36, tzinfo=timezone(timedelta(hours=-5))
                 ),
@@ -297,10 +296,10 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             Eletter(
                 subject="The subject of the e-mail",
                 to=[
-                    Address("", "recipient@domain.com"),
-                    Address("", "another.recipient@example.nil"),
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
                 ],
-                from_=[Address("", "sender@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
                 content=HTMLBody(
                     "<p>This is the <strong>body</strong> of the <em>e</em>-mail."
                     "  <span style='color: red;'>Write what you want here!</span></p>\n"
@@ -312,10 +311,10 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             Eletter(
                 subject="The subject of the e-mail",
                 to=[
-                    Address("", "recipient@domain.com"),
-                    Address("", "another.recipient@example.nil"),
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
                 ],
-                from_=[Address("", "sender@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
                 content=Mixed(
                     [
                         TextBody("Look at the pretty kitty!\n"),
@@ -336,10 +335,10 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             Eletter(
                 subject="The subject of the e-mail",
                 to=[
-                    Address("", "recipient@domain.com"),
-                    Address("", "another.recipient@example.nil"),
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
                 ],
-                from_=[Address("", "sender@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
                 content=Mixed(
                     [
                         Alternative(
@@ -380,10 +379,10 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             Eletter(
                 subject="The subject of the e-mail",
                 to=[
-                    Address("", "recipient@domain.com"),
-                    Address("", "another.recipient@example.nil"),
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
                 ],
-                from_=[Address("", "sender@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
                 content=Related(
                     [
                         HTMLBody(
@@ -459,10 +458,10 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             Eletter(
                 subject="The subject of the e-mail",
                 to=[
-                    Address("", "recipient@domain.com"),
-                    Address("", "another.recipient@example.nil"),
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
                 ],
-                from_=[Address("", "sender@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
                 content=TextBody(
                     "This is the body of the e-mail.  Write what you want here!\n"
                 ),
@@ -472,8 +471,8 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             "twine_release.eml",
             Eletter(
                 subject="[Distutils] Twine 3.3.0 released",
-                to=[Address("", "distutils-sig@python.org")],
-                from_=[Address("Brian Rutledge", "bhrutledge@gmail.com")],
+                to=[Address("", addr_spec="distutils-sig@python.org")],
+                from_=[Address("Brian Rutledge", addr_spec="bhrutledge@gmail.com")],
                 date=datetime(
                     2020, 12, 24, 6, 11, 59, tzinfo=timezone(timedelta(hours=-5))
                 ),
@@ -554,8 +553,8 @@ def test_decompose_email_attachment() -> None:
     decomposed = decompose(msg)
     assert decomposed == Eletter(
         subject="Fwd: Your confirmed booking",
-        from_=[Address("Steven E'Nder", "sender@example.nil")],
-        to=[Address("", "recipient@redacted.nil")],
+        from_=[Address("Steven E'Nder", addr_spec="sender@example.nil")],
+        to=[Address("", addr_spec="recipient@redacted.nil")],
         date=datetime(2018, 8, 18, 3, 11, 52, tzinfo=timezone.utc),
         headers={
             "message-id": ["<20180818031152.GA7082@example.nil>"],
