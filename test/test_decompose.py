@@ -463,14 +463,14 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                         BytesAttachment(
                             content=b"25\n10\n34\n10\n25\n21\n26\n10",
                             filename=None,
-                            content_type="Application/X-FixedRecord",
+                            content_type="application/x-fixedrecord",
                             inline=False,
                             content_id="<950120.aaCC@XIson.com>",
                         ),
                         BytesAttachment(
                             content=b"Old MacDonald had a farm\nE I E I O\nAnd on his farm he had some ducks\nE I E I O\nWith a quack quack here,\na quack quack there,\nevery where a quack quack\nE I E I O\n",
                             filename=None,
-                            content_type="Application/octet-stream",
+                            content_type="application/octet-stream",
                             inline=False,
                             content_id="<950120.aaCB@XIson.com>",
                         ),

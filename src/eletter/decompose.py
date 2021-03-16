@@ -139,39 +139,32 @@ def decompose(msg: EmailMessage) -> Eletter:
 
 
 def get_content(msg: EmailMessage) -> MailItem:
-    maintype = msg.get_content_maintype()
-    subtype = msg.get_content_subtype()
+    try:
+        ct = ContentType.parse(str(msg.get("Content-Type", msg.get_default_type())))
+    except ValueError:
+        ct = ContentType.parse("text/plain")
     disposition = msg.get_content_disposition()
     filename = msg.get_filename(None)
     content_id = get_str_header(msg, "Content-ID")
     if filename is not None and disposition is None:
         disposition = "attachment"
-    if maintype == "multipart":
+    if ct.maintype == "multipart":
         content: Multipart
-        if subtype == "mixed":
+        if ct.subtype == "mixed":
             content = Mixed(content_id=content_id)
-        elif subtype == "alternative":
+        elif ct.subtype == "alternative":
             content = Alternative(content_id=content_id)
-        elif subtype == "related":
-            h = msg["Content-Type"]
-            start: Optional[str]
-            if h is not None:
-                assert isinstance(h, hr.ContentTypeHeader)
-                s = h.params.get("start")
-                assert s is None or isinstance(s, str)
-                start = s
-            else:
-                start = None
-            content = Related(content_id=content_id, start=start)
+        elif ct.subtype == "related":
+            content = Related(content_id=content_id, start=ct.params.get("start"))
         else:
-            raise ValueError(f"Unsupported Content-Type: {maintype}/{subtype}")
+            raise ValueError(f"Unsupported Content-Type: {ct.content_type}")
         for p in msg.iter_parts():
             if not isinstance(p, EmailMessage):  # pragma: no cover
                 raise TypeError("EmailMessage parts must be EmailMessage instances")
             content.append(get_content(p))
         return content
-    elif maintype == "message":
-        if subtype == "rfc822":
+    elif ct.maintype == "message":
+        if ct.subtype == "rfc822":
             body = msg.get_content()
             if not isinstance(body, EmailMessage):  # pragma: no cover
                 raise TypeError("EmailMessage parts must be EmailMessage instances")
@@ -182,42 +175,35 @@ def get_content(msg: EmailMessage) -> MailItem:
                 content_id=content_id,
             )
         else:
-            raise ValueError(f"Unsupported Content-Type: {maintype}/{subtype}")
-    elif maintype == "text":
+            raise ValueError(f"Unsupported Content-Type: {ct.content_type}")
+    elif ct.maintype == "text":
         text = msg.get_content()
         assert isinstance(text, str)
-        ct = get_str_header(msg, "Content-Type")
-        if ct is None:
-            ct = "text/plain"
-        parsed_ct = ContentType.parse(ct)
-        parsed_ct.params.pop("charset", None)
         if (
             filename is not None
             or disposition == "attachment"
-            or subtype not in ("plain", "html")
+            or ct.subtype not in ("plain", "html")
         ):
+            ct.params.pop("charset", None)
             return TextAttachment(
                 content=text,
                 filename=filename,
-                content_type=str(parsed_ct),
+                content_type=str(ct),
                 inline=disposition == "inline",
                 content_id=content_id,
             )
-        elif subtype == "plain":
+        elif ct.subtype == "plain":
             return TextBody(text, content_id=content_id)
         else:
-            assert subtype == "html"
+            assert ct.subtype == "html"
             return HTMLBody(text, content_id=content_id)
     else:
         blob = msg.get_content()
         assert isinstance(blob, bytes)
-        ct = get_str_header(msg, "Content-Type")
-        if ct is None:
-            ct = "application/octet-stream"  # pragma: no cover
         return BytesAttachment(
             content=blob,
             filename=filename,
-            content_type=ct,
+            content_type=str(ct),
             content_id=content_id,
             inline=disposition == "inline",
         )
