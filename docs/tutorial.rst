@@ -124,7 +124,7 @@ accepts optional arguments for :mailheader:`CC`, :mailheader:`BCC`,
 
 .. code:: python
 
-    from eletter import compose
+    from eletter import Address, compose
 
     msg = compose(
         from_=Address("Mme E.", "me@here.com"),
@@ -356,7 +356,7 @@ between.
 
     html1 = HTMLBody("<p>Look at the <em>pretty kitty</em>!</p>\n")
     html2 = HTMLBody("<p>Now look at this <strong>dog</strong>.</p>\n")
-    html2 = HTMLBody("<p>Which one is <span style='color: pink'>cuter</span>?</p>\n")
+    html3 = HTMLBody("<p>Which one is <span style='color: pink'>cuter</span>?</p>\n")
 
     snuffles = BytesAttachment.from_file("snuffles.jpeg", inline=True)
     rags = BytesAttachment.from_file("rags.jpeg", inline=True)
