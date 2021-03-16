@@ -654,7 +654,7 @@ class Related(Multipart):
     display the part indicated by the `start` parameter, or the first part if
     `start` is not set.  This part may refer to other parts (e.g., images or
     CSS stylesheets) by their :mailheader:`Content-ID` headers, which can be
-    generated using `email.utils.make_msgid()`.
+    generated using `email.utils.make_msgid`.
 
     .. note::
 

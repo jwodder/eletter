@@ -394,7 +394,7 @@ HTML, it'd be better if we could reference attachments directly in, say, an
 ``<img>`` tag's ``src`` attribute.  We can do this in three steps:
 
 1. Assign each attachment's ``content_id`` attribute a unique ID generated with
-   `email.utils.make_msgid()`.
+   `email.utils.make_msgid`.
 
 2. Within the HTML document, refer to a given attachment via the URI
    ``cid:{content_id[1:-1]}`` — that is, "``cid:``" followed by the
