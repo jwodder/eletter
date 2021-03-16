@@ -1,0 +1,75 @@
+MIME-Version: 1.0
+Reply-To: organizer@sender.nil
+Sender: Google Calendar <calendar-notification@google.com>
+Message-ID: <000000000000b9dd4705bdab7532@google.com>
+Date: Tue, 16 Mar 2021 18:23:15 +0000
+Subject: Invitation: Create eletter decomposition tests @ Tue Mar 16, 2021 2pm
+ - 3pm (EDT)
+From: organizer@sender.nil
+To: recipient@example.nil
+Content-Type: multipart/mixed; boundary="000000000000b9dd3905bdab7531"
+
+--000000000000b9dd3905bdab7531
+Content-Type: multipart/alternative; boundary="000000000000b9dd3705bdab752f"
+
+--000000000000b9dd3705bdab752f
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Transfer-Encoding: base64
+
+WW91IGhhdmUgYmVlbiBpbnZpdGVkIHRvIHRoZSBmb2xsb3dpbmcgZXZlbnQuCgpUaXRsZTogQ3Jl
+YXRlIGVsZXR0ZXIgZGVjb21wb3NpdGlvbiB0ZXN0cwpXaGVuOiBUdWUgTWFyIDE2LCAyMDIxIDJw
+bSDigJMgM3BtIEVhc3Rlcm4gVGltZSAtIE5ldyBZb3JrCg==
+--000000000000b9dd3705bdab752f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<h2>You have been invited to the following event.</h2><table><tr><th>Title:=
+</th><td>Create eletter decomposition tests</td></tr><tr><th>When:</th><td>=
+Tue Mar 16, 2021 2pm =E2=80=93 3pm Eastern Time - New York</td></tr></table>
+--000000000000b9dd3705bdab752f
+Content-Type: text/calendar; charset="UTF-8"; method=REQUEST
+Content-Transfer-Encoding: 7bit
+
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART:20210316T180000Z
+DTEND:20210316T190000Z
+DTSTAMP:20210316T182315Z
+ORGANIZER;CN=organizer@sender.nil:mailto:organizer@sender.nil
+UID:06iihhb86aebbk9q558m4ucnir@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=recipient@example.nil;X-NUM-GUESTS=0:mailto:recipient@example.nil
+X-MICROSOFT-CDO-OWNERAPPTID:-356041672
+CREATED:20210316T182312Z
+LAST-MODIFIED:20210316T182313Z
+LOCATION:
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Create eletter decomposition tests
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+
+--000000000000b9dd3705bdab752f--
+--000000000000b9dd3905bdab7531
+Content-Type: application/ics; name="invite.ics"
+Content-Disposition: attachment; filename="invite.ics"
+Content-Transfer-Encoding: base64
+
+QkVHSU46VkNBTEVOREFSClBST0RJRDotLy9Hb29nbGUgSW5jLy9Hb29nbGUgQ2FsZW5kYXIgNzAu
+OTA1NC8vRU4KVkVSU0lPTjoyLjAKQ0FMU0NBTEU6R1JFR09SSUFOCk1FVEhPRDpSRVFVRVNUCkJF
+R0lOOlZFVkVOVApEVFNUQVJUOjIwMjEwMzE2VDE4MDAwMFoKRFRFTkQ6MjAyMTAzMTZUMTkwMDAw
+WgpEVFNUQU1QOjIwMjEwMzE2VDE4MjMxNVoKT1JHQU5JWkVSO0NOPW9yZ2FuaXplckBzZW5kZXIu
+bmlsOm1haWx0bzpvcmdhbml6ZXJAc2VuZGVyLm5pbApVSUQ6MDZpaWhoYjg2YWViYms5cTU1OG00
+dWNuaXJAZ29vZ2xlLmNvbQpBVFRFTkRFRTtDVVRZUEU9SU5ESVZJRFVBTDtST0xFPVJFUS1QQVJU
+SUNJUEFOVDtQQVJUU1RBVD1ORUVEUy1BQ1RJT047UlNWUD0KIFRSVUU7Q049cmVjaXBpZW50QGV4
+YW1wbGUubmlsO1gtTlVNLUdVRVNUUz0wOm1haWx0bzpyZWNpcGllbnRAZXhhbXBsZS5uaWwKWC1N
+SUNST1NPRlQtQ0RPLU9XTkVSQVBQVElEOi0zNTYwNDE2NzIKQ1JFQVRFRDoyMDIxMDMxNlQxODIz
+MTJaCkxBU1QtTU9ESUZJRUQ6MjAyMTAzMTZUMTgyMzEzWgpMT0NBVElPTjoKU0VRVUVOQ0U6MApT
+VEFUVVM6Q09ORklSTUVEClNVTU1BUlk6Q3JlYXRlIGVsZXR0ZXIgZGVjb21wb3NpdGlvbiB0ZXN0
+cwpUUkFOU1A6T1BBUVVFCkVORDpWRVZFTlQKRU5EOlZDQUxFTkRBUgo=
+--000000000000b9dd3905bdab7531--

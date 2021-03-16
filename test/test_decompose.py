@@ -375,6 +375,32 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             ),
         ),
         (
+            "name-in-type.eml",
+            Eletter(
+                subject="A pretty kitty!",
+                from_=[Address("", addr_spec="kitties@r.us")],
+                to=[Address("", addr_spec="kitty@lov.er")],
+                content=Related(
+                    [
+                        HTMLBody(
+                            "<p>Look at the <em>pretty kitty</em>!\n"
+                            '<div class="align: center;">\n'
+                            '    <img src="cid:161592191396.26443.11558378911136694407@example.nil" width="500" height="500"\n'
+                            '         style="border: 1px solid blue;" />\n'
+                            "</div>\n"
+                        ),
+                        BytesAttachment(
+                            CAT,
+                            "snuffles.png",
+                            content_type='image/png; name="snuffles.png"',
+                            inline=False,
+                            content_id="<161592191396.26443.11558378911136694407@example.nil>",
+                        ),
+                    ]
+                ),
+            ),
+        ),
+        (
             "related.eml",
             Eletter(
                 subject="The subject of the e-mail",
@@ -537,6 +563,94 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                 ),
             ),
         ),
+        (
+            "unattached-vcard.eml",
+            Eletter(
+                subject="Invitation: Create eletter decomposition tests @ Tue Mar 16, 2021 2pm - 3pm (EDT)",
+                from_=[Address("", addr_spec="organizer@sender.nil")],
+                to=[Address("", addr_spec="recipient@example.nil")],
+                reply_to=[Address("", addr_spec="organizer@sender.nil")],
+                sender=Address(
+                    "Google Calendar", addr_spec="calendar-notification@google.com"
+                ),
+                date=datetime(2021, 3, 16, 18, 23, 15, tzinfo=timezone.utc),
+                headers={"message-id": ["<000000000000b9dd4705bdab7532@google.com>"]},
+                content=Mixed(
+                    [
+                        Alternative(
+                            [
+                                TextBody(
+                                    "You have been invited to the following event.\n"
+                                    "\n"
+                                    "Title: Create eletter decomposition tests\n"
+                                    "When: Tue Mar 16, 2021 2pm – 3pm Eastern Time - New York\n"
+                                ),
+                                HTMLBody(
+                                    "<h2>You have been invited to the following event.</h2><table><tr><th>Title:</th><td>Create eletter decomposition tests</td></tr><tr><th>When:</th><td>Tue Mar 16, 2021 2pm – 3pm Eastern Time - New York</td></tr></table>"
+                                ),
+                                # TODO: Should this be inline?
+                                TextAttachment(
+                                    "BEGIN:VCALENDAR\n"
+                                    "PRODID:-//Google Inc//Google Calendar 70.9054//EN\n"
+                                    "VERSION:2.0\n"
+                                    "CALSCALE:GREGORIAN\n"
+                                    "METHOD:REQUEST\n"
+                                    "BEGIN:VEVENT\n"
+                                    "DTSTART:20210316T180000Z\n"
+                                    "DTEND:20210316T190000Z\n"
+                                    "DTSTAMP:20210316T182315Z\n"
+                                    "ORGANIZER;CN=organizer@sender.nil:mailto:organizer@sender.nil\n"
+                                    "UID:06iihhb86aebbk9q558m4ucnir@google.com\n"
+                                    "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=\n"
+                                    " TRUE;CN=recipient@example.nil;X-NUM-GUESTS=0:mailto:recipient@example.nil\n"
+                                    "X-MICROSOFT-CDO-OWNERAPPTID:-356041672\n"
+                                    "CREATED:20210316T182312Z\n"
+                                    "LAST-MODIFIED:20210316T182313Z\n"
+                                    "LOCATION:\n"
+                                    "SEQUENCE:0\n"
+                                    "STATUS:CONFIRMED\n"
+                                    "SUMMARY:Create eletter decomposition tests\n"
+                                    "TRANSP:OPAQUE\n"
+                                    "END:VEVENT\n"
+                                    "END:VCALENDAR\n",
+                                    filename=None,
+                                    content_type='text/calendar; method="REQUEST"',
+                                    inline=False,
+                                ),
+                            ]
+                        ),
+                        BytesAttachment(
+                            b"BEGIN:VCALENDAR\n"
+                            b"PRODID:-//Google Inc//Google Calendar 70.9054//EN\n"
+                            b"VERSION:2.0\n"
+                            b"CALSCALE:GREGORIAN\n"
+                            b"METHOD:REQUEST\n"
+                            b"BEGIN:VEVENT\n"
+                            b"DTSTART:20210316T180000Z\n"
+                            b"DTEND:20210316T190000Z\n"
+                            b"DTSTAMP:20210316T182315Z\n"
+                            b"ORGANIZER;CN=organizer@sender.nil:mailto:organizer@sender.nil\n"
+                            b"UID:06iihhb86aebbk9q558m4ucnir@google.com\n"
+                            b"ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=\n"
+                            b" TRUE;CN=recipient@example.nil;X-NUM-GUESTS=0:mailto:recipient@example.nil\n"
+                            b"X-MICROSOFT-CDO-OWNERAPPTID:-356041672\n"
+                            b"CREATED:20210316T182312Z\n"
+                            b"LAST-MODIFIED:20210316T182313Z\n"
+                            b"LOCATION:\n"
+                            b"SEQUENCE:0\n"
+                            b"STATUS:CONFIRMED\n"
+                            b"SUMMARY:Create eletter decomposition tests\n"
+                            b"TRANSP:OPAQUE\n"
+                            b"END:VEVENT\n"
+                            b"END:VCALENDAR\n",
+                            filename="invite.ics",
+                            content_type='application/ics; name="invite.ics"',
+                            inline=False,
+                        ),
+                    ]
+                ),
+            ),
+        ),
     ],
 )
 def test_decompose(eml: str, decomposed: Eletter) -> None:
@@ -603,3 +717,12 @@ def test_decompose_email_attachment() -> None:
         "content": "We have great news! Your booking has been finalized and confirmed. Enjoy your trip, and please let us know if we can be helpful in any way. \n",
         "epilogue": None,
     }
+
+
+def test_decompose_bad_content_type() -> None:
+    with (EMAIL_DIR / "signed.eml").open("rb") as fp:
+        msg = email.message_from_binary_file(fp, policy=policy.default)
+    assert isinstance(msg, EmailMessage)
+    with pytest.raises(ValueError) as excinfo:
+        decompose(msg)
+    assert str(excinfo.value) == "Unsupported Content-Type: multipart/signed"

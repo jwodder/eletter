@@ -1,0 +1,38 @@
+Date: Tue, 16 Mar 2021 18:55:41 +0000
+From: "John T. Wodder II" <eletter@varonathe.org>
+To: recipient@example.nil
+Subject: A signed e-mail
+Message-ID: <20210316185541.GA122323@varonathe.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gBBFr7Ir9EOA20Yy"
+Content-Disposition: inline
+
+
+--gBBFr7Ir9EOA20Yy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+This e-mail is signed.
+
+--gBBFr7Ir9EOA20Yy
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEnzwgM0lLOCvvaRu0A7tnRHk3IaMFAmBQ/yoACgkQA7tnRHk3
+IaNa3w//b6c5KY/wlHiPBkPNb6RM8xNoZxzcHdjDflxQwXQJ/M0vhS/oxfD/Dg4Q
+VorwWzRG0HHS+wtfk9Ox8veOfj1M3baddEK/anznoRIHC6WHg2HIUTnFS6Mokv0j
+IYKkZqJrf7ZaFp6dNEXx3iTWSeO0nZPW9Rf7ZY0bjjAsjf/aJXEB1ahEfrXv1y/o
+EKBgqorE4RFqfZQJhrQrHp+3/TqIquafq2IREaMy4slLbyAHGgZ4zywUgqItYZFt
+it6/7F/1VVIQDbpuIu1YnAc7z3wTH/hEYIp0x5KX2RWfEwrb/K1XC5coCo0hH113
+OjUbJJn6sS5V7ldwJnFM5X1qEyrxQwQDrG54/8AgWqgAbHfWdUxxZxc1j0eYMSAy
+hsrNUU2lK+dcyAvX1shz2wzDFdcMJufJPY8YUmpP/5ryjH7yZhSNGHV+BNUpUIvf
+ah24efE5gsmWNJ6ncSgPzFN+PHUxYvm0YrxXtuSspLD9rVBc+tTyKKLbf5sUmnhc
+8ziYdXApAB1n71WVVZA+U/V4rVB8biPmTB0D7asbG8CalcZ6iqBgQ2C6BE84eMLO
+DK01AxFwP7TB1+DWvbFXp1F90zRldrI+Yt977WXcLYwgHmQCgNDqfcmOq6z4qRXh
+xH9kfFjxTsnzKeXIr9quC7pvu1e1DE+bTPZ6iFRNh2Ckyo90e8A=
+=k27J
+-----END PGP SIGNATURE-----
+
+--gBBFr7Ir9EOA20Yy--

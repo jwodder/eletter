@@ -166,14 +166,14 @@ def get_content(msg: EmailMessage) -> MailItem:
         else:
             raise ValueError(f"Unsupported Content-Type: {maintype}/{subtype}")
         for p in msg.iter_parts():
-            if not isinstance(p, EmailMessage):
+            if not isinstance(p, EmailMessage):  # pragma: no cover
                 raise TypeError("EmailMessage parts must be EmailMessage instances")
             content.append(get_content(p))
         return content
     elif maintype == "message":
         if subtype == "rfc822":
             body = msg.get_content()
-            if not isinstance(body, EmailMessage):
+            if not isinstance(body, EmailMessage):  # pragma: no cover
                 raise TypeError("EmailMessage parts must be EmailMessage instances")
             return EmailAttachment(
                 content=body,
@@ -213,7 +213,7 @@ def get_content(msg: EmailMessage) -> MailItem:
         assert isinstance(blob, bytes)
         ct = get_str_header(msg, "Content-Type")
         if ct is None:
-            ct = "application/octet-stream"
+            ct = "application/octet-stream"  # pragma: no cover
         return BytesAttachment(
             content=blob,
             filename=filename,
