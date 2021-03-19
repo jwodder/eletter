@@ -1208,3 +1208,77 @@ def test_compose_email_attachment() -> None:
         ],
         "epilogue": None,
     }
+
+
+def test_compose_text_bytes_attachment_null_filename() -> None:
+    msg = compose(
+        from_="me@here.com",
+        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+        subject="Some electronic mail",
+        text="This is the text of an e-mail.",
+        attachments=[
+            BytesAttachment(
+                b"\xFE\xED\xFA\xCE",
+                filename=None,
+                content_type="application/x-feedface",
+            )
+        ],
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "Some electronic mail",
+            "from": [
+                {
+                    "display_name": "",
+                    "address": "me@here.com",
+                }
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "you@there.net",
+                },
+                {
+                    "display_name": "Thaddeus Hem",
+                    "address": "them@hither.yon",
+                },
+            ],
+            "content-type": {
+                "content_type": "multipart/mixed",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": [
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "text/plain",
+                        "params": {},
+                    },
+                },
+                "preamble": None,
+                "content": "This is the text of an e-mail.\n",
+                "epilogue": None,
+            },
+            {
+                "unixfrom": None,
+                "headers": {
+                    "content-type": {
+                        "content_type": "application/x-feedface",
+                        "params": {},
+                    },
+                    "content-disposition": {
+                        "disposition": "attachment",
+                        "params": {},
+                    },
+                },
+                "preamble": None,
+                "content": b"\xFE\xED\xFA\xCE",
+                "epilogue": None,
+            },
+        ],
+        "epilogue": None,
+    }

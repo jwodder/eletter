@@ -401,6 +401,28 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             ),
         ),
         (
+            "null-filename.eml",
+            Eletter(
+                subject="Some electronic mail",
+                from_=[Address("", addr_spec="me@here.com")],
+                to=[
+                    Address("", addr_spec="you@there.net"),
+                    Address("Thaddeus Hem", addr_spec="them@hither.yon"),
+                ],
+                content=Mixed(
+                    [
+                        TextBody("This is the text of an e-mail.\n"),
+                        BytesAttachment(
+                            b"\xFE\xED\xFA\xCE",
+                            filename=None,
+                            content_type="application/x-feedface",
+                            inline=False,
+                        ),
+                    ]
+                ),
+            ),
+        ),
+        (
             "related.eml",
             Eletter(
                 subject="The subject of the e-mail",

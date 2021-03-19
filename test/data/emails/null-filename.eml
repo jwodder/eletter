@@ -1,0 +1,21 @@
+Content-Type: multipart/mixed; boundary="===============5984132588458272783=="
+Subject: Some electronic mail
+To: you@there.net, Thaddeus Hem <them@hither.yon>
+From: me@here.com
+
+--===============5984132588458272783==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+This is the text of an e-mail.
+
+--===============5984132588458272783==
+Content-Type: application/x-feedface
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment
+MIME-Version: 1.0
+
+/u36zg==
+
+--===============5984132588458272783==--
