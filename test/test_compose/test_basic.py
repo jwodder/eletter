@@ -462,3 +462,39 @@ def test_compose_null_from() -> None:
         "content": "This is the text of an e-mail.\n",
         "epilogue": None,
     }
+
+
+def test_compose_null_subject() -> None:
+    msg = compose(
+        from_="me@here.com",
+        to=["you@there.net", Address("Thaddeus Hem", "them@hither.yon")],
+        text="This is the text of an e-mail.",
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "from": [
+                {
+                    "display_name": "",
+                    "address": "me@here.com",
+                }
+            ],
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "you@there.net",
+                },
+                {
+                    "display_name": "Thaddeus Hem",
+                    "address": "them@hither.yon",
+                },
+            ],
+            "content-type": {
+                "content_type": "text/plain",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": "This is the text of an e-mail.\n",
+        "epilogue": None,
+    }

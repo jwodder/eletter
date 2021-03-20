@@ -86,9 +86,9 @@ class MailItem(ABC):
     def compose(
         self,
         *,
-        subject: str,
         to: Iterable[AddressOrGroup],
         from_: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,
+        subject: Optional[str] = None,
         cc: Optional[Iterable[AddressOrGroup]] = None,
         bcc: Optional[Iterable[AddressOrGroup]] = None,
         reply_to: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,
@@ -102,7 +102,7 @@ class MailItem(ABC):
         :mailheader:`From` address, :mailheader:`To` addresses, and optional
         other headers.
 
-        All parameters other than ``subject`` and ``to`` are optional.
+        All parameters other than ``to`` are optional.
 
         :param str subject: The e-mail's :mailheader:`Subject` line
         :param to: The e-mail's :mailheader:`To` line
@@ -131,7 +131,8 @@ class MailItem(ABC):
         :rtype: email.message.EmailMessage
         """
         msg = self._compile()
-        msg["Subject"] = subject
+        if subject is not None:
+            msg["Subject"] = subject
         msg["To"] = compile_addresses(to)
         if from_ is not None:
             msg["From"] = compile_addresses(from_)

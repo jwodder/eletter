@@ -8,9 +8,9 @@ from .util import AddressOrGroup, SingleAddress
 
 def compose(
     *,
-    subject: str,
     to: Iterable[AddressOrGroup],
     from_: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,
+    subject: Optional[str] = None,
     text: Optional[str] = None,
     html: Optional[str] = None,
     cc: Optional[Iterable[AddressOrGroup]] = None,
@@ -26,8 +26,8 @@ def compose(
     :mailheader:`From` address, :mailheader:`To` addresses, and a plain text
     and/or HTML body, optionally accompanied by attachments and other headers.
 
-    All parameters other than ``subject``, ``to``, and at least one of ``text``
-    and ``html`` are optional.
+    All parameters other than ``to`` and at least one of ``text`` and ``html``
+    are optional.
 
     :param str subject: The e-mail's :mailheader:`Subject` line
     :param to: The e-mail's :mailheader:`To` line
