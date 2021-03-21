@@ -133,14 +133,15 @@ class MailItem(ABC):
         msg = self._compile()
         if subject is not None:
             msg["Subject"] = subject
-        msg["To"] = compile_addresses(to)
-        if from_ is not None:
+        if to:
+            msg["To"] = compile_addresses(to)
+        if from_:
             msg["From"] = compile_addresses(from_)
-        if cc is not None:
+        if cc:
             msg["CC"] = compile_addresses(cc)
-        if bcc is not None:
+        if bcc:
             msg["BCC"] = compile_addresses(bcc)
-        if reply_to is not None:
+        if reply_to:
             msg["Reply-To"] = compile_addresses(reply_to)
         if sender is not None:
             msg["Sender"] = compile_address(sender)

@@ -498,3 +498,28 @@ def test_compose_null_subject() -> None:
         "content": "This is the text of an e-mail.\n",
         "epilogue": None,
     }
+
+
+def test_compose_empty_address_lists() -> None:
+    msg = compose(
+        from_=[],
+        to=[],
+        cc=[],
+        bcc=[],
+        reply_to=[],
+        subject="To: No One",
+        text="This is the text of an e-mail.",
+    )
+    assert email2dict(msg) == {
+        "unixfrom": None,
+        "headers": {
+            "subject": "To: No One",
+            "content-type": {
+                "content_type": "text/plain",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": "This is the text of an e-mail.\n",
+        "epilogue": None,
+    }
