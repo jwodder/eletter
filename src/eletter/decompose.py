@@ -52,6 +52,22 @@ class Eletter:
     #: Any additional headers on the message.  The header names are lowercase.
     headers: Dict[str, List[str]] = attr.ib(factory=dict)
 
+    def compose(self) -> EmailMessage:
+        """
+        Convert the `Eletter` back into an `~email.message.EmailMessage`
+        """
+        return self.content.compose(
+            subject=self.subject,
+            from_=self.from_,
+            to=self.to,
+            cc=self.cc,
+            bcc=self.bcc,
+            reply_to=self.reply_to,
+            sender=self.sender,
+            date=self.date,
+            headers=self.headers,
+        )
+
 
 STANDARD_HEADERS = {
     "subject",

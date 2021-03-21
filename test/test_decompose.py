@@ -608,7 +608,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                                     "When: Tue Mar 16, 2021 2pm – 3pm Eastern Time - New York\n"
                                 ),
                                 HTMLBody(
-                                    "<h2>You have been invited to the following event.</h2><table><tr><th>Title:</th><td>Create eletter decomposition tests</td></tr><tr><th>When:</th><td>Tue Mar 16, 2021 2pm – 3pm Eastern Time - New York</td></tr></table>"
+                                    "<h2>You have been invited to the following event.</h2><table><tr><th>Title:</th><td>Create eletter decomposition tests</td></tr><tr><th>When:</th><td>Tue Mar 16, 2021 2pm – 3pm Eastern Time - New York</td></tr></table>\n"
                                 ),
                                 # TODO: Should this be inline?
                                 TextAttachment(
@@ -680,6 +680,7 @@ def test_decompose(eml: str, decomposed: Eletter) -> None:
         msg = email.message_from_binary_file(fp, policy=policy.default)
     assert isinstance(msg, EmailMessage)
     assert decompose(msg) == decomposed
+    assert decompose(decomposed.compose()) == decomposed
 
 
 def test_decompose_email_attachment() -> None:
