@@ -1,11 +1,11 @@
 """
-Simple e-mail composition
+Simple e-mail composition & decomposition
 
-``eletter`` provides a basic function for constructing an
-`email.message.EmailMessage` instance without having to touch the needlessly
-complicated `EmailMessage` class itself.  E-mails with text bodies and/or HTML
-bodies plus attachments are supported.  Classes are also provided for composing
-more complex multipart e-mails.
+``eletter`` provides functionality for constructing & deconstructing
+`email.message.EmailMessage` instances without having to touch the needlessly
+complicated `EmailMessage` class itself.  A simple function enables composition
+of e-mails with text and/or HTML bodies plus attachments, and classes are
+provided for composing more complex multipart e-mails.
 
 Visit <https://github.com/jwodder/eletter> or <https://eletter.rtfd.io> for
 more information.

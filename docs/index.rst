@@ -1,8 +1,8 @@
 .. module:: eletter
 
-===================================
-eletter — Simple e-mail composition
-===================================
+===================================================
+eletter — Simple e-mail composition & decomposition
+===================================================
 
 `GitHub <https://github.com/jwodder/eletter>`_
 | `PyPI <https://pypi.org/project/eletter/>`_
@@ -17,11 +17,11 @@ eletter — Simple e-mail composition
     api
     changelog
 
-``eletter`` provides a basic function for constructing an
-`email.message.EmailMessage` instance without having to touch the needlessly
-complicated `~email.message.EmailMessage` class itself.  E-mails with text
-bodies and/or HTML bodies plus attachments are supported.  Classes are also
-provided for composing more complex multipart e-mails.
+``eletter`` provides functionality for constructing & deconstructing
+`email.message.EmailMessage` instances without having to touch the needlessly
+complicated `~email.message.EmailMessage` class itself.  A simple function
+enables composition of e-mails with text and/or HTML bodies plus attachments,
+and classes are provided for composing more complex multipart e-mails.
 
 
 Installation
