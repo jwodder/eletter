@@ -1,11 +1,13 @@
 from datetime import datetime
 from email import headerregistry as hr
 from email.message import EmailMessage
-from typing import Dict, List, Optional, Union
+from functools import partial
+from typing import Dict, List, Optional, Tuple, Union
 import attr
 from mailbits import ContentType, parse_addresses
 from .classes import (
     Alternative,
+    Attachment,
     BytesAttachment,
     EmailAttachment,
     HTMLBody,
@@ -16,6 +18,7 @@ from .classes import (
     TextAttachment,
     TextBody,
 )
+from .core import compose
 
 
 @attr.s
@@ -57,6 +60,133 @@ class Eletter:
         Convert the `Eletter` back into an `~email.message.EmailMessage`
         """
         return self.content.compose(
+            subject=self.subject,
+            from_=self.from_,
+            to=self.to,
+            cc=self.cc,
+            bcc=self.bcc,
+            reply_to=self.reply_to,
+            sender=self.sender,
+            date=self.date,
+            headers=self.headers,
+        )
+
+    def simplify(self, unmix: bool = False) -> "SimpleEletter":
+        """
+        Simplify the `Eletter` into a `SimpleEletter`, breaking down
+        `Eletter.content` into a text body, HTML body, and a list of
+        attachments.
+
+        By default, a :mimetype:`multipart/mixed` message can only be
+        simplified if all of the attachments come after all of the message
+        bodies; set ``unmix`` to `True` to separate the attachments from the
+        bodies regardless of what order they come in.
+
+        :raises ValueError: if ``msg`` cannot be simplified
+        """
+        content = smooth(self.content)
+        text: Optional[str]
+        html: Optional[str]
+        attachments: List[Attachment]
+        if isinstance(content, Alternative):
+            text = None
+            html = None
+            attachments = []
+            for t, h, attach in map(partial(simplify_alt_part, unmix=unmix), content):
+                if t is not None and h is None:
+                    if text is None:
+                        text = t
+                    else:
+                        raise ValueError(
+                            "Multiple text/plain parts in multipart/alternative"
+                        )
+                elif h is not None and t is None:
+                    if html is None:
+                        html = h
+                    else:
+                        raise ValueError(
+                            "Multiple text/html parts in multipart/alternative"
+                        )
+                elif t is None and h is None:
+                    raise ValueError(
+                        "Alternative part is neither text/plain nor text/html"
+                    )
+                else:
+                    raise ValueError(
+                        "Alternative part contains both text/plain and text/html"
+                    )
+                attachments.extend(a for a in attach if a not in attachments)
+        else:
+            text, html, attachments = simplify_alt_part(content, unmix=unmix)
+        if text is None and html is None:
+            raise ValueError("No text or HTML bodies in message")
+        return SimpleEletter(
+            text=text,
+            html=html,
+            attachments=attachments,
+            subject=self.subject,
+            from_=self.from_,
+            to=self.to,
+            cc=self.cc,
+            bcc=self.bcc,
+            reply_to=self.reply_to,
+            sender=self.sender,
+            date=self.date,
+            headers=self.headers,
+        )
+
+
+@attr.s
+class SimpleEletter:
+    """
+    A decomposed simple e-mail message, consisting of a text body and/or HTML
+    body plus some number of attachments and headers
+    """
+
+    #: The message's text body, if any
+    text: Optional[str] = attr.ib(default=None)
+
+    #: The message's HTML body, if any
+    html: Optional[str] = attr.ib(default=None)
+
+    #: Attachments on the message
+    attachments: List[Attachment] = attr.ib(factory=list)
+
+    #: The message's subject line, if any
+    subject: Optional[str] = attr.ib(default=None)
+
+    #: The message's :mailheader:`From` addresses
+    from_: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+
+    #: The message's :mailheader:`To` addresses
+    to: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+
+    #: The message's :mailheader:`CC` addresses
+    cc: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+
+    #: The message's :mailheader:`BCC` addresses
+    bcc: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+
+    #: The message's :mailheader:`Reply-To` addresses
+    reply_to: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+
+    #: The message's :mailheader:`Sender` address, if any
+    sender: Optional[hr.Address] = attr.ib(default=None)
+
+    #: The message's :mailheader:`Date` header, if set
+    date: Optional[datetime] = attr.ib(default=None)
+
+    #: Any additional headers on the message.  The header names are lowercase.
+    headers: Dict[str, List[str]] = attr.ib(factory=dict)
+
+    def compose(self) -> EmailMessage:
+        """
+        Convert the `SimpleEletter` back into an `~email.message.EmailMessage`
+        """
+        return compose(
+            text=self.text,
+            html=self.html,
+            attachments=self.attachments,
             subject=self.subject,
             from_=self.from_,
             to=self.to,
@@ -241,3 +371,127 @@ def get_address_list(
         assert isinstance(h, hr.AddressHeader)
         addresses.extend(parse_addresses(h))
     return addresses
+
+
+def decompose_simple(msg: EmailMessage, unmix: bool = False) -> SimpleEletter:
+    """
+    Decompose an `~email.message.EmailMessage` into a `SimpleEletter` instance
+    consisting of a text body and/or HTML body, some number of attachments, and
+    a collection of headers.  The `~email.message.EmailMessage` is first
+    decomposed with `decompose()` and then simplified by calling
+    `Eletter.simplify()`.
+
+    By default, a :mimetype:`multipart/mixed` message can only be simplified if
+    all of the attachments come after all of the message bodies; set ``unmix``
+    to `True` to separate the attachments from the bodies regardless of what
+    order they come in.
+
+    :raises TypeError:
+        if any sub-part of ``msg`` is not an `~email.message.EmailMessage`
+        instance
+    :raises ValueError: if ``msg`` cannot be decomposed or simplified
+    """
+    return decompose(msg).simplify(unmix=unmix)
+
+
+def smooth(mi: MailItem) -> MailItem:
+    if isinstance(mi, Multipart):
+        if len(mi) == 1:
+            return smooth(mi.content[0])
+        else:
+            out: List[MailItem] = []
+            for n in mi:
+                if type(n) is type(mi):
+                    n = smooth(n)
+                if type(n) is type(mi):
+                    assert isinstance(n, Multipart)
+                    out.extend(n)
+                elif not (isinstance(n, Multipart) and len(n) == 0):
+                    out.append(n)
+            return type(mi)(out)
+    else:
+        return mi
+
+
+def alt2text_html(alt: Alternative) -> Tuple[str, str]:
+    if len(alt) == 2:
+        if isinstance(alt[0], TextBody) and isinstance(alt[1], HTMLBody):
+            return (alt[0].content, alt[1].content)
+        elif isinstance(alt[0], HTMLBody) and isinstance(alt[1], TextBody):
+            return (alt[1].content, alt[0].content)
+    raise ValueError(
+        "multipart/alternative is not a text/plain part plus a text/html part"
+    )
+
+
+def simplify_alt_part(
+    content: MailItem, unmix: bool = False
+) -> Tuple[Optional[str], Optional[str], List[Attachment]]:
+    text: Optional[str] = None
+    html: Optional[str] = None
+    attachments: List[Attachment] = []
+
+    def add_text(t: str) -> None:
+        nonlocal text
+        if text is None:
+            text = t
+        else:
+            if not text.endswith("\n"):
+                text += "\n"
+            text += t
+
+    def add_html(h: str) -> None:
+        nonlocal html
+        if html is None:
+            html = h
+        else:
+            if not html.endswith("\n"):
+                html += "\n"
+            html += h
+
+    if isinstance(content, TextBody):
+        text = content.content
+    elif isinstance(content, HTMLBody):
+        html = content.content
+    elif isinstance(content, Mixed):
+        for mi in content:
+            if isinstance(mi, TextBody):
+                if attachments and not unmix:
+                    raise ValueError("Message intersperses attachments with text")
+                if html is not None:
+                    raise ValueError("No matching HTML alternative for text part")
+                add_text(mi.content)
+            elif isinstance(mi, HTMLBody):
+                if attachments and not unmix:
+                    raise ValueError("Message intersperses attachments with text")
+                if text is not None:
+                    raise ValueError("No matching text alternative for HTML part")
+                add_html(mi.content)
+            # elif isinstance(mi, Mixed):  # smoothed out
+            elif isinstance(mi, Alternative):
+                # Require the Alt to be only text | html; error on further
+                # nesting
+                text_part, html_part = alt2text_html(mi)
+                if attachments and not unmix:
+                    raise ValueError("Message intersperses attachments with text")
+                if (text is None) == (html is None):
+                    add_text(text_part)
+                    add_html(html_part)
+                elif text is not None:
+                    raise ValueError("Text + HTML alternative follows text-only body")
+                else:
+                    assert html is not None
+                    raise ValueError("Text + HTML alternative follows HTML-only body")
+            elif isinstance(mi, Related):
+                raise ValueError("Cannot simplify multipart/related")
+            elif isinstance(mi, Attachment):
+                attachments.append(mi)
+            else:
+                raise TypeError(str(type(mi)))  # pragma: no cover
+    elif isinstance(content, Related):
+        raise ValueError("Cannot simplify multipart/related")
+    elif isinstance(content, Attachment):
+        raise ValueError("Body is an attachment")
+    else:
+        raise TypeError(str(type(content)))  # pragma: no cover
+    return (text, html, attachments)

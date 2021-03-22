@@ -93,7 +93,10 @@ Decomposition
 -------------
 
 .. autofunction:: decompose
+.. autofunction:: decompose_simple
 .. autoclass:: Eletter()
+    :member-order: bysource
+.. autoclass:: SimpleEletter()
     :member-order: bysource
 
 

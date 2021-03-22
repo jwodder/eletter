@@ -34,7 +34,7 @@ from .classes import (
     TextBody,
 )
 from .core import assemble_content_type, compose, reply_quote
-from .decompose import Eletter, decompose
+from .decompose import Eletter, SimpleEletter, decompose, decompose_simple
 
 __all__ = [
     "Address",
@@ -49,11 +49,13 @@ __all__ = [
     "Mixed",
     "Multipart",
     "Related",
+    "SimpleEletter",
     "TextAttachment",
     "TextBody",
     "assemble_content_type",
     "compose",
     "decompose",
+    "decompose_simple",
     "format_addresses",
     "reply_quote",
 ]

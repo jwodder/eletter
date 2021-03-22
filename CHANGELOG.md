@@ -1,8 +1,10 @@
 v0.5.0 (in development)
 -----------------------
 - Attachments' filenames can now be `None`
-- Added a `decompose()` function for decomposing `EmailMessage`s into
-  `MailItem`s plus headers
+- Added a `decompose()` function for decomposing an `EmailMessage` into a
+  `MailItem` plus headers
+- Added a `decompose_simple()` function for decomposing an `EmailMessage` into
+  a text body, HTML body, attachments, and headers
 - The `subject` argument to the `compose()` function & method can now be
   `None`/omitted
 - If an address argument to `compose()` is set to an empty list, the

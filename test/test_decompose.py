@@ -15,9 +15,11 @@ from eletter import (
     HTMLBody,
     Mixed,
     Related,
+    SimpleEletter,
     TextAttachment,
     TextBody,
     decompose,
+    decompose_simple,
 )
 
 ATTACH_DIR = Path(__file__).with_name("data") / "attachments"
@@ -749,3 +751,363 @@ def test_decompose_bad_content_type() -> None:
     with pytest.raises(ValueError) as excinfo:
         decompose(msg)
     assert str(excinfo.value) == "Unsupported Content-Type: multipart/signed"
+
+
+@pytest.mark.parametrize(
+    "eml,decomposed",
+    [
+        (
+            "addresses.eml",
+            SimpleEletter(
+                subject="To: Everyone",
+                to=[
+                    Address("", addr_spec="you@there.net"),
+                    Address("Thaddeus Hem", addr_spec="them@hither.yon"),
+                ],
+                from_=[Address("Mme E.", addr_spec="me@here.com")],
+                cc=[
+                    Address("Cee Cee Cecil", addr_spec="ccc@seesaws.cc"),
+                    Address("", addr_spec="coco@nu.tz"),
+                ],
+                bcc=[
+                    Address("", addr_spec="eletter@depository.nil"),
+                    Address("Secret Cabal", addr_spec="illuminati@new.world.order"),
+                    Address("", addr_spec="mom@house.home"),
+                ],
+                reply_to=[Address("", addr_spec="replyee@some.where")],
+                sender=Address("", addr_spec="steven.ender@big.senders"),
+                text="Meeting tonight!  You know the place.  Bring pizza.\n",
+            ),
+        ),
+        (
+            "alt.eml",
+            SimpleEletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                text="This is displayed on plain text clients.\n",
+                html="<p>This is displayed on graphical clients.<p>\n",
+            ),
+        ),
+        (
+            "attachments.eml",
+            SimpleEletter(
+                subject="That data you wanted",
+                to=[Address("", addr_spec="recipient@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                text=(
+                    "Here's that data you wanted, sir.  And also the"
+                    " ... other thing.\n"
+                ),
+                attachments=[
+                    TextAttachment(
+                        "date,item,price\n"
+                        "2021-01-01,diamonds,500\n"
+                        "2021-02-02,gold,1000\n"
+                        "2021-03-03,dirt,1000000\n",
+                        "income.csv",
+                        content_type="text/csv",
+                        inline=False,
+                    ),
+                    BytesAttachment(
+                        CAT, "cat.png", content_type="image/png", inline=False
+                    ),
+                ],
+            ),
+        ),
+        (
+            "groups.eml",
+            SimpleEletter(
+                subject=None,
+                from_=[Address("Pete", addr_spec="pete@silly.example")],
+                to=[
+                    Group(
+                        "A Group",
+                        (
+                            Address("Ed Jones", addr_spec="c@a.test"),
+                            Address("", addr_spec="joe@where.test"),
+                            Address("John", addr_spec="jdoe@one.test"),
+                        ),
+                    )
+                ],
+                cc=[Group("Undisclosed recipients", ())],
+                date=datetime(
+                    1969,
+                    2,
+                    13,
+                    23,
+                    32,
+                    54,
+                    tzinfo=timezone(-timedelta(hours=3, minutes=30)),
+                ),
+                headers={"message-id": ["<testabcd.1234@silly.example>"]},
+                text="Testing.\n\n-- \nTaken from RFC 5322, section A.1.3.\n",
+            ),
+        ),
+        (
+            "headers.eml",
+            SimpleEletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                date=datetime(
+                    2021, 3, 10, 17, 56, 36, tzinfo=timezone(timedelta(hours=-5))
+                ),
+                headers={
+                    "user-agent": ["My Mail Application v.1"],
+                    "priority": ["urgent"],
+                    "comments": [
+                        "I like e-mail.",
+                        "But no one ever looks at e-mails' sources, so no one"
+                        " will ever know.",
+                    ],
+                },
+                text="This is the body of the e-mail.  Write what you want here!\n",
+            ),
+        ),
+        (
+            "html.eml",
+            SimpleEletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                html=(
+                    "<p>This is the <strong>body</strong> of the <em>e</em>-mail."
+                    "  <span style='color: red;'>Write what you want here!</span></p>\n"
+                ),
+            ),
+        ),
+        (
+            "null-filename.eml",
+            SimpleEletter(
+                subject="Some electronic mail",
+                from_=[Address("", addr_spec="me@here.com")],
+                to=[
+                    Address("", addr_spec="you@there.net"),
+                    Address("Thaddeus Hem", addr_spec="them@hither.yon"),
+                ],
+                text="This is the text of an e-mail.\n",
+                attachments=[
+                    BytesAttachment(
+                        b"\xFE\xED\xFA\xCE",
+                        filename=None,
+                        content_type="application/x-feedface",
+                        inline=False,
+                    ),
+                ],
+            ),
+        ),
+        (
+            "text.eml",
+            SimpleEletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                text="This is the body of the e-mail.  Write what you want here!\n",
+            ),
+        ),
+    ],
+)
+@pytest.mark.parametrize("unmix", [False, True])
+def test_simple_decompose(eml: str, decomposed: SimpleEletter, unmix: bool) -> None:
+    with (EMAIL_DIR / eml).open("rb") as fp:
+        msg = email.message_from_binary_file(fp, policy=policy.default)
+    assert isinstance(msg, EmailMessage)
+    assert decompose_simple(msg, unmix=unmix) == decomposed
+    assert decompose_simple(decomposed.compose()) == decomposed
+
+
+def test_simple_decompose_email_attachment() -> None:
+    with (EMAIL_DIR / "has_rfc822.eml").open("rb") as fp:
+        msg = email.message_from_binary_file(fp, policy=policy.default)
+    assert isinstance(msg, EmailMessage)
+    decomposed = decompose_simple(msg)
+    assert decomposed == SimpleEletter(
+        subject="Fwd: Your confirmed booking",
+        from_=[Address("Steven E'Nder", addr_spec="sender@example.nil")],
+        to=[Address("", addr_spec="recipient@redacted.nil")],
+        date=datetime(2018, 8, 18, 3, 11, 52, tzinfo=timezone.utc),
+        headers={
+            "message-id": ["<20180818031152.GA7082@example.nil>"],
+            "user-agent": ["Mutt/1.5.24 (2015-08-30)"],
+        },
+        text="Here's that e-mail you wanted:\n\n",
+        attachments=[EmailAttachment(content=ANY, filename=None, inline=True)],
+    )
+    submsg = decomposed.attachments[0].content  # type: ignore
+    assert isinstance(submsg, EmailMessage)
+    assert email2dict(submsg) == {
+        "unixfrom": None,
+        "headers": {
+            "delivered-to": [
+                "sender@example.nil",
+            ],
+            "date": datetime(2018, 8, 18, 3, 8, 20, tzinfo=timezone.utc),
+            "sender": {
+                "display_name": "",
+                "address": "hi.booker.com@company.out.foobar.qq",
+            },
+            "message-id": "<abcdefghijklmnopqrstuv@smtpd.sendgrid.net>",
+            "to": [
+                {
+                    "display_name": "",
+                    "address": "sender@example.nil",
+                },
+            ],
+            "from": [
+                {
+                    "display_name": "Booking Company",
+                    "address": "hi.booker.com@company.out.foobar.qq",
+                },
+            ],
+            "subject": "Your confirmed booking",
+            "content-type": {
+                "content_type": "text/plain",
+                "params": {},
+            },
+        },
+        "preamble": None,
+        "content": "We have great news! Your booking has been finalized and confirmed. Enjoy your trip, and please let us know if we can be helpful in any way. \n",
+        "epilogue": None,
+    }
+
+
+@pytest.mark.parametrize(
+    "eml,errmsg",
+    [
+        ("all-bytes.eml", "Body is an attachment"),
+        ("alt-mixed.eml", "Message intersperses attachments with text"),
+        ("mixed.eml", "Message intersperses attachments with text"),
+        ("mixed-alt.eml", "Message intersperses attachments with text"),
+        ("asparagus.eml", "Cannot simplify multipart/related"),
+        ("name-in-type.eml", "Cannot simplify multipart/related"),
+        ("related.eml", "Cannot simplify multipart/related"),
+        ("related-start.eml", "Cannot simplify multipart/related"),
+        ("twine_release.eml", "No matching HTML alternative for text part"),
+        (
+            "unattached-vcard.eml",
+            "multipart/alternative is not a text/plain part plus a text/html part",
+        ),
+    ],
+)
+def test_simple_error(eml: str, errmsg: str) -> None:
+    with (EMAIL_DIR / eml).open("rb") as fp:
+        msg = email.message_from_binary_file(fp, policy=policy.default)
+    assert isinstance(msg, EmailMessage)
+    with pytest.raises(ValueError) as excinfo:
+        decompose_simple(msg)
+    assert str(excinfo.value) == errmsg
+
+
+@pytest.mark.parametrize(
+    "eml,decomposed",
+    [
+        (
+            "alt-mixed.eml",
+            SimpleEletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                text=(
+                    "Look at the pretty kitty!\n"
+                    "Now look at this dog.\n"
+                    "Which one is cuter?\n"
+                ),
+                html=(
+                    "<p>Look at the <em>pretty kitty</em>!</p>\n"
+                    "<p>Now look at this <strong>dog</strong>.</p>\n"
+                    "<p>Which one is <span style='color: pink'>"
+                    "cuter</span>?</p>\n"
+                ),
+                attachments=[
+                    BytesAttachment(
+                        CAT,
+                        "snuffles.png",
+                        content_type="image/png",
+                        inline=True,
+                    ),
+                    BytesAttachment(
+                        DOG,
+                        "rags.png",
+                        content_type="image/png",
+                        inline=True,
+                    ),
+                ],
+            ),
+        ),
+        (
+            "mixed.eml",
+            SimpleEletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                text=(
+                    "Look at the pretty kitty!\n"
+                    "Now look at this dog.\n"
+                    "Which one is cuter?\n"
+                ),
+                attachments=[
+                    BytesAttachment(
+                        CAT, "snuffles.png", content_type="image/png", inline=True
+                    ),
+                    BytesAttachment(
+                        DOG, "rags.png", content_type="image/png", inline=True
+                    ),
+                ],
+            ),
+        ),
+        (
+            "mixed-alt.eml",
+            SimpleEletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                text=(
+                    "Look at the pretty kitty!\n"
+                    "Now look at this dog.\n"
+                    "Which one is cuter?\n"
+                ),
+                html=(
+                    "<p>Look at the <em>pretty kitty</em>!</p>\n"
+                    "<p>Now look at this <strong>dog</strong>.</p>\n"
+                    "<p>Which one is <span style='color: pink'>"
+                    "cuter</span>?</p>\n"
+                ),
+                attachments=[
+                    BytesAttachment(
+                        CAT, "snuffles.png", content_type="image/png", inline=True
+                    ),
+                    BytesAttachment(
+                        DOG, "rags.png", content_type="image/png", inline=True
+                    ),
+                ],
+            ),
+        ),
+    ],
+)
+def test_simple_decompose_unmix(eml: str, decomposed: SimpleEletter) -> None:
+    with (EMAIL_DIR / eml).open("rb") as fp:
+        msg = email.message_from_binary_file(fp, policy=policy.default)
+    assert isinstance(msg, EmailMessage)
+    assert decompose_simple(msg, unmix=True) == decomposed
