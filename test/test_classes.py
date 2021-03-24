@@ -1151,52 +1151,65 @@ def test_multipart_mutable_sequences(cls: Type[Multipart]) -> None:
     seq = cls()
     assert len(seq) == 0
     assert list(seq) == []
+    assert not bool(seq)
     seq.append(t1)
     assert len(seq) == 1
     assert list(seq) == [t1]
+    assert bool(seq)
     assert seq[0] == t1
     seq.insert(0, t2)
     assert len(seq) == 2
     assert list(seq) == [t2, t1]
+    assert bool(seq)
     assert seq[0] == t2
     assert seq[1] == t1
     seq[1] = t3
     assert len(seq) == 2
     assert list(seq) == [t2, t3]
+    assert bool(seq)
     assert seq[0] == t2
     assert seq[1] == t3
     seq.pop(0)
     assert len(seq) == 1
     assert list(seq) == [t3]
+    assert bool(seq)
     assert seq[0] == t3
     seq.extend([t1, t4])
     assert len(seq) == 3
     assert list(seq) == [t3, t1, t4]
+    assert bool(seq)
     seq.reverse()
     assert len(seq) == 3
     assert list(seq) == [t4, t1, t3]
+    assert bool(seq)
     seq.reverse()
     assert len(seq) == 3
     assert list(seq) == [t3, t1, t4]
+    assert bool(seq)
     assert seq[1:] == cls([t1, t4])
     seq.pop()
     assert len(seq) == 2
     assert list(seq) == [t3, t1]
+    assert bool(seq)
     seq.remove(t1)
     assert len(seq) == 1
     assert list(seq) == [t3]
+    assert bool(seq)
     seq += [t1, t2]
     assert len(seq) == 3
     assert list(seq) == [t3, t1, t2]
+    assert bool(seq)
     del seq[0]
     assert len(seq) == 2
     assert list(seq) == [t1, t2]
     seq[1:] = [t3, t4]
     assert len(seq) == 3
     assert list(seq) == [t1, t3, t4]
+    assert bool(seq)
     del seq[:2]
     assert len(seq) == 1
     assert list(seq) == [t4]
+    assert bool(seq)
 
 
 def test_str_or_html() -> None:
