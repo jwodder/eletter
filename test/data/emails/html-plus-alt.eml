@@ -1,0 +1,33 @@
+Content-Type: multipart/mixed; boundary="===============2065172639968579280=="
+Subject: The subject of the e-mail
+To: recipient@domain.com, another.recipient@example.nil
+From: sender@domain.com
+
+--===============2065172639968579280==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+<p>This is the <strong>all-HTML</strong> start of the message.</p>
+
+--===============2065172639968579280==
+Content-Type: multipart/alternative;
+ boundary="===============2001407714750929799=="
+
+--===============2001407714750929799==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+This is the text version of the second part of the message.
+
+--===============2001407714750929799==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+<p>This is the HTML version of the <em>second</em> part of the message.</p>
+
+--===============2001407714750929799==--
+
+--===============2065172639968579280==--

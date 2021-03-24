@@ -37,7 +37,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
 
 
 @pytest.mark.parametrize(
-    "eml,decomposed",
+    "eml,decomposed,recomposable",
     [
         (
             "addresses.eml",
@@ -63,6 +63,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     "Meeting tonight!  You know the place.  Bring pizza.\n"
                 ),
             ),
+            True,
         ),
         (
             "all-bytes.eml",
@@ -77,6 +78,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     CAT, "snuffles.png", content_type="image/png", inline=True
                 ),
             ),
+            True,
         ),
         (
             "alt-mixed.eml",
@@ -135,6 +137,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     ]
                 ),
             ),
+            True,
         ),
         (
             "alt.eml",
@@ -152,6 +155,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     ]
                 ),
             ),
+            True,
         ),
         (
             "asparagus.eml",
@@ -207,6 +211,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     ]
                 ),
             ),
+            True,
         ),
         (
             "attachments.eml",
@@ -235,6 +240,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     ]
                 ),
             ),
+            True,
         ),
         (
             "groups.eml",
@@ -266,6 +272,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     "Testing.\n\n-- \nTaken from RFC 5322, section A.1.3.\n"
                 ),
             ),
+            True,
         ),
         (
             "headers.eml",
@@ -292,6 +299,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     "This is the body of the e-mail.  Write what you want here!\n"
                 ),
             ),
+            True,
         ),
         (
             "html.eml",
@@ -307,6 +315,67 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     "  <span style='color: red;'>Write what you want here!</span></p>\n"
                 ),
             ),
+            True,
+        ),
+        (
+            "html-plus-alt.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Mixed(
+                    [
+                        HTMLBody(
+                            "<p>This is the <strong>all-HTML</strong> start of the message.</p>\n"
+                        ),
+                        Alternative(
+                            [
+                                TextBody(
+                                    "This is the text version of the second part of the message.\n"
+                                ),
+                                HTMLBody(
+                                    "<p>This is the HTML version of the <em>second</em> part of the message.</p>\n"
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+            ),
+            True,
+        ),
+        (
+            "mdalt.eml",
+            Eletter(
+                subject="Text vs. Markdown",
+                to=[Address("", addr_spec="recipient@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Alternative(
+                    [
+                        TextBody("This is the plain text version of the message.\n"),
+                        Mixed(
+                            [
+                                # TODO: Should this be inline?
+                                TextAttachment(
+                                    "This is the *Markdown* version of the message.\n",
+                                    filename=None,
+                                    content_type="text/markdown",
+                                    inline=False,
+                                ),
+                                BytesAttachment(
+                                    DOG,
+                                    "dog.png",
+                                    content_type="image/png",
+                                    inline=False,
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+            ),
+            True,
         ),
         (
             "mixed.eml",
@@ -331,6 +400,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     ]
                 ),
             ),
+            True,
         ),
         (
             "mixed-alt.eml",
@@ -375,6 +445,131 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     ]
                 ),
             ),
+            True,
+        ),
+        (
+            "mixed-attach.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Mixed(
+                    [
+                        BytesAttachment(
+                            b"\xFE\xED\xFA\xCE",
+                            filename="blob.dat",
+                            content_type="application/x-feedface",
+                        ),
+                        BytesAttachment(
+                            b"\xDE\xAD\xBE\xEF",
+                            filename="dead.beef",
+                            content_type="application/x-deadbeef",
+                        ),
+                    ]
+                ),
+            ),
+            True,
+        ),
+        (
+            "mixed-html.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Mixed(
+                    [
+                        HTMLBody("<p>Look at the <em>pretty kitty</em>!</p>\n"),
+                        BytesAttachment(
+                            CAT, "snuffles.png", content_type="image/png", inline=True
+                        ),
+                        HTMLBody("<p>Now look at this <strong>dog</strong>.</p>\n"),
+                        BytesAttachment(
+                            DOG, "rags.png", content_type="image/png", inline=True
+                        ),
+                        HTMLBody(
+                            "<p>Which one is <span style='color: pink'>"
+                            "cuter</span>?</p>\n"
+                        ),
+                    ]
+                ),
+            ),
+            True,
+        ),
+        (
+            "mixed-related.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Mixed(
+                    [
+                        Related(
+                            [
+                                HTMLBody(
+                                    "<p>Look at the <em>pretty kitty</em>!\n"
+                                    '<div class="align: center;">\n'
+                                    '    <img src="cid:161652570180.16119.6180689265099732111@example.nil" width="500" height="500"\n'
+                                    '         style="border: 1px solid blue;" />\n'
+                                    "</div>\n"
+                                ),
+                                BytesAttachment(
+                                    CAT,
+                                    "snuffles.png",
+                                    content_type="image/png",
+                                    inline=True,
+                                    content_id="<161652570180.16119.6180689265099732111@example.nil>",
+                                ),
+                            ]
+                        )
+                    ]
+                ),
+            ),
+            True,
+        ),
+        (
+            "multi-html-alt.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Alternative(
+                    [
+                        HTMLBody("<p>Version <strong>1</strong></p>\n"),
+                        HTMLBody("<p>Version <strong>2</strong></p>\n"),
+                    ]
+                ),
+            ),
+            True,
+        ),
+        (
+            "multi-text-alt.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Alternative(
+                    [
+                        TextBody("Version 1\n"),
+                        TextBody("Version 2\n"),
+                    ]
+                ),
+            ),
+            True,
         ),
         (
             "name-in-type.eml",
@@ -401,6 +596,41 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     ]
                 ),
             ),
+            True,
+        ),
+        (
+            "no-newline-html.eml",
+            Eletter(
+                subject="HTML without a terminating newline",
+                from_=[Address("", addr_spec="sender@domain.com")],
+                to=[Address("", addr_spec="recipient@domain.com")],
+                content=Mixed(
+                    [
+                        HTMLBody(
+                            "<p>This <em>doesn't</em> end with a <code>newline</code>!</p>"
+                        ),
+                        HTMLBody(
+                            "<p><strong>But</strong> one will be inserted in the middle.</p>"
+                        ),
+                    ]
+                ),
+            ),
+            False,
+        ),
+        (
+            "no-newline-text.eml",
+            Eletter(
+                subject="Text without a terminating newline",
+                from_=[Address("", addr_spec="sender@domain.com")],
+                to=[Address("", addr_spec="recipient@domain.com")],
+                content=Mixed(
+                    [
+                        TextBody("This doesn't end with a newline!"),
+                        TextBody("But one will be inserted in the middle."),
+                    ]
+                ),
+            ),
+            False,
         ),
         (
             "null-filename.eml",
@@ -423,6 +653,26 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     ]
                 ),
             ),
+            True,
+        ),
+        (
+            "one-related.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Related(
+                    [
+                        HTMLBody(
+                            "<p>This is <code>multipart/related</code>, but it's not related <em>to</em> anything!</p>\n"
+                        )
+                    ]
+                ),
+            ),
+            True,
         ),
         (
             "related.eml",
@@ -474,6 +724,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     ]
                 ),
             ),
+            True,
         ),
         (
             "related-start.eml",
@@ -502,6 +753,25 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     start="<950120.aaCC@XIson.com>",
                 ),
             ),
+            True,
+        ),
+        (
+            "reverse-alt.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Alternative(
+                    [
+                        HTMLBody("<p>This is displayed on graphical clients.<p>\n"),
+                        TextBody("This is displayed on plain text clients.\n"),
+                    ]
+                ),
+            ),
+            True,
         ),
         (
             "text.eml",
@@ -516,6 +786,34 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     "This is the body of the e-mail.  Write what you want here!\n"
                 ),
             ),
+            True,
+        ),
+        (
+            "text-plus-alt.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Mixed(
+                    [
+                        TextBody("This is the all-text start of the message.\n"),
+                        Alternative(
+                            [
+                                TextBody(
+                                    "This is the text version of the second part of the message.\n"
+                                ),
+                                HTMLBody(
+                                    "<p>This is the HTML version of the <em>second</em> part of the message.</p>\n"
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+            ),
+            True,
         ),
         (
             "twine_release.eml",
@@ -586,6 +884,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     ]
                 ),
             ),
+            True,
         ),
         (
             "unattached-vcard.eml",
@@ -674,15 +973,17 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     ]
                 ),
             ),
+            True,
         ),
     ],
 )
-def test_decompose(eml: str, decomposed: Eletter) -> None:
+def test_decompose(eml: str, decomposed: Eletter, recomposable: bool) -> None:
     with (EMAIL_DIR / eml).open("rb") as fp:
         msg = email.message_from_binary_file(fp, policy=policy.default)
     assert isinstance(msg, EmailMessage)
     assert decompose(msg) == decomposed
-    assert decompose(decomposed.compose()) == decomposed
+    if recomposable:
+        assert decompose(decomposed.compose()) == decomposed
 
 
 def test_decompose_email_attachment() -> None:
@@ -754,7 +1055,7 @@ def test_decompose_bad_content_type() -> None:
 
 
 @pytest.mark.parametrize(
-    "eml,decomposed",
+    "eml,decomposed,recomposable",
     [
         (
             "addresses.eml",
@@ -778,6 +1079,7 @@ def test_decompose_bad_content_type() -> None:
                 sender=Address("", addr_spec="steven.ender@big.senders"),
                 text="Meeting tonight!  You know the place.  Bring pizza.\n",
             ),
+            True,
         ),
         (
             "alt.eml",
@@ -791,6 +1093,7 @@ def test_decompose_bad_content_type() -> None:
                 text="This is displayed on plain text clients.\n",
                 html="<p>This is displayed on graphical clients.<p>\n",
             ),
+            True,
         ),
         (
             "attachments.eml",
@@ -817,6 +1120,7 @@ def test_decompose_bad_content_type() -> None:
                     ),
                 ],
             ),
+            True,
         ),
         (
             "groups.eml",
@@ -846,6 +1150,7 @@ def test_decompose_bad_content_type() -> None:
                 headers={"message-id": ["<testabcd.1234@silly.example>"]},
                 text="Testing.\n\n-- \nTaken from RFC 5322, section A.1.3.\n",
             ),
+            True,
         ),
         (
             "headers.eml",
@@ -870,6 +1175,7 @@ def test_decompose_bad_content_type() -> None:
                 },
                 text="This is the body of the e-mail.  Write what you want here!\n",
             ),
+            True,
         ),
         (
             "html.eml",
@@ -885,6 +1191,33 @@ def test_decompose_bad_content_type() -> None:
                     "  <span style='color: red;'>Write what you want here!</span></p>\n"
                 ),
             ),
+            True,
+        ),
+        (
+            "no-newline-html.eml",
+            SimpleEletter(
+                subject="HTML without a terminating newline",
+                from_=[Address("", addr_spec="sender@domain.com")],
+                to=[Address("", addr_spec="recipient@domain.com")],
+                html=(
+                    "<p>This <em>doesn't</em> end with a <code>newline</code>!</p>\n"
+                    "<p><strong>But</strong> one will be inserted in the middle.</p>"
+                ),
+            ),
+            False,
+        ),
+        (
+            "no-newline-text.eml",
+            SimpleEletter(
+                subject="Text without a terminating newline",
+                from_=[Address("", addr_spec="sender@domain.com")],
+                to=[Address("", addr_spec="recipient@domain.com")],
+                text=(
+                    "This doesn't end with a newline!\n"
+                    "But one will be inserted in the middle."
+                ),
+            ),
+            False,
         ),
         (
             "null-filename.eml",
@@ -905,6 +1238,34 @@ def test_decompose_bad_content_type() -> None:
                     ),
                 ],
             ),
+            True,
+        ),
+        (
+            "one-related.eml",
+            SimpleEletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                html="<p>This is <code>multipart/related</code>, but it's not related <em>to</em> anything!</p>\n",
+            ),
+            True,
+        ),
+        (
+            "reverse-alt.eml",
+            SimpleEletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                text="This is displayed on plain text clients.\n",
+                html="<p>This is displayed on graphical clients.<p>\n",
+            ),
+            True,
         ),
         (
             "text.eml",
@@ -917,16 +1278,20 @@ def test_decompose_bad_content_type() -> None:
                 from_=[Address("", addr_spec="sender@domain.com")],
                 text="This is the body of the e-mail.  Write what you want here!\n",
             ),
+            True,
         ),
     ],
 )
 @pytest.mark.parametrize("unmix", [False, True])
-def test_simple_decompose(eml: str, decomposed: SimpleEletter, unmix: bool) -> None:
+def test_simple_decompose(
+    eml: str, decomposed: SimpleEletter, recomposable: bool, unmix: bool
+) -> None:
     with (EMAIL_DIR / eml).open("rb") as fp:
         msg = email.message_from_binary_file(fp, policy=policy.default)
     assert isinstance(msg, EmailMessage)
     assert decompose_simple(msg, unmix=unmix) == decomposed
-    assert decompose_simple(decomposed.compose()) == decomposed
+    if recomposable:
+        assert decompose_simple(decomposed.compose()) == decomposed
 
 
 def test_simple_decompose_email_attachment() -> None:
@@ -989,16 +1354,24 @@ def test_simple_decompose_email_attachment() -> None:
     [
         ("all-bytes.eml", "Body is an attachment"),
         ("alt-mixed.eml", "Message intersperses attachments with text"),
+        ("asparagus.eml", "Cannot simplify multipart/related"),
+        ("html-plus-alt.eml", "Text + HTML alternative follows HTML-only body"),
+        ("mdalt.eml", "Alternative part contains neither text/plain nor text/html"),
         ("mixed.eml", "Message intersperses attachments with text"),
         ("mixed-alt.eml", "Message intersperses attachments with text"),
-        ("asparagus.eml", "Cannot simplify multipart/related"),
+        ("mixed-attach.eml", "No text or HTML bodies in message"),
+        ("mixed-html.eml", "Message intersperses attachments with text"),
+        ("mixed-related.eml", "Cannot simplify multipart/related"),
+        ("multi-html-alt.eml", "Multiple text/html parts in multipart/alternative"),
+        ("multi-text-alt.eml", "Multiple text/plain parts in multipart/alternative"),
         ("name-in-type.eml", "Cannot simplify multipart/related"),
         ("related.eml", "Cannot simplify multipart/related"),
         ("related-start.eml", "Cannot simplify multipart/related"),
+        ("text-plus-alt.eml", "Text + HTML alternative follows text-only body"),
         ("twine_release.eml", "No matching HTML alternative for text part"),
         (
             "unattached-vcard.eml",
-            "multipart/alternative is not a text/plain part plus a text/html part",
+            "multipart/alternative inside multipart/mixed is not a text/plain part plus a text/html part",
         ),
     ],
 )
@@ -1088,6 +1461,31 @@ def test_simple_error(eml: str, errmsg: str) -> None:
                     "Now look at this dog.\n"
                     "Which one is cuter?\n"
                 ),
+                html=(
+                    "<p>Look at the <em>pretty kitty</em>!</p>\n"
+                    "<p>Now look at this <strong>dog</strong>.</p>\n"
+                    "<p>Which one is <span style='color: pink'>"
+                    "cuter</span>?</p>\n"
+                ),
+                attachments=[
+                    BytesAttachment(
+                        CAT, "snuffles.png", content_type="image/png", inline=True
+                    ),
+                    BytesAttachment(
+                        DOG, "rags.png", content_type="image/png", inline=True
+                    ),
+                ],
+            ),
+        ),
+        (
+            "mixed-html.eml",
+            SimpleEletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
                 html=(
                     "<p>Look at the <em>pretty kitty</em>!</p>\n"
                     "<p>Now look at this <strong>dog</strong>.</p>\n"

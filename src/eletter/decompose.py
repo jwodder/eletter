@@ -109,7 +109,7 @@ class Eletter:
                         )
                 elif t is None and h is None:
                     raise ValueError(
-                        "Alternative part is neither text/plain nor text/html"
+                        "Alternative part contains neither text/plain nor text/html"
                     )
                 else:
                     raise ValueError(
@@ -420,7 +420,8 @@ def alt2text_html(alt: Alternative) -> Tuple[str, str]:
         elif isinstance(alt[0], HTMLBody) and isinstance(alt[1], TextBody):
             return (alt[1].content, alt[0].content)
     raise ValueError(
-        "multipart/alternative is not a text/plain part plus a text/html part"
+        "multipart/alternative inside multipart/mixed is not a text/plain part"
+        " plus a text/html part"
     )
 
 

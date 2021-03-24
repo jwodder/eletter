@@ -1,0 +1,53 @@
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============3257662377926918914=="
+Subject: Text vs. Markdown
+From: sender@domain.com
+To: recipient@domain.com
+
+--===============3257662377926918914==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+This is the plain text version of the message.
+
+--===============3257662377926918914==
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============7306062091132988574=="
+
+--===============7306062091132988574==
+Content-Type: text/markdown; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+This is the *Markdown* version of the message.
+
+--===============7306062091132988574==
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="dog.png"
+MIME-Version: 1.0
+
+iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJ
+bWFnZVJlYWR5ccllPAAABAZJREFUeNrEV1tIFGEUPqau0XiZFdkp87IKXnqo1uxKVmta0MXUXiwi
+spd6CUoIoihIgh6z3soX9UEKoov1WjhWdANpU6i2i1qotVu5Y7lqa1b/+f1n+l1nZ2c3oQM/szNn
+5nznfOf85/wL8J8lJtwLv7vaRHKpJWsfWQ72WCFLJqvtYuMN0ef7purwuYuslhOt15sjcuDsnp1o
+oIEspwpSWGhvrq7cgOBiKAPXrrfD6zcf9FTNxIn94RyYw8AR9BkHjiImJc47YgSOUlKyNJSqlgUV
+3gEiTXpKyWYNS6FkS4WUlMRQatGsA3Y9pYHhabJi+aJQKtMMRCV+r4eu/LysqBmIM1IaMdBz9w74
+PR76e67VCgvnp8LAp6Hg1/qiZmBugoU68NzdC8p3/zTduM9HweW3A9D48AV8/uSFTEHXVJ9ZBlzB
++crKmk/BV+6uI9tBAE9Hq6abnAjQ69GbD+k1KSEeDlbmwMsv4zA8PMKbcZllQNYrrOGRqciDGYgX
+plKTbxO1q4U8Ky9bwb92nvQBxSwD9azbUYtYVMgArr0VG8GebtM+eD/opQ4lSRJcqnHCx2E/dSA5
+MwMW2CRYV+Iovf/ApRBwV6Sd0M6cUI4f29cQ/CKCbj5wkqYFZdvaImg8VAO/AhMgSDYQCPi3/n6Y
+DARgXlqaKyE5uQW7YcySSiXiWUD6fxNzZlrk+dsPcG1SgKeXGyCbsYPA7ltt9IqSVlAIC4qLkYVS
+IydC7YI6Nlg08E0k+lMHd1HgpQU5UOFcRR1CHcpXt1sDR/nifgX9jx+p84UPrgqXoQPM42r1HqPc
+QQDPXLpC7zENt+UncPXccY0BT3fXDDu+nh50qpYAOhg4zpYbfIOKMRjDWBO9/DMERgayuaLUWLrX
+QWsgWHLLy2l9sJ5gZ8zmqGkx6oR2vvEE/H5KPf8M+wEzDtLiJTMciLVYND1nbz9fE3FmtgoaVinG
+tovgKigCYPRqtIOdnVSP72WuXsN3ROw1LQRcNjsLtDaK2wy6/0autWurVXOQ1sr6DZC3ZaueLQQ+
+HdEwIh/0kTpAqkSM0iIINA3T6Z2qhRCgvMjRjmPtQ4xOkCQt8tyycuqEeq+yEamEqwFMbhUPylVz
+uNTZzTgQjgG9fl4U4jmyVU1Sl2NmDEd9ImJbqE1HdYHobpo9Cc3KkUyPelK4TrJTHLNVA5EwQ9Oi
+9PYeHup5B7Hx8bRwuT8rUTHQEKkjvyYnW8Rsu+L3elVWDKeh0SxwkmnWnpyRSc9/ZLRSg1hkRNce
+9CcGGJA8m9vQNTE6qpB8imOK1v3q+XGLh5ERcixPX1Y8+30AaSOR4pZz/uz8gVUtq3nG1vpzbMwx
+JzZOZIdUOZro/1lwzrOxHbX8EWAAn/mS863ULjQAAAAASUVORK5CYII=
+
+--===============7306062091132988574==--
+
+--===============3257662377926918914==--

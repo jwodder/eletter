@@ -1,0 +1,22 @@
+Content-Type: multipart/mixed; boundary="===============8161266818668645571=="
+Subject: The subject of the e-mail
+To: recipient@domain.com, another.recipient@example.nil
+From: sender@domain.com
+
+--===============8161266818668645571==
+Content-Type: application/x-feedface
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="blob.dat"
+MIME-Version: 1.0
+
+/u36zg==
+
+--===============8161266818668645571==
+Content-Type: application/x-deadbeef
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="dead.beef"
+MIME-Version: 1.0
+
+3q2+7w==
+
+--===============8161266818668645571==--

@@ -1,0 +1,23 @@
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============0854185956726633880=="
+Subject: HTML without a terminating newline
+From: sender@domain.com
+To: recipient@domain.com
+
+--===============0854185956726633880==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: base64
+
+PHA+VGhpcyA8ZW0+ZG9lc24ndDwvZW0+IGVuZCB3aXRoIGEgPGNvZGU+bmV3bGluZTwvY29kZT4h
+PC9wPg==
+
+--===============0854185956726633880==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+MIME-Version: 1.0
+
+PHA+PHN0cm9uZz5CdXQ8L3N0cm9uZz4gb25lIHdpbGwgYmUgaW5zZXJ0ZWQgaW4gdGhlIG1pZGRs
+ZS48L3A+
+
+--===============0854185956726633880==--

@@ -1,0 +1,20 @@
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============3534225998908005851=="
+Subject: Text without a terminating newline
+From: sender@domain.com
+To: recipient@domain.com
+
+--===============3534225998908005851==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+
+VGhpcyBkb2Vzbid0IGVuZCB3aXRoIGEgbmV3bGluZSE=
+
+--===============3534225998908005851==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+
+QnV0IG9uZSB3aWxsIGJlIGluc2VydGVkIGluIHRoZSBtaWRkbGUu
+
+--===============3534225998908005851==--

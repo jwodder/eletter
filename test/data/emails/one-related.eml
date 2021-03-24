@@ -1,0 +1,15 @@
+Content-Type: multipart/related; type="text/html";
+ boundary="===============0990775214144314932=="
+Subject: The subject of the e-mail
+To: recipient@domain.com, another.recipient@example.nil
+From: sender@domain.com
+
+--===============0990775214144314932==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<p>This is <code>multipart/related</code>, but it's not related <em>to</em> a=
+nything!</p>
+
+--===============0990775214144314932==--

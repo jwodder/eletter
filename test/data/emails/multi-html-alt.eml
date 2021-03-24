@@ -1,0 +1,21 @@
+Content-Type: multipart/alternative;
+ boundary="===============8264103561467808803=="
+Subject: The subject of the e-mail
+To: recipient@domain.com, another.recipient@example.nil
+From: sender@domain.com
+
+--===============8264103561467808803==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+<p>Version <strong>1</strong></p>
+
+--===============8264103561467808803==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+<p>Version <strong>2</strong></p>
+
+--===============8264103561467808803==--
