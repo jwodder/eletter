@@ -357,12 +357,11 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                         TextBody("This is the plain text version of the message.\n"),
                         Mixed(
                             [
-                                # TODO: Should this be inline?
                                 TextAttachment(
                                     "This is the *Markdown* version of the message.\n",
                                     filename=None,
                                     content_type="text/markdown",
-                                    inline=False,
+                                    inline=True,
                                 ),
                                 BytesAttachment(
                                     DOG,
@@ -556,12 +555,11 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                                 TextBody(
                                     "This is the plain text version of the message.\n"
                                 ),
-                                # TODO: Should this be inline?
                                 TextAttachment(
                                     "This is the *Markdown* version of the message.\n",
                                     filename=None,
                                     content_type="text/markdown",
-                                    inline=False,
+                                    inline=True,
                                 ),
                             ]
                         ),
@@ -845,14 +843,14 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                             content=b"25\n10\n34\n10\n25\n21\n26\n10",
                             filename=None,
                             content_type="application/x-fixedrecord",
-                            inline=False,
+                            inline=True,
                             content_id="<950120.aaCC@XIson.com>",
                         ),
                         BytesAttachment(
                             content=b"Old MacDonald had a farm\nE I E I O\nAnd on his farm he had some ducks\nE I E I O\nWith a quack quack here,\na quack quack there,\nevery where a quack quack\nE I E I O\n",
                             filename=None,
                             content_type="application/octet-stream",
-                            inline=False,
+                            inline=True,
                             content_id="<950120.aaCB@XIson.com>",
                         ),
                     ],
@@ -1065,7 +1063,6 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                                 HTMLBody(
                                     "<h2>You have been invited to the following event.</h2><table><tr><th>Title:</th><td>Create eletter decomposition tests</td></tr><tr><th>When:</th><td>Tue Mar 16, 2021 2pm – 3pm Eastern Time - New York</td></tr></table>\n"
                                 ),
-                                # TODO: Should this be inline?
                                 TextAttachment(
                                     "BEGIN:VCALENDAR\n"
                                     "PRODID:-//Google Inc//Google Calendar 70.9054//EN\n"
@@ -1092,7 +1089,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                                     "END:VCALENDAR\n",
                                     filename=None,
                                     content_type='text/calendar; method="REQUEST"',
-                                    inline=False,
+                                    inline=True,
                                 ),
                             ]
                         ),

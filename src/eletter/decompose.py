@@ -224,7 +224,8 @@ def decompose(msg: EmailMessage) -> Eletter:
 
     All message parts that are not :mimetype:`text/plain`,
     :mimetype:`text/html`, :mimetype:`multipart/*`, or :mimetype:`message/*`
-    are treated as attachments.
+    are treated as attachments.  Attachments without filenames or an explicit
+    "attachment" :mailheader:`Content-Disposition` are treated as inline.
 
     Any information specific to how the message is encoded is discarded
     (namely, "charset" parameters on :mimetype:`text/*` parts,
@@ -317,7 +318,7 @@ def get_content(msg: EmailMessage) -> MailItem:
             return EmailAttachment(
                 content=body,
                 filename=filename,
-                inline=disposition == "inline",
+                inline=disposition != "attachment",
                 content_id=content_id,
             )
         else:
@@ -335,7 +336,7 @@ def get_content(msg: EmailMessage) -> MailItem:
                 content=text,
                 filename=filename,
                 content_type=str(ct),
-                inline=disposition == "inline",
+                inline=disposition != "attachment",
                 content_id=content_id,
             )
         elif ct.subtype == "plain":
@@ -351,7 +352,7 @@ def get_content(msg: EmailMessage) -> MailItem:
             filename=filename,
             content_type=str(ct),
             content_id=content_id,
-            inline=disposition == "inline",
+            inline=disposition != "attachment",
         )
 
 
