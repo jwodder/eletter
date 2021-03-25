@@ -448,6 +448,47 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             True,
         ),
         (
+            "mixed-alt-text.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Alternative(
+                    [
+                        Mixed(
+                            [
+                                Alternative(
+                                    [
+                                        TextBody(
+                                            "This is the first part of the less-preferred version.\n"
+                                        ),
+                                        HTMLBody(
+                                            "<p>This is the first part of the <em>less-preferred</em> version.</p>\n"
+                                        ),
+                                    ]
+                                ),
+                                Alternative(
+                                    [
+                                        TextBody(
+                                            "This is the second part of the less-preferred version.\n"
+                                        ),
+                                        HTMLBody(
+                                            "<p>This is the second part of the <em>less-preferred</em> version.</p>\n"
+                                        ),
+                                    ]
+                                ),
+                            ]
+                        ),
+                        TextBody("This is the more-preferred version.\n"),
+                    ]
+                ),
+            ),
+            True,
+        ),
+        (
             "mixed-attach.eml",
             Eletter(
                 subject="The subject of the e-mail",
@@ -727,6 +768,43 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             True,
         ),
         (
+            "related-in-mixed.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Mixed(
+                    [
+                        HTMLBody(
+                            "<p>There's a <strong>pretty kitty</strong> coming up!</p>\n"
+                        ),
+                        Related(
+                            [
+                                HTMLBody(
+                                    "<p>Look at the <em>pretty kitty</em>!\n"
+                                    '<div class="align: center;">\n'
+                                    '    <img src="cid:161668323565.35409.10635783721556797858@example.nil" width="500" height="500"\n'
+                                    '         style="border: 1px solid blue;" />\n'
+                                    "</div>\n"
+                                ),
+                                BytesAttachment(
+                                    CAT,
+                                    "snuffles.png",
+                                    content_type="image/png",
+                                    inline=True,
+                                    content_id="<161668323565.35409.10635783721556797858@example.nil>",
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+            ),
+            True,
+        ),
+        (
             "related-start.eml",
             Eletter(
                 subject=None,
@@ -816,6 +894,24 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             True,
         ),
         (
+            "text-plus-html.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Mixed(
+                    [
+                        TextBody("This is the first part.\n"),
+                        HTMLBody("<p>This is the <strong>second</strong> part.</p>\n"),
+                    ]
+                ),
+            ),
+            True,
+        ),
+        (
             "twine_release.eml",
             Eletter(
                 subject="[Distutils] Twine 3.3.0 released",
@@ -880,6 +976,36 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                         ),
                         TextBody(
                             "--\nDistutils-SIG mailing list -- distutils-sig@python.org\nTo unsubscribe send an email to distutils-sig-leave@python.org\nhttps://mail.python.org/mailman3/lists/distutils-sig.python.org/\nMessage archived at https://mail.python.org/archives/list/distutils-sig@python.org/message/5FC6OKCCVOJZGRYTKAK7CA5RC2XVX24Z/\n"
+                        ),
+                    ]
+                ),
+            ),
+            True,
+        ),
+        (
+            "twisted.eml",
+            Eletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Mixed(
+                    [
+                        Alternative(
+                            [
+                                HTMLBody("<p>This is the <em>first</em> part.</p>\n"),
+                                TextBody("This is the first part.\n"),
+                            ]
+                        ),
+                        Alternative(
+                            [
+                                TextBody("This is the second part.\n"),
+                                HTMLBody(
+                                    "<p>This is the <strong>second</strong> part.</p>\n"
+                                ),
+                            ]
                         ),
                     ]
                 ),
@@ -1280,6 +1406,23 @@ def test_decompose_bad_content_type() -> None:
             ),
             True,
         ),
+        (
+            "twisted.eml",
+            SimpleEletter(
+                subject="The subject of the e-mail",
+                to=[
+                    Address("", addr_spec="recipient@domain.com"),
+                    Address("", addr_spec="another.recipient@example.nil"),
+                ],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                text=("This is the first part.\n" "This is the second part.\n"),
+                html=(
+                    "<p>This is the <em>first</em> part.</p>\n"
+                    "<p>This is the <strong>second</strong> part.</p>\n"
+                ),
+            ),
+            True,
+        ),
     ],
 )
 @pytest.mark.parametrize("unmix", [False, True])
@@ -1359,6 +1502,10 @@ def test_simple_decompose_email_attachment() -> None:
         ("mdalt.eml", "Alternative part contains neither text/plain nor text/html"),
         ("mixed.eml", "Message intersperses attachments with text"),
         ("mixed-alt.eml", "Message intersperses attachments with text"),
+        (
+            "mixed-alt-text.eml",
+            "Alternative part contains both text/plain and text/html",
+        ),
         ("mixed-attach.eml", "No text or HTML bodies in message"),
         ("mixed-html.eml", "Message intersperses attachments with text"),
         ("mixed-related.eml", "Cannot simplify multipart/related"),
@@ -1366,8 +1513,10 @@ def test_simple_decompose_email_attachment() -> None:
         ("multi-text-alt.eml", "Multiple text/plain parts in multipart/alternative"),
         ("name-in-type.eml", "Cannot simplify multipart/related"),
         ("related.eml", "Cannot simplify multipart/related"),
+        ("related-in-mixed.eml", "Cannot simplify multipart/related"),
         ("related-start.eml", "Cannot simplify multipart/related"),
         ("text-plus-alt.eml", "Text + HTML alternative follows text-only body"),
+        ("text-plus-html.eml", "No matching text alternative for HTML part"),
         ("twine_release.eml", "No matching HTML alternative for text part"),
         (
             "unattached-vcard.eml",
