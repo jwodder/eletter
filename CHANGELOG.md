@@ -9,6 +9,7 @@ v0.5.0 (in development)
   `None`/omitted
 - If an address argument to `compose()` is set to an empty list, the
   corresponding header will no longer be present in the resulting e-mail
+- Gave `Related` a `get_root()` method
 
 v0.4.0 (2021-03-13)
 -------------------

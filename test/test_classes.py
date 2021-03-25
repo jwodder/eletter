@@ -1001,6 +1001,39 @@ def test_img_html_related_start() -> None:
     }
 
 
+def test_get_root() -> None:
+    cid = make_msgid()
+    html1 = HTMLBody("<p>This is the <em>first</em> part.</p>\n")
+    html2 = HTMLBody("<p>This is the <em>second</em> part.</p>\n", content_id=cid)
+    rel = html1 ^ html2
+    rel.start = cid
+    assert rel.get_root() is html2
+
+
+def test_get_root_start_unset() -> None:
+    html1 = HTMLBody("<p>This is the <em>first</em> part.</p>\n")
+    html2 = HTMLBody("<p>This is the <em>second</em> part.</p>\n")
+    rel = html1 ^ html2
+    assert rel.get_root() is html1
+
+
+def test_get_root_not_found() -> None:
+    cid = make_msgid()
+    html1 = HTMLBody("<p>This is the <em>first</em> part.</p>\n")
+    html2 = HTMLBody("<p>This is the <em>second</em> part.</p>\n")
+    rel = html1 ^ html2
+    rel.start = cid
+    with pytest.raises(ValueError) as excinfo:
+        rel.get_root()
+    assert str(excinfo.value) == "Part specified by `start` not found"
+
+
+def test_get_root_empty() -> None:
+    with pytest.raises(ValueError) as excinfo:
+        Related().get_root()
+    assert str(excinfo.value) == "Related instance is empty"
+
+
 def test_multipart_content_ids() -> None:
     img_cid = make_msgid()
     img = BytesAttachment(

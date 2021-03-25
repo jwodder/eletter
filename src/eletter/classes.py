@@ -744,6 +744,25 @@ class Related(Multipart):
     #: first part)
     start: Optional[str] = None
 
+    def get_root(self) -> MailItem:
+        """
+        Retrieves the root part, i.e., the part whose ``content_id`` equals
+        `start`, or the first part if `start` is not set.
+
+        :raises ValueError:
+            if the instance is empty or no part has a ``content_id`` equaling
+            `start`
+        """
+        if not self.content:
+            raise ValueError("Related instance is empty")
+        elif self.start is not None:
+            for mi in self.content:
+                if mi.content_id == self.start:
+                    return mi
+            raise ValueError("Part specified by `start` not found")
+        else:
+            return self.content[0]
+
     def _compile(self) -> EmailMessage:
         if not self.content:
             raise ValueError("Cannot compose empty Related")
