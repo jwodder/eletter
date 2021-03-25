@@ -543,6 +543,34 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
             True,
         ),
         (
+            "mixed-mdalt.eml",
+            Eletter(
+                subject="Text plus Text vs. Markdown",
+                to=[Address("", addr_spec="recipient@domain.com")],
+                from_=[Address("", addr_spec="sender@domain.com")],
+                content=Mixed(
+                    [
+                        TextBody("This is the start of the message.\n"),
+                        Alternative(
+                            [
+                                TextBody(
+                                    "This is the plain text version of the message.\n"
+                                ),
+                                # TODO: Should this be inline?
+                                TextAttachment(
+                                    "This is the *Markdown* version of the message.\n",
+                                    filename=None,
+                                    content_type="text/markdown",
+                                    inline=False,
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+            ),
+            True,
+        ),
+        (
             "mixed-related.eml",
             Eletter(
                 subject="The subject of the e-mail",
@@ -1508,6 +1536,10 @@ def test_simple_decompose_email_attachment() -> None:
         ),
         ("mixed-attach.eml", "No text or HTML bodies in message"),
         ("mixed-html.eml", "Message intersperses attachments with text"),
+        (
+            "mixed-mdalt.eml",
+            "multipart/alternative inside multipart/mixed is not a text/plain part plus a text/html part",
+        ),
         ("mixed-related.eml", "Cannot simplify multipart/related"),
         ("multi-html-alt.eml", "Multiple text/html parts in multipart/alternative"),
         ("multi-text-alt.eml", "Multiple text/plain parts in multipart/alternative"),

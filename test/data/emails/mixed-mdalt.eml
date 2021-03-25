@@ -1,0 +1,33 @@
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============4844716894546649826=="
+Subject: Text plus Text vs. Markdown
+From: sender@domain.com
+To: recipient@domain.com
+
+--===============4844716894546649826==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+This is the start of the message.
+
+--===============4844716894546649826==
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============6441585325629676068=="
+
+--===============6441585325629676068==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+This is the plain text version of the message.
+
+--===============6441585325629676068==
+Content-Type: text/markdown; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+
+This is the *Markdown* version of the message.
+
+--===============6441585325629676068==--
+
+--===============4844716894546649826==--
