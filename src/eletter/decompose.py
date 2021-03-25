@@ -396,18 +396,18 @@ def decompose_simple(msg: EmailMessage, unmix: bool = False) -> SimpleEletter:
 
 def smooth(mi: MailItem) -> MailItem:
     if isinstance(mi, Multipart):
-        if len(mi) == 1:
-            return smooth(mi.content[0])
+        out: List[MailItem] = []
+        for n in mi:
+            n = smooth(n)
+            # Flatten nested Mixed and Alternative, but not Related:
+            if type(n) is type(mi) and not isinstance(mi, Related):
+                assert isinstance(n, Multipart)
+                out.extend(n)
+            elif not (isinstance(n, Multipart) and len(n) == 0):
+                out.append(n)
+        if len(out) == 1:
+            return out[0]
         else:
-            out: List[MailItem] = []
-            for n in mi:
-                if type(n) is type(mi):
-                    n = smooth(n)
-                if type(n) is type(mi):
-                    assert isinstance(n, Multipart)
-                    out.extend(n)
-                elif not (isinstance(n, Multipart) and len(n) == 0):
-                    out.append(n)
             return type(mi)(out)
     else:
         return mi
