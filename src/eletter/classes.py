@@ -37,7 +37,11 @@ class Address(hr.Address):
 
 
 class Group(hr.Group):
-    """ An e-mail address group """
+    """
+    .. versionadded:: 0.2.0
+
+    An e-mail address group
+    """
 
     def __init__(self, display_name: str, addresses: Iterable[SingleAddress]) -> None:
         super().__init__(
@@ -74,8 +78,14 @@ class ContentTyped:
 
 @attr.s
 class MailItem(ABC):
-    """ Base class for all ``eletter`` message components """
+    """
+    .. versionadded:: 0.3.0
 
+    Base class for all ``eletter`` message components
+    """
+
+    #: .. versionadded:: 0.3.0
+    #:
     #: :mailheader:`Content-ID` header value for the item
     content_id: Optional[str] = attr.ib(default=None, kw_only=True)
 
@@ -103,6 +113,15 @@ class MailItem(ABC):
         other headers.
 
         All parameters other than ``to`` are optional.
+
+        .. versionchanged:: 0.4.0
+            ``from_`` may now be `None` or omitted.
+
+        .. versionchanged:: 0.4.0
+            All arguments are now keyword-only.
+
+        .. versionchanged:: 0.5.0
+            ``subject`` may now be `None` or omitted.
 
         :param str subject: The e-mail's :mailheader:`Subject` line
         :param to: The e-mail's :mailheader:`To` line
@@ -243,6 +262,9 @@ class TextAttachment(Attachment, ContentTyped):
     #: The body of the attachment
     content: str
     #: The filename of the attachment
+    #:
+    #: .. versionchanged:: 0.5.0
+    #:     ``filename`` can now be `None`.
     filename: Optional[str]
     #: Whether the attachment should be displayed inline in clients
     inline: bool = attr.ib(default=False, kw_only=True)
@@ -274,12 +296,17 @@ class TextAttachment(Attachment, ContentTyped):
         content_id: Optional[str] = None,
     ) -> "TextAttachment":
         """
+        .. versionadded:: 0.2.0
+
         Construct a `TextAttachment` from the contents of the file at ``path``.
         The filename of the attachment will be set to the basename of ``path``.
         If ``content_type`` is `None`, the :mailheader:`Content-Type` is
         guessed based on ``path``'s file extension.  ``encoding`` and
         ``errors`` are used when opening the file and have no relation to the
         :mailheader:`Content-Type`.
+
+        .. versionchanged:: 0.3.0
+            ``inline`` and ``content_id`` arguments added
         """
         with open(path, "r", encoding=encoding, errors=errors) as fp:
             content = fp.read()
@@ -305,6 +332,9 @@ class BytesAttachment(Attachment, ContentTyped):
     #: The body of the attachment
     content: bytes
     #: The filename of the attachment
+    #:
+    #: .. versionchanged:: 0.5.0
+    #:     ``filename`` can now be `None`.
     filename: Optional[str]
     #: Whether the attachment should be displayed inline in clients
     inline: bool = attr.ib(default=False, kw_only=True)
@@ -331,11 +361,16 @@ class BytesAttachment(Attachment, ContentTyped):
         content_id: Optional[str] = None,
     ) -> "BytesAttachment":
         """
+        .. versionadded:: 0.2.0
+
         Construct a `BytesAttachment` from the contents of the file at
         ``path``.  The filename of the attachment will be set to the basename
         of ``path``.  If ``content_type`` is `None`, the
         :mailheader:`Content-Type` is guessed based on ``path``'s file
         extension.
+
+        .. versionchanged:: 0.3.0
+            ``inline`` and ``content_id`` arguments added
         """
         with open(path, "rb") as fp:
             content = fp.read()
@@ -353,11 +388,18 @@ class BytesAttachment(Attachment, ContentTyped):
 
 @attr.s(auto_attribs=True)
 class EmailAttachment(Attachment):
-    """ A :mimetype:`message/rfc822` e-mail attachment """
+    """
+    .. versionadded:: 0.2.0
+
+    A :mimetype:`message/rfc822` e-mail attachment
+    """
 
     #: The body of the attachment
     content: EmailMessage
     #: The filename of the attachment
+    #:
+    #: .. versionchanged:: 0.5.0
+    #:     ``filename`` can now be `None`.
     filename: Optional[str]
     #: Whether the attachment should be displayed inline in clients
     inline: bool = attr.ib(default=False, kw_only=True)
@@ -400,6 +442,8 @@ M = TypeVar("M", bound="Multipart")
 @attr.s
 class Multipart(MailItem, MutableSequence[MailItem]):
     """
+    .. versionadded:: 0.3.0
+
     Base class for all multipart classes.  All such classes are mutable
     sequences of `MailItem`\\s supporting the usual methods (construction from
     an iterable, subscription, ``append()``, ``pop()``, etc.).
@@ -478,6 +522,8 @@ class Multipart(MailItem, MutableSequence[MailItem]):
 @attr.s
 class Alternative(Multipart):
     """
+    .. versionadded:: 0.3.0
+
     A :mimetype:`multipart/alternative` e-mail payload.  E-mails clients will
     display the resulting payload by choosing whichever part they support best.
 
@@ -535,6 +581,10 @@ class Alternative(Multipart):
             TextBody("This is displayed on plain text clients.\\n"),
             HTMLBody("<p>This is displayed on graphical clients.<p>\\n"),
         ]
+
+    .. versionchanged:: 0.4.0
+        Using ``|`` to combine a `MailItem` with a `str` now automatically
+        converts the `str` to a `TextBody`
     """
 
     def _compile(self) -> EmailMessage:
@@ -561,6 +611,8 @@ class Alternative(Multipart):
 @attr.s
 class Mixed(Multipart):
     """
+    .. versionadded:: 0.3.0
+
     A :mimetype:`multipart/mixed` e-mail payload.  E-mails clients will
     display the resulting payload one part after another, with attachments
     displayed inline if their ``inline`` attribute is set.
@@ -626,6 +678,10 @@ class Mixed(Multipart):
             BytesAttachment.from_file("rags.jpeg", inline=True),
             TextBody("Which one is cuter?\\n"),
         ]
+
+    .. versionchanged:: 0.4.0
+        Using ``&`` to combine a `MailItem` with a `str` now automatically
+        converts the `str` to a `TextBody`
     """
 
     def _compile(self) -> EmailMessage:
@@ -652,6 +708,8 @@ class Mixed(Multipart):
 @attr.s(auto_attribs=True)
 class Related(Multipart):
     """
+    .. versionadded:: 0.3.0
+
     A :mimetype:`multipart/related` e-mail payload.  E-mail clients will
     display the part indicated by the `start` parameter, or the first part if
     `start` is not set.  This part may refer to other parts (e.g., images or
@@ -738,6 +796,10 @@ class Related(Multipart):
             ),
             BytesAttachment.from_file("snuffles.jpeg", content_id=img_cid),
         ]
+
+    .. versionchanged:: 0.4.0
+        Using ``^`` to combine a `MailItem` with a `str` now automatically
+        converts the `str` to a `TextBody`
     """
 
     #: The :mailheader:`Content-ID` of the part to display (defaults to the
@@ -746,6 +808,8 @@ class Related(Multipart):
 
     def get_root(self) -> MailItem:
         """
+        .. versionadded:: 0.5.0
+
         Retrieves the root part, i.e., the part whose ``content_id`` equals
         `start`, or the first part if `start` is not set.
 
@@ -795,7 +859,11 @@ class Related(Multipart):
 
 @attr.s(auto_attribs=True)
 class TextBody(MailItem):
-    """ A :mimetype:`text/plain` e-mail body """
+    """
+    .. versionadded:: 0.3.0
+
+    A :mimetype:`text/plain` e-mail body
+    """
 
     #: The plain text body
     content: str
@@ -808,7 +876,11 @@ class TextBody(MailItem):
 
 @attr.s(auto_attribs=True)
 class HTMLBody(MailItem):
-    """ A :mimetype:`text/html` e-mail body """
+    """
+    .. versionadded:: 0.3.0
+
+    A :mimetype:`text/html` e-mail body
+    """
 
     #: The HTML source of the body
     content: str

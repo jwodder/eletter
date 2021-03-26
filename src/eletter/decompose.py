@@ -24,7 +24,11 @@ from .errors import DecompositionError, MixedContentError, SimplificationError
 
 @attr.s
 class Eletter:
-    """ A decomposed e-mail message """
+    """
+    .. versionadded:: 0.5.0
+
+    A decomposed e-mail message
+    """
 
     #: The message's body
     content: MailItem = attr.ib()
@@ -140,6 +144,8 @@ class Eletter:
 @attr.s
 class SimpleEletter:
     """
+    .. versionadded:: 0.5.0
+
     A decomposed simple e-mail message, consisting of a text body and/or HTML
     body plus some number of attachments and headers
     """
@@ -219,6 +225,8 @@ STANDARD_HEADERS = {
 
 def decompose(msg: EmailMessage) -> Eletter:
     """
+    .. versionadded:: 0.5.0
+
     Decompose an `~email.message.EmailMessage` into an `Eletter` instance
     containing a `MailItem` and a collection of headers.  Only structures that
     can be represented by ``eletter`` classes are supported.
@@ -377,6 +385,8 @@ def get_address_list(
 
 def decompose_simple(msg: EmailMessage, unmix: bool = False) -> SimpleEletter:
     """
+    .. versionadded:: 0.5.0
+
     Decompose an `~email.message.EmailMessage` into a `SimpleEletter` instance
     consisting of a text body and/or HTML body, some number of attachments, and
     a collection of headers.  The `~email.message.EmailMessage` is first

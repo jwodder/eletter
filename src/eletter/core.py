@@ -29,6 +29,18 @@ def compose(
     All parameters other than ``to`` and at least one of ``text`` and ``html``
     are optional.
 
+    .. versionchanged:: 0.2.0
+        ``from_`` and ``reply_to`` may now be passed lists of addresses.
+
+    .. versionchanged:: 0.4.0
+        ``from_`` may now be `None` or omitted.
+
+    .. versionchanged:: 0.4.0
+        All arguments are now keyword-only.
+
+    .. versionchanged:: 0.5.0
+        ``subject`` may now be `None` or omitted.
+
     :param str subject: The e-mail's :mailheader:`Subject` line
     :param to: The e-mail's :mailheader:`To` line
     :type to: iterable of addresses
@@ -94,6 +106,8 @@ def compose(
 
 def assemble_content_type(maintype: str, subtype: str, **params: str) -> str:
     """
+    .. versionadded:: 0.2.0
+
     Construct a :mailheader:`Content-Type` string from a maintype, subtype, and
     some number of parameters
 
@@ -105,6 +119,8 @@ def assemble_content_type(maintype: str, subtype: str, **params: str) -> str:
 
 def reply_quote(s: str, prefix: str = "> ") -> str:
     """
+    .. versionadded:: 0.2.0
+
     Quote__ a text following the *de facto* standard for replying to an e-mail;
     that is, prefix each line of the text with ``"> "`` (or a custom prefix),
     and if a line already starts with the prefix, omit any trailing whitespace
