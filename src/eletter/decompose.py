@@ -19,6 +19,7 @@ from .classes import (
     TextBody,
 )
 from .core import compose
+from .errors import DecompositionError, MixedContentError, SimplificationError
 
 
 @attr.s
@@ -82,7 +83,7 @@ class Eletter:
         bodies; set ``unmix`` to `True` to separate the attachments from the
         bodies regardless of what order they come in.
 
-        :raises ValueError: if ``msg`` cannot be simplified
+        :raises SimplificationError: if ``msg`` cannot be simplified
         """
         content = smooth(self.content)
         text: Optional[str]
@@ -97,29 +98,29 @@ class Eletter:
                     if text is None:
                         text = t
                     else:
-                        raise ValueError(
+                        raise SimplificationError(
                             "Multiple text/plain parts in multipart/alternative"
                         )
                 elif h is not None and t is None:
                     if html is None:
                         html = h
                     else:
-                        raise ValueError(
+                        raise SimplificationError(
                             "Multiple text/html parts in multipart/alternative"
                         )
                 elif t is None and h is None:
-                    raise ValueError(
+                    raise SimplificationError(
                         "Alternative part contains neither text/plain nor text/html"
                     )
                 else:
-                    raise ValueError(
+                    raise SimplificationError(
                         "Alternative part contains both text/plain and text/html"
                     )
                 attachments.extend(a for a in attach if a not in attachments)
         else:
             text, html, attachments = simplify_alt_part(content, unmix=unmix)
         if text is None and html is None:
-            raise ValueError("No text or HTML bodies in message")
+            raise SimplificationError("No text or HTML bodies in message")
         return SimpleEletter(
             text=text,
             html=html,
@@ -240,7 +241,7 @@ def decompose(msg: EmailMessage) -> Eletter:
     :raises TypeError:
         if any sub-part of ``msg`` is not an `~email.message.EmailMessage`
         instance
-    :raises ValueError:
+    :raises DecompositionError:
         if ``msg`` contains a part with an unrepresentable
         :mailheader:`Content-Type`
     """
@@ -304,7 +305,7 @@ def get_content(msg: EmailMessage) -> MailItem:
         elif ct.subtype == "related":
             content = Related(content_id=content_id, start=ct.params.get("start"))
         else:
-            raise ValueError(f"Unsupported Content-Type: {ct.content_type}")
+            raise DecompositionError(f"Unsupported Content-Type: {ct.content_type}")
         for p in msg.iter_parts():
             if not isinstance(p, EmailMessage):  # pragma: no cover
                 raise TypeError("EmailMessage parts must be EmailMessage instances")
@@ -322,7 +323,7 @@ def get_content(msg: EmailMessage) -> MailItem:
                 content_id=content_id,
             )
         else:
-            raise ValueError(f"Unsupported Content-Type: {ct.content_type}")
+            raise DecompositionError(f"Unsupported Content-Type: {ct.content_type}")
     elif ct.maintype == "text":
         text = msg.get_content()
         assert isinstance(text, str)
@@ -390,7 +391,10 @@ def decompose_simple(msg: EmailMessage, unmix: bool = False) -> SimpleEletter:
     :raises TypeError:
         if any sub-part of ``msg`` is not an `~email.message.EmailMessage`
         instance
-    :raises ValueError: if ``msg`` cannot be decomposed or simplified
+    :raises DecompositionError:
+        if ``msg`` contains a part with an unrepresentable
+        :mailheader:`Content-Type`
+    :raises SimplificationError: if ``msg`` cannot be simplified
     """
     return decompose(msg).simplify(unmix=unmix)
 
@@ -420,7 +424,7 @@ def alt2text_html(alt: Alternative) -> Tuple[str, str]:
             return (alt[0].content, alt[1].content)
         elif isinstance(alt[0], HTMLBody) and isinstance(alt[1], TextBody):
             return (alt[1].content, alt[0].content)
-    raise ValueError(
+    raise SimplificationError(
         "multipart/alternative inside multipart/mixed is not a text/plain part"
         " plus a text/html part"
     )
@@ -459,15 +463,23 @@ def simplify_alt_part(
         for mi in content:
             if isinstance(mi, TextBody):
                 if attachments and not unmix:
-                    raise ValueError("Message intersperses attachments with text")
+                    raise MixedContentError(
+                        "Message intersperses attachments with text"
+                    )
                 if html is not None:
-                    raise ValueError("No matching HTML alternative for text part")
+                    raise SimplificationError(
+                        "No matching HTML alternative for text part"
+                    )
                 add_text(mi.content)
             elif isinstance(mi, HTMLBody):
                 if attachments and not unmix:
-                    raise ValueError("Message intersperses attachments with text")
+                    raise MixedContentError(
+                        "Message intersperses attachments with text"
+                    )
                 if text is not None:
-                    raise ValueError("No matching text alternative for HTML part")
+                    raise SimplificationError(
+                        "No matching text alternative for HTML part"
+                    )
                 add_html(mi.content)
             # elif isinstance(mi, Mixed):  # smoothed out
             elif isinstance(mi, Alternative):
@@ -475,25 +487,31 @@ def simplify_alt_part(
                 # nesting
                 text_part, html_part = alt2text_html(mi)
                 if attachments and not unmix:
-                    raise ValueError("Message intersperses attachments with text")
+                    raise MixedContentError(
+                        "Message intersperses attachments with text"
+                    )
                 if (text is None) == (html is None):
                     add_text(text_part)
                     add_html(html_part)
                 elif text is not None:
-                    raise ValueError("Text + HTML alternative follows text-only body")
+                    raise SimplificationError(
+                        "Text + HTML alternative follows text-only body"
+                    )
                 else:
                     assert html is not None
-                    raise ValueError("Text + HTML alternative follows HTML-only body")
+                    raise SimplificationError(
+                        "Text + HTML alternative follows HTML-only body"
+                    )
             elif isinstance(mi, Related):
-                raise ValueError("Cannot simplify multipart/related")
+                raise SimplificationError("Cannot simplify multipart/related")
             elif isinstance(mi, Attachment):
                 attachments.append(mi)
             else:
                 raise TypeError(str(type(mi)))  # pragma: no cover
     elif isinstance(content, Related):
-        raise ValueError("Cannot simplify multipart/related")
+        raise SimplificationError("Cannot simplify multipart/related")
     elif isinstance(content, Attachment):
-        raise ValueError("Body is an attachment")
+        raise SimplificationError("Body is an attachment")
     else:
         raise TypeError(str(type(content)))  # pragma: no cover
     return (text, html, attachments)

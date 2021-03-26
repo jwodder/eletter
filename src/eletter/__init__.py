@@ -35,21 +35,26 @@ from .classes import (
 )
 from .core import assemble_content_type, compose, reply_quote
 from .decompose import Eletter, SimpleEletter, decompose, decompose_simple
+from .errors import DecompositionError, Error, MixedContentError, SimplificationError
 
 __all__ = [
     "Address",
     "Alternative",
     "Attachment",
     "BytesAttachment",
+    "DecompositionError",
     "Eletter",
     "EmailAttachment",
+    "Error",
     "Group",
     "HTMLBody",
     "MailItem",
     "Mixed",
+    "MixedContentError",
     "Multipart",
     "Related",
     "SimpleEletter",
+    "SimplificationError",
     "TextAttachment",
     "TextBody",
     "assemble_content_type",

@@ -10,12 +10,15 @@ import pytest
 from eletter import (
     Alternative,
     BytesAttachment,
+    DecompositionError,
     Eletter,
     EmailAttachment,
     HTMLBody,
     Mixed,
+    MixedContentError,
     Related,
     SimpleEletter,
+    SimplificationError,
     TextAttachment,
     TextBody,
     decompose,
@@ -1200,7 +1203,7 @@ def test_decompose_bad_content_type() -> None:
     with (EMAIL_DIR / "signed.eml").open("rb") as fp:
         msg = email.message_from_binary_file(fp, policy=policy.default)
     assert isinstance(msg, EmailMessage)
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(DecompositionError) as excinfo:
         decompose(msg)
     assert str(excinfo.value) == "Unsupported Content-Type: multipart/signed"
 
@@ -1521,18 +1524,14 @@ def test_simple_decompose_email_attachment() -> None:
     "eml,errmsg",
     [
         ("all-bytes.eml", "Body is an attachment"),
-        ("alt-mixed.eml", "Message intersperses attachments with text"),
         ("asparagus.eml", "Cannot simplify multipart/related"),
         ("html-plus-alt.eml", "Text + HTML alternative follows HTML-only body"),
         ("mdalt.eml", "Alternative part contains neither text/plain nor text/html"),
-        ("mixed.eml", "Message intersperses attachments with text"),
-        ("mixed-alt.eml", "Message intersperses attachments with text"),
         (
             "mixed-alt-text.eml",
             "Alternative part contains both text/plain and text/html",
         ),
         ("mixed-attach.eml", "No text or HTML bodies in message"),
-        ("mixed-html.eml", "Message intersperses attachments with text"),
         (
             "mixed-mdalt.eml",
             "multipart/alternative inside multipart/mixed is not a text/plain part plus a text/html part",
@@ -1557,9 +1556,22 @@ def test_simple_error(eml: str, errmsg: str) -> None:
     with (EMAIL_DIR / eml).open("rb") as fp:
         msg = email.message_from_binary_file(fp, policy=policy.default)
     assert isinstance(msg, EmailMessage)
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(SimplificationError) as excinfo:
         decompose_simple(msg)
     assert str(excinfo.value) == errmsg
+
+
+@pytest.mark.parametrize(
+    "eml",
+    ["alt-mixed.eml", "mixed.eml", "mixed-alt.eml", "mixed-html.eml"],
+)
+def test_simple_mixed_content_error(eml: str) -> None:
+    with (EMAIL_DIR / eml).open("rb") as fp:
+        msg = email.message_from_binary_file(fp, policy=policy.default)
+    assert isinstance(msg, EmailMessage)
+    with pytest.raises(MixedContentError) as excinfo:
+        decompose_simple(msg)
+    assert str(excinfo.value) == "Message intersperses attachments with text"
 
 
 @pytest.mark.parametrize(

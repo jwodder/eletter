@@ -100,6 +100,19 @@ Decomposition
     :member-order: bysource
 
 
+Exceptions
+----------
+
+.. autoexception:: eletter.errors.Error
+    :show-inheritance:
+.. autoexception:: eletter.errors.DecompositionError
+    :show-inheritance:
+.. autoexception:: eletter.errors.SimplificationError
+    :show-inheritance:
+.. autoexception:: eletter.errors.MixedContentError
+    :show-inheritance:
+
+
 Utility Functions
 -----------------
 
