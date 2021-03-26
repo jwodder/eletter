@@ -126,10 +126,10 @@ class MailItem(ABC):
         :param str subject: The e-mail's :mailheader:`Subject` line
         :param to: The e-mail's :mailheader:`To` line
         :type to: iterable of addresses
-        :param from_:
+        :param from\\_:
             The e-mail's :mailheader:`From` line.  Note that this argument is
             spelled with an underscore, as "``from``" is a keyword in Python.
-        :type from_: address or iterable of addresses
+        :type from\\_: address or iterable of addresses
         :param cc: The e-mail's :mailheader:`CC` line
         :type cc: iterable of addresses
         :param bcc: The e-mail's :mailheader:`BCC` line
