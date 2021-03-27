@@ -1,5 +1,5 @@
-v0.5.0 (in development)
------------------------
+v0.5.0 (2021-03-27)
+-------------------
 - Attachments' filenames can now be `None`
 - Added a `decompose()` function for decomposing an `EmailMessage` into a
   `MailItem` plus headers
