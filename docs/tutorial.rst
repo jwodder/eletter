@@ -430,7 +430,7 @@ Example:
                  style="border: 1px solid red;" />
         </div>
 
-        <p>Which one is <span style="color: pink">cuter</span>?
+        <p>Which one is <span style="color: pink">cuter</span>?</p>
     """)
 
     snuffles = BytesAttachment.from_file("snuffles.jpeg", inline=True, content_id=snuffles_cid)
@@ -459,3 +459,80 @@ Actually doing this is beyond the scope of this tutorial & library, but may I
 suggest outgoing_, by yours truly?
 
 .. _outgoing: https://github.com/jwodder/outgoing
+
+
+Decomposing Emails
+------------------
+
+.. versionadded:: 0.5.0
+
+If you have an `email.message.EmailMessage` instance (either composed using
+``eletter`` or acquired elsewhere) and you want to convert it into an
+``eletter`` structure to make it easier to work with, ``eletter`` provides a
+`decompose()` function for doing just that.  Calling `decompose()` on an
+`~email.message.EmailMessage` produces an `Eletter` instance that has
+attributes for all of the fields accepted by the `~MailItem.compose()` method
+plus a `~Eletter.content` field containing an ``eletter`` class.
+
+.. tip::
+
+    If you want to decompose a message that is a plain `email.message.Message`
+    instance but not an `~email.message.EmailMessage` instance, you need to
+    first convert it into an `~email.message.EmailMessage` before passing it to
+    `decompose()` or `decompose_simplify()`.  This can be done with the
+    ``message2email()`` function from the mailbits_ package.
+
+    .. _mailbits: https://github.com/jwodder/mailbits
+
+If you want to decompose a message even further, you can call the
+`decompose_simple()` function on an `~email.message.EmailMessage` or call the
+`~Eletter.simplify()` method of an `Eletter` to produce a `SimpleEletter`
+instance.  In place of a ``content`` attribute, a `SimpleEletter` has
+`~SimpleEletter.text`, `~SimpleEletter.html`, and `~SimpleEletter.attachments`
+attributes giving the original message's text and HTML bodies plus any
+attachments.
+
+Once you've decomposed and/or simplified a message, you can examine its parts
+and do whatever you want with that information.  You can also manually modify
+the `Eletter`/`SimpleEletter`'s various attributes and then call its
+`~Eletter.compose()` method (which takes no arguments) to recompose the
+instance into a modified `~email.message.EmailMessage`.  Note that the
+attributes are of stricter types than what is accepted by the corresponding
+arguments to the `compose()` function.  In particular, addresses must be
+specified as `Address` instances, not as strings [1]_, the `~Eletter.from_` and
+`~Eletter.reply_to` attributes must always be lists, and the values of the
+`~Eletter.headers` attribute must always be lists.
+
+.. note::
+
+    Most `~email.message.EmailMessage` instances can be decomposed into
+    `Eletter` instances; those that can't use :mailheader:`Content-Type`\s not
+    supported by ``eletter``, i.e., :mimetype:`message` types other than
+    :mimetype:`message/rfc822` or :mimetype:`multipart` types other than
+    :mimetype:`multipart/alternative`, :mimetype:`multipart/mixed`, and
+    :mimetype:`multipart/related`.
+
+    On the other hand, considerably fewer `~email.message.EmailMessage`
+    instances can be simplified into `SimpleEletter` instances.  Messages that
+    cannot be simplified include messages without plain text or HTML parts,
+    mixed messages that alternate between plain text & HTML without supplying
+    both types for every body part, :mimetype:`multipart/related` messages with
+    more than one part, :mimetype:`multipart/mixed` messages containing
+    :mimetype:`multipart/alternative` parts that do not consist of a plain text
+    body plus an HTML body, and other unusual things.  Trying to simplify such
+    messages will produce `~eletter.errors.SimplificationError`\s.
+
+    One category of messages can be simplified, but not without loss of
+    information, and so they are not simplified by default: namely,
+    :mimetype:`multipart/mixed` messages that alternate between bodies and
+    attachments rather than placing all attachments at the end of the message.
+    By default, trying to simplify such a message produces a
+    `~eletter.errors.MixedContentError`; however, if the ``unmix`` argument to
+    `decompose_simple()` or `Eletter.simplify()` is set to `True`, such
+    messages will instead be simplified by separating the attachments from the
+    bodies, which are then concatenated with no indication of where the
+    attachments were located in the text.
+
+.. [1] An e-mail address without a display name can be represented as an
+       `Address` object by setting the display name to the empty string:
+       ``Address("", "user@domain.nil")``.

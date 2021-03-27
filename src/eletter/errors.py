@@ -24,7 +24,7 @@ class SimplificationError(Error, ValueError):
     """
     .. versionadded:: 0.5.0
 
-    Raised when ``eletter`` is asked to decompose a message that cannot be
+    Raised when ``eletter`` is asked to simplify a message that cannot be
     simplified
     """
 
@@ -38,7 +38,8 @@ class MixedContentError(SimplificationError):
     Subclass of `SimplificationError` raised when a :mimetype:`multipart/mixed`
     is encountered in which one or more attachments precede a message body
     part; such messages can be forced to be simplified by setting the ``unmix``
-    argument of `~Eletter.simplify()` or `decompose_simple()` to `True`.
+    argument of `~eletter.Eletter.simplify()` or `~eletter.decompose_simple()`
+    to `True`.
     """
 
     pass
