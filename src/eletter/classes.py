@@ -2,8 +2,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterable as IterableABC
 from datetime import datetime
 from email import headerregistry as hr
-from email import message_from_binary_file
-from email import policy
+from email import message_from_binary_file, policy
 from email.message import EmailMessage
 import os
 import os.path
