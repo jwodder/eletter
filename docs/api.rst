@@ -103,13 +103,13 @@ Decomposition
 Exceptions
 ----------
 
-.. autoexception:: eletter.errors.Error
+.. autoexception:: Error
     :show-inheritance:
-.. autoexception:: eletter.errors.DecompositionError
+.. autoexception:: DecompositionError
     :show-inheritance:
-.. autoexception:: eletter.errors.SimplificationError
+.. autoexception:: SimplificationError
     :show-inheritance:
-.. autoexception:: eletter.errors.MixedContentError
+.. autoexception:: MixedContentError
     :show-inheritance:
 
 
