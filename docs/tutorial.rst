@@ -441,8 +441,8 @@ Example:
 .. tip::
 
     You can remember the fact that :mimetype:`multipart/related` objects use
-    ``^`` by association with :mailheader:`Content-ID`\\s, which are enclosed
-    in ``<...>``, which look like a sideways ``^``!
+    ``^`` by association with :mailheader:`Content-ID`\s, which are enclosed in
+    ``<...>``, which look like a sideways ``^``!
 
 Like mixed & alternative objects, ``related`` can then be converted to an
 e-mail with the `~MailItem.compose()` method.  If you want, you can even use
