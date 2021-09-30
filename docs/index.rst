@@ -55,7 +55,7 @@ Constructing an e-mail with the `compose()` function:
     HTML = (
         "<p>Oh my beloved!</p>\n"
         "<p>Wilt thou dine with me on the morrow?</p>\n"
-        "<p>We're having <strong>hot pockets</strong>.<p>\n"
+        "<p>We're having <strong>hot pockets</strong>.</p>\n"
         "<p><em>Love</em>, Me</p>\n"
     )
 
