@@ -3,6 +3,10 @@
 Changelog
 =========
 
+v0.6.0 (in development)
+-----------------------
+- Support Python 3.10
+
 v0.5.0 (2021-03-27)
 -------------------
 - Attachments' filenames can now be `None`

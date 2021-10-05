@@ -66,7 +66,10 @@ class ContentTyped:
     #: The :mailheader:`Content-Type` of the attachment
     content_type: str = attr.ib(
         kw_only=True,
-        default=attr.Factory(lambda self: self.DEFAULT_CONTENT_TYPE, takes_self=True),
+        default=attr.Factory(  # type: ignore[call-overload]
+            lambda self: self.DEFAULT_CONTENT_TYPE,
+            takes_self=True,
+        ),
         on_setattr=cache_content_type,
     )
     _ct: ContentType = attr.ib(init=False, repr=False, eq=False, order=False)
