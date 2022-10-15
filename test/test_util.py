@@ -1,4 +1,4 @@
-from typing import Dict
+from __future__ import annotations
 import pytest
 from eletter import assemble_content_type, reply_quote
 from eletter.util import get_mime_type
@@ -21,7 +21,7 @@ from eletter.util import get_mime_type
     ],
 )
 def test_assemble_content_type(
-    maintype: str, subtype: str, params: Dict[str, str], ct: str
+    maintype: str, subtype: str, params: dict[str, str], ct: str
 ) -> None:
     assert assemble_content_type(maintype, subtype, **params) == ct
 

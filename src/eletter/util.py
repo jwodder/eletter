@@ -1,8 +1,9 @@
-from collections.abc import Iterable as IterableABC
+from __future__ import annotations
+from collections.abc import Iterable
 from email import headerregistry as hr
 from mimetypes import guess_type
 import os
-from typing import Iterable, List, Union
+from typing import Union
 
 AnyPath = Union[bytes, str, "os.PathLike[bytes]", "os.PathLike[str]"]
 
@@ -19,11 +20,11 @@ def compile_address(addr: SingleAddress) -> hr.Address:
 
 
 def compile_addresses(
-    addrs: Union[AddressOrGroup, Iterable[AddressOrGroup]]
-) -> List[Union[hr.Address, hr.Group]]:
+    addrs: AddressOrGroup | Iterable[AddressOrGroup],
+) -> list[hr.Address | hr.Group]:
     if isinstance(addrs, str):
         return [hr.Address(addr_spec=addrs)]
-    elif not isinstance(addrs, IterableABC):
+    elif not isinstance(addrs, Iterable):
         return [addrs]
     else:
         return [hr.Address(addr_spec=a) if isinstance(a, str) else a for a in addrs]

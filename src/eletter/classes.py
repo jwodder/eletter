@@ -1,21 +1,13 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
-from collections.abc import Iterable as IterableABC
+from collections.abc import Iterable, Mapping
 from datetime import datetime
 from email import headerregistry as hr
 from email import message_from_binary_file, policy
 from email.message import EmailMessage
 import os
 import os.path
-from typing import (
-    Iterable,
-    List,
-    Mapping,
-    MutableSequence,
-    Optional,
-    TypeVar,
-    Union,
-    overload,
-)
+from typing import MutableSequence, Optional, TypeVar, overload
 import attr
 from mailbits import ContentType
 from .util import (
@@ -29,7 +21,7 @@ from .util import (
 
 
 class Address(hr.Address):
-    """ A combination of a person's name and their e-mail address """
+    """A combination of a person's name and their e-mail address"""
 
     def __init__(self, display_name: str, address: str) -> None:
         super().__init__(display_name=display_name, addr_spec=address)
@@ -49,7 +41,7 @@ class Group(hr.Group):
 
 
 def cache_content_type(
-    ctd: "ContentTyped",
+    ctd: ContentTyped,
     _attr: Optional[attr.Attribute],
     value: str,
 ) -> None:
@@ -99,14 +91,14 @@ class MailItem(ABC):
         self,
         *,
         to: Iterable[AddressOrGroup],
-        from_: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,
+        from_: Optional[AddressOrGroup | Iterable[AddressOrGroup]] = None,
         subject: Optional[str] = None,
         cc: Optional[Iterable[AddressOrGroup]] = None,
         bcc: Optional[Iterable[AddressOrGroup]] = None,
-        reply_to: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,
+        reply_to: Optional[AddressOrGroup | Iterable[AddressOrGroup]] = None,
         sender: Optional[SingleAddress] = None,
         date: Optional[datetime] = None,
-        headers: Optional[Mapping[str, Union[str, Iterable[str]]]] = None,
+        headers: Optional[Mapping[str, str | Iterable[str]]] = None,
     ) -> EmailMessage:
         """
         Convert the `MailItem` into an `~email.message.EmailMessage` with the
@@ -170,7 +162,7 @@ class MailItem(ABC):
             msg["Date"] = date
         if headers is not None:
             for k, v in headers.items():
-                values: List[str]
+                values: list[str]
                 if isinstance(v, str):
                     values = [v]
                 else:
@@ -179,8 +171,8 @@ class MailItem(ABC):
                     msg[k] = v2
         return msg
 
-    def __or__(self, other: Union["MailItem", str]) -> "Alternative":
-        parts: List[MailItem] = []
+    def __or__(self, other: MailItem | str) -> Alternative:
+        parts: list[MailItem] = []
         for mi in [self, other]:
             if isinstance(mi, Alternative):
                 parts.extend(mi.content)
@@ -190,8 +182,8 @@ class MailItem(ABC):
                 parts.append(mi)
         return Alternative(parts)
 
-    def __ror__(self, other: Union["MailItem", str]) -> "Alternative":
-        parts: List[MailItem] = []
+    def __ror__(self, other: MailItem | str) -> Alternative:
+        parts: list[MailItem] = []
         for mi in [other, self]:
             if isinstance(mi, Alternative):
                 parts.extend(mi.content)  # pragma: no cover
@@ -201,8 +193,8 @@ class MailItem(ABC):
                 parts.append(mi)  # pragma: no cover
         return Alternative(parts)
 
-    def __and__(self, other: Union["MailItem", str]) -> "Mixed":
-        parts: List[MailItem] = []
+    def __and__(self, other: MailItem | str) -> Mixed:
+        parts: list[MailItem] = []
         for mi in [self, other]:
             if isinstance(mi, Mixed):
                 parts.extend(mi.content)
@@ -212,8 +204,8 @@ class MailItem(ABC):
                 parts.append(mi)
         return Mixed(parts)
 
-    def __rand__(self, other: Union["MailItem", str]) -> "Mixed":
-        parts: List[MailItem] = []
+    def __rand__(self, other: MailItem | str) -> Mixed:
+        parts: list[MailItem] = []
         for mi in [other, self]:
             if isinstance(mi, Mixed):
                 parts.extend(mi.content)  # pragma: no cover
@@ -223,8 +215,8 @@ class MailItem(ABC):
                 parts.append(mi)  # pragma: no cover
         return Mixed(parts)
 
-    def __xor__(self, other: Union["MailItem", str]) -> "Related":
-        parts: List[MailItem] = []
+    def __xor__(self, other: MailItem | str) -> Related:
+        parts: list[MailItem] = []
         for mi in [self, other]:
             if isinstance(mi, Related):
                 parts.extend(mi.content)
@@ -234,8 +226,8 @@ class MailItem(ABC):
                 parts.append(mi)
         return Related(parts)
 
-    def __rxor__(self, other: Union["MailItem", str]) -> "Related":
-        parts: List[MailItem] = []
+    def __rxor__(self, other: MailItem | str) -> Related:
+        parts: list[MailItem] = []
         for mi in [other, self]:
             if isinstance(mi, Related):
                 parts.extend(mi.content)  # pragma: no cover
@@ -247,7 +239,7 @@ class MailItem(ABC):
 
 
 class Attachment(MailItem):
-    """ Base class for the attachment classes """
+    """Base class for the attachment classes"""
 
     pass
 
@@ -296,7 +288,7 @@ class TextAttachment(Attachment, ContentTyped):
         errors: Optional[str] = None,
         inline: bool = False,
         content_id: Optional[str] = None,
-    ) -> "TextAttachment":
+    ) -> TextAttachment:
         """
         .. versionadded:: 0.2.0
 
@@ -361,7 +353,7 @@ class BytesAttachment(Attachment, ContentTyped):
         content_type: Optional[str] = None,
         inline: bool = False,
         content_id: Optional[str] = None,
-    ) -> "BytesAttachment":
+    ) -> BytesAttachment:
         """
         .. versionadded:: 0.2.0
 
@@ -419,7 +411,7 @@ class EmailAttachment(Attachment):
     @classmethod
     def from_file(
         cls, path: AnyPath, inline: bool = False, content_id: Optional[str] = None
-    ) -> "EmailAttachment":
+    ) -> EmailAttachment:
         """
         Construct an `EmailAttachment` from the contents of the file at
         ``path``.  The filename of the attachment will be set to the basename
@@ -434,7 +426,7 @@ class EmailAttachment(Attachment):
         )
 
 
-def mail_item_list(xs: Iterable[MailItem]) -> List[MailItem]:
+def mail_item_list(xs: Iterable[MailItem]) -> list[MailItem]:
     return list(xs)
 
 
@@ -452,7 +444,7 @@ class Multipart(MailItem, MutableSequence[MailItem]):
     """
 
     #: The `MailItem`\s contained within the instance
-    content: List[MailItem] = attr.ib(factory=list, converter=mail_item_list)
+    content: list[MailItem] = attr.ib(factory=list, converter=mail_item_list)
 
     @overload
     def __getitem__(self, index: int) -> MailItem:
@@ -462,7 +454,7 @@ class Multipart(MailItem, MutableSequence[MailItem]):
     def __getitem__(self: M, index: slice) -> M:
         ...
 
-    def __getitem__(self: M, index: Union[int, slice]) -> Union[MailItem, M]:
+    def __getitem__(self: M, index: int | slice) -> MailItem | M:
         if isinstance(index, int):
             return self.content[index]
         else:
@@ -477,43 +469,43 @@ class Multipart(MailItem, MutableSequence[MailItem]):
         ...
 
     def __setitem__(
-        self, index: Union[int, slice], mi: Union[MailItem, Iterable[MailItem]]
+        self, index: int | slice, mi: MailItem | Iterable[MailItem]
     ) -> None:
         if isinstance(index, int):
             assert isinstance(mi, MailItem)
             self.content[index] = mi
         else:
-            assert isinstance(mi, IterableABC)
+            assert isinstance(mi, Iterable)
             self.content[index] = mi
 
-    def __delitem__(self: M, index: Union[int, slice]) -> None:
+    def __delitem__(self: M, index: int | slice) -> None:
         del self.content[index]
 
     def __len__(self) -> int:
         return len(self.content)
 
     def insert(self, index: int, value: MailItem) -> None:
-        """ :meta private: """
+        """:meta private:"""
         self.content.insert(index, value)
 
     def append(self, value: MailItem) -> None:
-        """ :meta private: """
+        """:meta private:"""
         self.content.append(value)
 
     def reverse(self) -> None:
-        """ :meta private: """
+        """:meta private:"""
         self.content.reverse()
 
     def extend(self, values: Iterable[MailItem]) -> None:
-        """ :meta private: """
+        """:meta private:"""
         self.content.extend(values)
 
     def pop(self, index: int = -1) -> MailItem:
-        """ :meta private: """
+        """:meta private:"""
         return self.content.pop(index)
 
     def remove(self, value: MailItem) -> None:
-        """ :meta private: """
+        """:meta private:"""
         self.content.remove(value)
 
     def __iadd__(self: M, other: Iterable[MailItem]) -> M:
@@ -600,7 +592,7 @@ class Alternative(Multipart):
             msg["Content-ID"] = self.content_id
         return msg
 
-    def __ior__(self, other: Union[MailItem, str]) -> "Alternative":
+    def __ior__(self, other: MailItem | str) -> Alternative:
         if isinstance(other, Alternative):
             self.content.extend(other.content)
         elif isinstance(other, str):
@@ -697,7 +689,7 @@ class Mixed(Multipart):
             msg["Content-ID"] = self.content_id
         return msg
 
-    def __iand__(self, other: Union[MailItem, str]) -> "Mixed":
+    def __iand__(self, other: MailItem | str) -> Mixed:
         if isinstance(other, Mixed):
             self.content.extend(other.content)
         elif isinstance(other, str):
@@ -849,7 +841,7 @@ class Related(Multipart):
             msg.set_param("start", self.start)
         return msg
 
-    def __ixor__(self, other: Union[MailItem, str]) -> "Related":
+    def __ixor__(self, other: MailItem | str) -> Related:
         if isinstance(other, Related):
             self.content.extend(other.content)
         elif isinstance(other, str):

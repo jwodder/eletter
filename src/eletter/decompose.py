@@ -1,8 +1,9 @@
+from __future__ import annotations
 from datetime import datetime
 from email import headerregistry as hr
 from email.message import EmailMessage
 from functools import partial
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Optional
 import attr
 from mailbits import ContentType, parse_addresses
 from .classes import (
@@ -37,19 +38,19 @@ class Eletter:
     subject: Optional[str] = attr.ib(default=None)
 
     #: The message's :mailheader:`From` addresses
-    from_: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+    from_: list[hr.Address | hr.Group] = attr.ib(factory=list)
 
     #: The message's :mailheader:`To` addresses
-    to: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+    to: list[hr.Address | hr.Group] = attr.ib(factory=list)
 
     #: The message's :mailheader:`CC` addresses
-    cc: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+    cc: list[hr.Address | hr.Group] = attr.ib(factory=list)
 
     #: The message's :mailheader:`BCC` addresses
-    bcc: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+    bcc: list[hr.Address | hr.Group] = attr.ib(factory=list)
 
     #: The message's :mailheader:`Reply-To` addresses
-    reply_to: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+    reply_to: list[hr.Address | hr.Group] = attr.ib(factory=list)
 
     #: The message's :mailheader:`Sender` address, if any
     sender: Optional[hr.Address] = attr.ib(default=None)
@@ -58,7 +59,7 @@ class Eletter:
     date: Optional[datetime] = attr.ib(default=None)
 
     #: Any additional headers on the message.  The header names are lowercase.
-    headers: Dict[str, List[str]] = attr.ib(factory=dict)
+    headers: dict[str, list[str]] = attr.ib(factory=dict)
 
     def compose(self) -> EmailMessage:
         """
@@ -76,7 +77,7 @@ class Eletter:
             headers=self.headers,
         )
 
-    def simplify(self, unmix: bool = False) -> "SimpleEletter":
+    def simplify(self, unmix: bool = False) -> SimpleEletter:
         """
         Simplify the `Eletter` into a `SimpleEletter`, breaking down
         `Eletter.content` into a text body, HTML body, and a list of
@@ -92,7 +93,7 @@ class Eletter:
         content = smooth(self.content)
         text: Optional[str]
         html: Optional[str]
-        attachments: List[Attachment]
+        attachments: list[Attachment]
         if isinstance(content, Alternative):
             text = None
             html = None
@@ -157,25 +158,25 @@ class SimpleEletter:
     html: Optional[str] = attr.ib(default=None)
 
     #: Attachments on the message
-    attachments: List[Attachment] = attr.ib(factory=list)
+    attachments: list[Attachment] = attr.ib(factory=list)
 
     #: The message's subject line, if any
     subject: Optional[str] = attr.ib(default=None)
 
     #: The message's :mailheader:`From` addresses
-    from_: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+    from_: list[hr.Address | hr.Group] = attr.ib(factory=list)
 
     #: The message's :mailheader:`To` addresses
-    to: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+    to: list[hr.Address | hr.Group] = attr.ib(factory=list)
 
     #: The message's :mailheader:`CC` addresses
-    cc: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+    cc: list[hr.Address | hr.Group] = attr.ib(factory=list)
 
     #: The message's :mailheader:`BCC` addresses
-    bcc: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+    bcc: list[hr.Address | hr.Group] = attr.ib(factory=list)
 
     #: The message's :mailheader:`Reply-To` addresses
-    reply_to: List[Union[hr.Address, hr.Group]] = attr.ib(factory=list)
+    reply_to: list[hr.Address | hr.Group] = attr.ib(factory=list)
 
     #: The message's :mailheader:`Sender` address, if any
     sender: Optional[hr.Address] = attr.ib(default=None)
@@ -184,7 +185,7 @@ class SimpleEletter:
     date: Optional[datetime] = attr.ib(default=None)
 
     #: Any additional headers on the message.  The header names are lowercase.
-    headers: Dict[str, List[str]] = attr.ib(factory=dict)
+    headers: dict[str, list[str]] = attr.ib(factory=dict)
 
     def compose(self) -> EmailMessage:
         """
@@ -274,7 +275,7 @@ def decompose(msg: EmailMessage) -> Eletter:
         date = date_head.datetime
     else:
         date = None
-    headers: Dict[str, List[str]] = {}
+    headers: dict[str, list[str]] = {}
     for h in msg.keys():
         h = h.lower()
         if h not in STANDARD_HEADERS:
@@ -373,9 +374,7 @@ def get_str_header(msg: EmailMessage, header: str) -> Optional[str]:
         return None
 
 
-def get_address_list(
-    msg: EmailMessage, header: str
-) -> List[Union[hr.Address, hr.Group]]:
+def get_address_list(msg: EmailMessage, header: str) -> list[hr.Address | hr.Group]:
     addresses = []
     for h in msg.get_all(header, []):
         assert isinstance(h, hr.AddressHeader)
@@ -411,7 +410,7 @@ def decompose_simple(msg: EmailMessage, unmix: bool = False) -> SimpleEletter:
 
 def smooth(mi: MailItem) -> MailItem:
     if isinstance(mi, Multipart):
-        out: List[MailItem] = []
+        out: list[MailItem] = []
         for n in mi:
             n = smooth(n)
             # Flatten nested Mixed and Alternative, but not Related:
@@ -428,7 +427,7 @@ def smooth(mi: MailItem) -> MailItem:
         return mi
 
 
-def alt2text_html(alt: Alternative) -> Tuple[str, str]:
+def alt2text_html(alt: Alternative) -> tuple[str, str]:
     if len(alt) == 2:
         if isinstance(alt[0], TextBody) and isinstance(alt[1], HTMLBody):
             return (alt[0].content, alt[1].content)
@@ -442,10 +441,10 @@ def alt2text_html(alt: Alternative) -> Tuple[str, str]:
 
 def simplify_alt_part(
     content: MailItem, unmix: bool = False
-) -> Tuple[Optional[str], Optional[str], List[Attachment]]:
+) -> tuple[Optional[str], Optional[str], list[Attachment]]:
     text: Optional[str] = None
     html: Optional[str] = None
-    attachments: List[Attachment] = []
+    attachments: list[Attachment] = []
 
     def add_text(t: str) -> None:
         nonlocal text

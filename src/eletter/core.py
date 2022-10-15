@@ -1,6 +1,8 @@
+from __future__ import annotations
+from collections.abc import Iterable, Mapping
 from datetime import datetime
 from email.message import EmailMessage
-from typing import Iterable, Mapping, Optional, Union
+from typing import Optional
 from mailbits import ContentType
 from .classes import Attachment, HTMLBody, MailItem, TextBody
 from .util import AddressOrGroup, SingleAddress
@@ -9,16 +11,16 @@ from .util import AddressOrGroup, SingleAddress
 def compose(
     *,
     to: Iterable[AddressOrGroup],
-    from_: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,
+    from_: Optional[AddressOrGroup | Iterable[AddressOrGroup]] = None,
     subject: Optional[str] = None,
     text: Optional[str] = None,
     html: Optional[str] = None,
     cc: Optional[Iterable[AddressOrGroup]] = None,
     bcc: Optional[Iterable[AddressOrGroup]] = None,
-    reply_to: Optional[Union[AddressOrGroup, Iterable[AddressOrGroup]]] = None,
+    reply_to: Optional[AddressOrGroup | Iterable[AddressOrGroup]] = None,
     sender: Optional[SingleAddress] = None,
     date: Optional[datetime] = None,
-    headers: Optional[Mapping[str, Union[str, Iterable[str]]]] = None,
+    headers: Optional[Mapping[str, str | Iterable[str]]] = None,
     attachments: Optional[Iterable[Attachment]] = None,
 ) -> EmailMessage:
     """

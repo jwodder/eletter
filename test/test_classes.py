@@ -1,6 +1,8 @@
+from __future__ import annotations
+from collections.abc import Iterable
 from datetime import datetime, timedelta, timezone
 from email.utils import make_msgid
-from typing import Any, Iterable, Type, Union
+from typing import Any
 from mailbits import email2dict
 import pytest
 from eletter import (
@@ -390,11 +392,11 @@ def test_compose_empty_alt() -> None:
 )
 def test_mailitem_compose(
     mi: MailItem,
-    from_input: Union[AddressOrGroup, Iterable[AddressOrGroup]],
+    from_input: AddressOrGroup | Iterable[AddressOrGroup],
     from_output: Any,
     to_input: Iterable[AddressOrGroup],
     to_output: Any,
-    reply_to_input: Union[AddressOrGroup, Iterable[AddressOrGroup]],
+    reply_to_input: AddressOrGroup | Iterable[AddressOrGroup],
     reply_to_output: Any,
 ) -> None:
     when = datetime(2021, 3, 8, 18, 14, 29, tzinfo=timezone(timedelta(hours=-5)))
@@ -1176,7 +1178,7 @@ def test_multipart_content_ids() -> None:
 
 
 @pytest.mark.parametrize("cls", [Alternative, Mixed, Related])
-def test_multipart_mutable_sequences(cls: Type[Multipart]) -> None:
+def test_multipart_mutable_sequences(cls: type[Multipart]) -> None:
     t1 = TextBody("Part 1")
     t2 = TextBody("Part 2")
     t3 = TextBody("Part 3")
