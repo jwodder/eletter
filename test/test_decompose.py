@@ -1443,7 +1443,7 @@ def test_decompose_bad_content_type() -> None:
                     Address("", addr_spec="another.recipient@example.nil"),
                 ],
                 from_=[Address("", addr_spec="sender@domain.com")],
-                text=("This is the first part.\n" "This is the second part.\n"),
+                text="This is the first part.\nThis is the second part.\n",
                 html=(
                     "<p>This is the <em>first</em> part.</p>\n"
                     "<p>This is the <strong>second</strong> part.</p>\n"
