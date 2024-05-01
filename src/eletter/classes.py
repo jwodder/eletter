@@ -84,8 +84,7 @@ class MailItem(ABC):
     content_id: Optional[str] = attr.ib(default=None, kw_only=True)
 
     @abstractmethod
-    def _compile(self) -> EmailMessage:
-        ...
+    def _compile(self) -> EmailMessage: ...
 
     def compose(
         self,
@@ -447,12 +446,10 @@ class Multipart(MailItem, MutableSequence[MailItem]):
     content: list[MailItem] = attr.ib(factory=list, converter=mail_item_list)
 
     @overload
-    def __getitem__(self, index: int) -> MailItem:
-        ...
+    def __getitem__(self, index: int) -> MailItem: ...
 
     @overload
-    def __getitem__(self: M, index: slice) -> M:
-        ...
+    def __getitem__(self: M, index: slice) -> M: ...
 
     def __getitem__(self: M, index: int | slice) -> MailItem | M:
         if isinstance(index, int):
@@ -461,12 +458,10 @@ class Multipart(MailItem, MutableSequence[MailItem]):
             return type(self)(self.content[index])
 
     @overload
-    def __setitem__(self, index: int, mi: MailItem) -> None:
-        ...
+    def __setitem__(self, index: int, mi: MailItem) -> None: ...
 
     @overload
-    def __setitem__(self, index: slice, mis: Iterable[MailItem]) -> None:
-        ...
+    def __setitem__(self, index: slice, mis: Iterable[MailItem]) -> None: ...
 
     def __setitem__(
         self, index: int | slice, mi: MailItem | Iterable[MailItem]
