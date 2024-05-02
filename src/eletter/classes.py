@@ -830,7 +830,9 @@ class Related(Multipart):
         if self.content_id is not None:
             msg["Content-ID"] = self.content_id
         if ctype is None:
-            ctype = msg.get_payload()[0].get_content_type()
+            rel1 = msg.get_payload(0)
+            assert isinstance(rel1, EmailMessage)
+            ctype = rel1.get_content_type()
         msg.set_param("type", ctype)
         if self.start is not None:
             msg.set_param("start", self.start)
