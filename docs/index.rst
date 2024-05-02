@@ -26,7 +26,7 @@ and classes are provided for composing more complex multipart e-mails.
 
 Installation
 ============
-``eletter`` requires Python 3.7 or higher.  Just use `pip
+``eletter`` requires Python 3.8 or higher.  Just use `pip
 <https://pip.pypa.io>`_ for Python 3 (You have pip, right?) to install
 ``eletter`` and its dependencies::
 
