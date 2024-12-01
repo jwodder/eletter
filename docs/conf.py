@@ -2,7 +2,7 @@ from eletter import __version__
 
 project = "eletter"
 author = "John Thorvald Wodder II"
-copyright = "2021 John Thorvald Wodder II"  # noqa: A001
+copyright = "2021-2024 John Thorvald Wodder II"  # noqa: A001
 
 extensions = [
     "sphinx.ext.autodoc",
