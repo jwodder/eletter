@@ -417,7 +417,8 @@ class EmailAttachment(Attachment):
         of ``path``.
         """
         with open(path, "rb") as fp:
-            content = message_from_binary_file(fp, policy=policy.default)
+            # <https://github.com/python/typeshed/issues/13273>
+            content = message_from_binary_file(fp, policy=policy.default)  # type: ignore[arg-type]
             assert isinstance(content, EmailMessage)
         filename = os.path.basename(os.fsdecode(path))
         return cls(

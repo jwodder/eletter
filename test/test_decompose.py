@@ -1133,7 +1133,8 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
 )
 def test_decompose(eml: str, decomposed: Eletter, recomposable: bool) -> None:
     with (EMAIL_DIR / eml).open("rb") as fp:
-        msg = email.message_from_binary_file(fp, policy=policy.default)
+        # <https://github.com/python/typeshed/issues/13273>
+        msg = email.message_from_binary_file(fp, policy=policy.default)  # type: ignore[arg-type]
     assert isinstance(msg, EmailMessage)
     assert decompose(msg) == decomposed
     if recomposable:
@@ -1142,7 +1143,8 @@ def test_decompose(eml: str, decomposed: Eletter, recomposable: bool) -> None:
 
 def test_decompose_email_attachment() -> None:
     with (EMAIL_DIR / "has_rfc822.eml").open("rb") as fp:
-        msg = email.message_from_binary_file(fp, policy=policy.default)
+        # <https://github.com/python/typeshed/issues/13273>
+        msg = email.message_from_binary_file(fp, policy=policy.default)  # type: ignore[arg-type]
     assert isinstance(msg, EmailMessage)
     decomposed = decompose(msg)
     assert decomposed == Eletter(
@@ -1201,7 +1203,8 @@ def test_decompose_email_attachment() -> None:
 
 def test_decompose_bad_content_type() -> None:
     with (EMAIL_DIR / "signed.eml").open("rb") as fp:
-        msg = email.message_from_binary_file(fp, policy=policy.default)
+        # <https://github.com/python/typeshed/issues/13273>
+        msg = email.message_from_binary_file(fp, policy=policy.default)  # type: ignore[arg-type]
     assert isinstance(msg, EmailMessage)
     with pytest.raises(DecompositionError) as excinfo:
         decompose(msg)
@@ -1458,7 +1461,8 @@ def test_simple_decompose(
     eml: str, decomposed: SimpleEletter, recomposable: bool, unmix: bool
 ) -> None:
     with (EMAIL_DIR / eml).open("rb") as fp:
-        msg = email.message_from_binary_file(fp, policy=policy.default)
+        # <https://github.com/python/typeshed/issues/13273>
+        msg = email.message_from_binary_file(fp, policy=policy.default)  # type: ignore[arg-type]
     assert isinstance(msg, EmailMessage)
     assert decompose_simple(msg, unmix=unmix) == decomposed
     if recomposable:
@@ -1467,7 +1471,8 @@ def test_simple_decompose(
 
 def test_simple_decompose_email_attachment() -> None:
     with (EMAIL_DIR / "has_rfc822.eml").open("rb") as fp:
-        msg = email.message_from_binary_file(fp, policy=policy.default)
+        # <https://github.com/python/typeshed/issues/13273>
+        msg = email.message_from_binary_file(fp, policy=policy.default)  # type: ignore[arg-type]
     assert isinstance(msg, EmailMessage)
     decomposed = decompose_simple(msg)
     assert decomposed == SimpleEletter(
@@ -1554,7 +1559,8 @@ def test_simple_decompose_email_attachment() -> None:
 )
 def test_simple_error(eml: str, errmsg: str) -> None:
     with (EMAIL_DIR / eml).open("rb") as fp:
-        msg = email.message_from_binary_file(fp, policy=policy.default)
+        # <https://github.com/python/typeshed/issues/13273>
+        msg = email.message_from_binary_file(fp, policy=policy.default)  # type: ignore[arg-type]
     assert isinstance(msg, EmailMessage)
     with pytest.raises(SimplificationError) as excinfo:
         decompose_simple(msg)
@@ -1567,7 +1573,8 @@ def test_simple_error(eml: str, errmsg: str) -> None:
 )
 def test_simple_mixed_content_error(eml: str) -> None:
     with (EMAIL_DIR / eml).open("rb") as fp:
-        msg = email.message_from_binary_file(fp, policy=policy.default)
+        # <https://github.com/python/typeshed/issues/13273>
+        msg = email.message_from_binary_file(fp, policy=policy.default)  # type: ignore[arg-type]
     assert isinstance(msg, EmailMessage)
     with pytest.raises(MixedContentError) as excinfo:
         decompose_simple(msg)
@@ -1696,6 +1703,7 @@ def test_simple_mixed_content_error(eml: str) -> None:
 )
 def test_simple_decompose_unmix(eml: str, decomposed: SimpleEletter) -> None:
     with (EMAIL_DIR / eml).open("rb") as fp:
-        msg = email.message_from_binary_file(fp, policy=policy.default)
+        # <https://github.com/python/typeshed/issues/13273>
+        msg = email.message_from_binary_file(fp, policy=policy.default)  # type: ignore[arg-type]
     assert isinstance(msg, EmailMessage)
     assert decompose_simple(msg, unmix=True) == decomposed
