@@ -10,7 +10,7 @@ def test_compose_text_bytes_attachment_custom_content_type() -> None:
         text="This is the text of an e-mail.",
         attachments=[
             BytesAttachment(
-                b"\xFE\xED\xFA\xCE",
+                b"\xfe\xed\xfa\xce",
                 filename="blob.dat",
                 content_type="application/x-feedface",
             )
@@ -68,7 +68,7 @@ def test_compose_text_bytes_attachment_custom_content_type() -> None:
                     },
                 },
                 "preamble": None,
-                "content": b"\xFE\xED\xFA\xCE",
+                "content": b"\xfe\xed\xfa\xce",
                 "epilogue": None,
             },
         ],
@@ -77,7 +77,7 @@ def test_compose_text_bytes_attachment_custom_content_type() -> None:
 
 
 def test_compose_text_bytes_attachment_set_custom_content_type() -> None:
-    attach = BytesAttachment(b"\xFE\xED\xFA\xCE", filename="blob.dat")
+    attach = BytesAttachment(b"\xfe\xed\xfa\xce", filename="blob.dat")
     attach.content_type = "application/x-feedface; face=pretty"
     msg = compose(
         from_="me@here.com",
@@ -138,7 +138,7 @@ def test_compose_text_bytes_attachment_set_custom_content_type() -> None:
                     },
                 },
                 "preamble": None,
-                "content": b"\xFE\xED\xFA\xCE",
+                "content": b"\xfe\xed\xfa\xce",
                 "epilogue": None,
             },
         ],
@@ -154,7 +154,7 @@ def test_compose_text_bytes_attachment_custom_main_type() -> None:
         text="This is the text of an e-mail.",
         attachments=[
             BytesAttachment(
-                b"\xFE\xED\xFA\xCE",
+                b"\xfe\xed\xfa\xce",
                 filename="blob.dat",
                 content_type="image/x-feedface",
             )
@@ -212,7 +212,7 @@ def test_compose_text_bytes_attachment_custom_main_type() -> None:
                     },
                 },
                 "preamble": None,
-                "content": b"\xFE\xED\xFA\xCE",
+                "content": b"\xfe\xed\xfa\xce",
                 "epilogue": None,
             },
         ],
@@ -229,7 +229,7 @@ def test_compose_text_html_bytes_attachment() -> None:
         html="<p>This is the <i>text</i> of an <b>e</b>-mail.<p>",
         attachments=[
             BytesAttachment(
-                b"\xFE\xED\xFA\xCE",
+                b"\xfe\xed\xfa\xce",
                 filename="blob.dat",
                 content_type="application/x-feedface",
             )
@@ -314,7 +314,7 @@ def test_compose_text_html_bytes_attachment() -> None:
                     },
                 },
                 "preamble": None,
-                "content": b"\xFE\xED\xFA\xCE",
+                "content": b"\xfe\xed\xfa\xce",
                 "epilogue": None,
             },
         ],
@@ -330,7 +330,7 @@ def test_compose_text_bytes_attachment_default_content_type() -> None:
         text="This is the text of an e-mail.",
         attachments=[
             BytesAttachment(
-                b"\xFE\xED\xFA\xCE",
+                b"\xfe\xed\xfa\xce",
                 filename="blob.dat",
             )
         ],
@@ -387,7 +387,7 @@ def test_compose_text_bytes_attachment_default_content_type() -> None:
                     },
                 },
                 "preamble": None,
-                "content": b"\xFE\xED\xFA\xCE",
+                "content": b"\xfe\xed\xfa\xce",
                 "epilogue": None,
             },
         ],
@@ -403,7 +403,7 @@ def test_compose_text_bytes_attachment_paramed_content_type() -> None:
         text="This is the text of an e-mail.",
         attachments=[
             BytesAttachment(
-                b"\xFE\xED\xFA\xCE",
+                b"\xfe\xed\xfa\xce",
                 filename="blob.dat",
                 content_type="application/x-feedface; face=pretty",
             )
@@ -461,7 +461,7 @@ def test_compose_text_bytes_attachment_paramed_content_type() -> None:
                     },
                 },
                 "preamble": None,
-                "content": b"\xFE\xED\xFA\xCE",
+                "content": b"\xfe\xed\xfa\xce",
                 "epilogue": None,
             },
         ],
@@ -477,7 +477,7 @@ def test_compose_text_bytes_attachment_inline() -> None:
         text="This is the text of an e-mail.",
         attachments=[
             BytesAttachment(
-                b"\xFE\xED\xFA\xCE",
+                b"\xfe\xed\xfa\xce",
                 filename="blob.dat",
                 content_type="application/x-feedface",
                 inline=True,
@@ -536,7 +536,7 @@ def test_compose_text_bytes_attachment_inline() -> None:
                     },
                 },
                 "preamble": None,
-                "content": b"\xFE\xED\xFA\xCE",
+                "content": b"\xfe\xed\xfa\xce",
                 "epilogue": None,
             },
         ],
@@ -985,7 +985,7 @@ def test_compose_html_bytes_attachment_text_attachment() -> None:
         html="<p>This is the <i>text</i> of an <b>e</b>-mail.<p>",
         attachments=[
             BytesAttachment(
-                b"\xFE\xED\xFA\xCE",
+                b"\xfe\xed\xfa\xce",
                 filename="blob.dat",
                 content_type="application/x-feedface",
             ),
@@ -1044,7 +1044,7 @@ def test_compose_html_bytes_attachment_text_attachment() -> None:
                     },
                 },
                 "preamble": None,
-                "content": b"\xFE\xED\xFA\xCE",
+                "content": b"\xfe\xed\xfa\xce",
                 "epilogue": None,
             },
             {
@@ -1083,7 +1083,7 @@ def test_compose_email_attachment() -> None:
                     text="Look at the pretty picture!  ... It came through, right?",
                     attachments=[
                         BytesAttachment(
-                            b"\xFE\xED\xFA\xCE",
+                            b"\xfe\xed\xfa\xce",
                             filename="blob.dat",
                             content_type="application/x-feedface",
                         )
@@ -1197,7 +1197,7 @@ def test_compose_email_attachment() -> None:
                                 },
                             },
                             "preamble": None,
-                            "content": b"\xFE\xED\xFA\xCE",
+                            "content": b"\xfe\xed\xfa\xce",
                             "epilogue": None,
                         },
                     ],
@@ -1218,7 +1218,7 @@ def test_compose_text_bytes_attachment_null_filename() -> None:
         text="This is the text of an e-mail.",
         attachments=[
             BytesAttachment(
-                b"\xFE\xED\xFA\xCE",
+                b"\xfe\xed\xfa\xce",
                 filename=None,
                 content_type="application/x-feedface",
             )
@@ -1276,7 +1276,7 @@ def test_compose_text_bytes_attachment_null_filename() -> None:
                     },
                 },
                 "preamble": None,
-                "content": b"\xFE\xED\xFA\xCE",
+                "content": b"\xfe\xed\xfa\xce",
                 "epilogue": None,
             },
         ],

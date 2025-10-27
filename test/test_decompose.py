@@ -502,12 +502,12 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                 content=Mixed(
                     [
                         BytesAttachment(
-                            b"\xFE\xED\xFA\xCE",
+                            b"\xfe\xed\xfa\xce",
                             filename="blob.dat",
                             content_type="application/x-feedface",
                         ),
                         BytesAttachment(
-                            b"\xDE\xAD\xBE\xEF",
+                            b"\xde\xad\xbe\xef",
                             filename="dead.beef",
                             content_type="application/x-deadbeef",
                         ),
@@ -715,7 +715,7 @@ ASPARAGUS = (ATTACH_DIR / "asparagus.png").read_bytes()
                     [
                         TextBody("This is the text of an e-mail.\n"),
                         BytesAttachment(
-                            b"\xFE\xED\xFA\xCE",
+                            b"\xfe\xed\xfa\xce",
                             filename=None,
                             content_type="application/x-feedface",
                             inline=False,
@@ -1388,7 +1388,7 @@ def test_decompose_bad_content_type() -> None:
                 text="This is the text of an e-mail.\n",
                 attachments=[
                     BytesAttachment(
-                        b"\xFE\xED\xFA\xCE",
+                        b"\xfe\xed\xfa\xce",
                         filename=None,
                         content_type="application/x-feedface",
                         inline=False,
