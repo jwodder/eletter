@@ -3,7 +3,6 @@ from datetime import datetime
 from email import headerregistry as hr
 from email.message import EmailMessage
 from functools import partial
-from typing import Optional
 import attr
 from mailbits import ContentType, parse_addresses
 from .classes import (
@@ -35,7 +34,7 @@ class Eletter:
     content: MailItem = attr.ib()
 
     #: The message's subject line, if any
-    subject: Optional[str] = attr.ib(default=None)
+    subject: str | None = attr.ib(default=None)
 
     #: The message's :mailheader:`From` addresses
     from_: list[hr.Address | hr.Group] = attr.ib(factory=list)
@@ -53,10 +52,10 @@ class Eletter:
     reply_to: list[hr.Address | hr.Group] = attr.ib(factory=list)
 
     #: The message's :mailheader:`Sender` address, if any
-    sender: Optional[hr.Address] = attr.ib(default=None)
+    sender: hr.Address | None = attr.ib(default=None)
 
     #: The message's :mailheader:`Date` header, if set
-    date: Optional[datetime] = attr.ib(default=None)
+    date: datetime | None = attr.ib(default=None)
 
     #: Any additional headers on the message.  The header names are lowercase.
     headers: dict[str, list[str]] = attr.ib(factory=dict)
@@ -91,8 +90,8 @@ class Eletter:
         :raises SimplificationError: if ``msg`` cannot be simplified
         """
         content = smooth(self.content)
-        text: Optional[str]
-        html: Optional[str]
+        text: str | None
+        html: str | None
         attachments: list[Attachment]
         if isinstance(content, Alternative):
             text = None
@@ -152,16 +151,16 @@ class SimpleEletter:
     """
 
     #: The message's text body, if any
-    text: Optional[str] = attr.ib(default=None)
+    text: str | None = attr.ib(default=None)
 
     #: The message's HTML body, if any
-    html: Optional[str] = attr.ib(default=None)
+    html: str | None = attr.ib(default=None)
 
     #: Attachments on the message
     attachments: list[Attachment] = attr.ib(factory=list)
 
     #: The message's subject line, if any
-    subject: Optional[str] = attr.ib(default=None)
+    subject: str | None = attr.ib(default=None)
 
     #: The message's :mailheader:`From` addresses
     from_: list[hr.Address | hr.Group] = attr.ib(factory=list)
@@ -179,10 +178,10 @@ class SimpleEletter:
     reply_to: list[hr.Address | hr.Group] = attr.ib(factory=list)
 
     #: The message's :mailheader:`Sender` address, if any
-    sender: Optional[hr.Address] = attr.ib(default=None)
+    sender: hr.Address | None = attr.ib(default=None)
 
     #: The message's :mailheader:`Date` header, if set
-    date: Optional[datetime] = attr.ib(default=None)
+    date: datetime | None = attr.ib(default=None)
 
     #: Any additional headers on the message.  The header names are lowercase.
     headers: dict[str, list[str]] = attr.ib(factory=dict)
@@ -262,14 +261,14 @@ def decompose(msg: EmailMessage) -> Eletter:
     bcc = get_address_list(msg, "BCC")
     reply_to = get_address_list(msg, "Reply-To")
     sender_head = msg.get("Sender")
-    sender: Optional[hr.Address]
+    sender: hr.Address | None
     if sender_head is not None:
         assert isinstance(sender_head, hr.SingleAddressHeader)
         sender = sender_head.address
     else:
         sender = None
     date_head = msg.get("Date")
-    date: Optional[datetime]
+    date: datetime | None
     if date_head is not None:
         assert isinstance(date_head, hr.DateHeader)
         date = date_head.datetime
@@ -366,7 +365,7 @@ def get_content(msg: EmailMessage) -> MailItem:
         )
 
 
-def get_str_header(msg: EmailMessage, header: str) -> Optional[str]:
+def get_str_header(msg: EmailMessage, header: str) -> str | None:
     value = msg.get(header)
     if value is not None:
         return str(value)
@@ -441,9 +440,9 @@ def alt2text_html(alt: Alternative) -> tuple[str, str]:
 
 def simplify_alt_part(
     content: MailItem, unmix: bool = False
-) -> tuple[Optional[str], Optional[str], list[Attachment]]:
-    text: Optional[str] = None
-    html: Optional[str] = None
+) -> tuple[str | None, str | None, list[Attachment]]:
+    text: str | None = None
+    html: str | None = None
     attachments: list[Attachment] = []
 
     def add_text(t: str) -> None:

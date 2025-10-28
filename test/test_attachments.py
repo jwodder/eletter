@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 import attr
 from mailbits import ContentType, email2dict
 import pytest
@@ -150,7 +149,7 @@ def test_text_attachment_from_file_content_id() -> None:
 
 @pytest.mark.parametrize("inline", [False, True])
 @pytest.mark.parametrize("cid", [None, "cid"])
-def test_email_attachment_from_file(inline: bool, cid: Optional[None]) -> None:
+def test_email_attachment_from_file(inline: bool, cid: str | None) -> None:
     ea = EmailAttachment.from_file(
         ATTACH_DIR / "sample.eml", inline=inline, content_id=cid
     )

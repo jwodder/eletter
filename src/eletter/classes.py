@@ -1,13 +1,13 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, MutableSequence
 from datetime import datetime
 from email import headerregistry as hr
 from email import message_from_binary_file, policy
 from email.message import EmailMessage
 import os
 import os.path
-from typing import MutableSequence, Optional, TypeVar, overload
+from typing import TypeVar, overload
 import attr
 from mailbits import ContentType
 from .util import (
@@ -42,7 +42,7 @@ class Group(hr.Group):
 
 def cache_content_type(
     ctd: ContentTyped,
-    _attr: Optional[attr.Attribute],
+    _attr: attr.Attribute | None,
     value: str,
 ) -> None:
     ct = ContentType.parse(value)
@@ -81,7 +81,7 @@ class MailItem(ABC):
     #: .. versionadded:: 0.3.0
     #:
     #: :mailheader:`Content-ID` header value for the item
-    content_id: Optional[str] = attr.ib(default=None, kw_only=True)
+    content_id: str | None = attr.ib(default=None, kw_only=True)
 
     @abstractmethod
     def _compile(self) -> EmailMessage: ...
@@ -90,14 +90,14 @@ class MailItem(ABC):
         self,
         *,
         to: Iterable[AddressOrGroup],
-        from_: Optional[AddressOrGroup | Iterable[AddressOrGroup]] = None,
-        subject: Optional[str] = None,
-        cc: Optional[Iterable[AddressOrGroup]] = None,
-        bcc: Optional[Iterable[AddressOrGroup]] = None,
-        reply_to: Optional[AddressOrGroup | Iterable[AddressOrGroup]] = None,
-        sender: Optional[SingleAddress] = None,
-        date: Optional[datetime] = None,
-        headers: Optional[Mapping[str, str | Iterable[str]]] = None,
+        from_: AddressOrGroup | Iterable[AddressOrGroup] | None = None,
+        subject: str | None = None,
+        cc: Iterable[AddressOrGroup] | None = None,
+        bcc: Iterable[AddressOrGroup] | None = None,
+        reply_to: AddressOrGroup | Iterable[AddressOrGroup] | None = None,
+        sender: SingleAddress | None = None,
+        date: datetime | None = None,
+        headers: Mapping[str, str | Iterable[str]] | None = None,
     ) -> EmailMessage:
         """
         Convert the `MailItem` into an `~email.message.EmailMessage` with the
@@ -258,7 +258,7 @@ class TextAttachment(Attachment, ContentTyped):
     #:
     #: .. versionchanged:: 0.5.0
     #:     ``filename`` can now be `None`.
-    filename: Optional[str]
+    filename: str | None
     #: Whether the attachment should be displayed inline in clients
     inline: bool = attr.ib(default=False, kw_only=True)
 
@@ -282,11 +282,11 @@ class TextAttachment(Attachment, ContentTyped):
     def from_file(
         cls,
         path: AnyPath,
-        content_type: Optional[str] = None,
-        encoding: Optional[str] = None,
-        errors: Optional[str] = None,
+        content_type: str | None = None,
+        encoding: str | None = None,
+        errors: str | None = None,
         inline: bool = False,
-        content_id: Optional[str] = None,
+        content_id: str | None = None,
     ) -> TextAttachment:
         """
         .. versionadded:: 0.2.0
@@ -301,7 +301,7 @@ class TextAttachment(Attachment, ContentTyped):
         .. versionchanged:: 0.3.0
             ``inline`` and ``content_id`` arguments added
         """
-        with open(path, "r", encoding=encoding, errors=errors) as fp:
+        with open(path, encoding=encoding, errors=errors) as fp:
             content = fp.read()
         filename = os.path.basename(os.fsdecode(path))
         if content_type is None:
@@ -328,7 +328,7 @@ class BytesAttachment(Attachment, ContentTyped):
     #:
     #: .. versionchanged:: 0.5.0
     #:     ``filename`` can now be `None`.
-    filename: Optional[str]
+    filename: str | None
     #: Whether the attachment should be displayed inline in clients
     inline: bool = attr.ib(default=False, kw_only=True)
 
@@ -349,9 +349,9 @@ class BytesAttachment(Attachment, ContentTyped):
     def from_file(
         cls,
         path: AnyPath,
-        content_type: Optional[str] = None,
+        content_type: str | None = None,
         inline: bool = False,
-        content_id: Optional[str] = None,
+        content_id: str | None = None,
     ) -> BytesAttachment:
         """
         .. versionadded:: 0.2.0
@@ -393,7 +393,7 @@ class EmailAttachment(Attachment):
     #:
     #: .. versionchanged:: 0.5.0
     #:     ``filename`` can now be `None`.
-    filename: Optional[str]
+    filename: str | None
     #: Whether the attachment should be displayed inline in clients
     inline: bool = attr.ib(default=False, kw_only=True)
 
@@ -409,7 +409,7 @@ class EmailAttachment(Attachment):
 
     @classmethod
     def from_file(
-        cls, path: AnyPath, inline: bool = False, content_id: Optional[str] = None
+        cls, path: AnyPath, inline: bool = False, content_id: str | None = None
     ) -> EmailAttachment:
         """
         Construct an `EmailAttachment` from the contents of the file at
@@ -794,7 +794,7 @@ class Related(Multipart):
 
     #: The :mailheader:`Content-ID` of the part to display (defaults to the
     #: first part)
-    start: Optional[str] = None
+    start: str | None = None
 
     def get_root(self) -> MailItem:
         """
@@ -822,7 +822,7 @@ class Related(Multipart):
             raise ValueError("Cannot compose empty Related")
         msg = EmailMessage()
         msg.make_related()
-        ctype: Optional[str] = None
+        ctype: str | None = None
         for mi in self.content:
             obj = mi._compile()
             if self.start is not None and mi.content_id == self.start:
