@@ -2,7 +2,6 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 from datetime import datetime
 from email.message import EmailMessage
-from typing import Optional
 from mailbits import ContentType
 from .classes import Attachment, HTMLBody, MailItem, TextBody
 from .util import AddressOrGroup, SingleAddress
@@ -11,17 +10,17 @@ from .util import AddressOrGroup, SingleAddress
 def compose(
     *,
     to: Iterable[AddressOrGroup],
-    from_: Optional[AddressOrGroup | Iterable[AddressOrGroup]] = None,
-    subject: Optional[str] = None,
-    text: Optional[str] = None,
-    html: Optional[str] = None,
-    cc: Optional[Iterable[AddressOrGroup]] = None,
-    bcc: Optional[Iterable[AddressOrGroup]] = None,
-    reply_to: Optional[AddressOrGroup | Iterable[AddressOrGroup]] = None,
-    sender: Optional[SingleAddress] = None,
-    date: Optional[datetime] = None,
-    headers: Optional[Mapping[str, str | Iterable[str]]] = None,
-    attachments: Optional[Iterable[Attachment]] = None,
+    from_: AddressOrGroup | Iterable[AddressOrGroup] | None = None,
+    subject: str | None = None,
+    text: str | None = None,
+    html: str | None = None,
+    cc: Iterable[AddressOrGroup] | None = None,
+    bcc: Iterable[AddressOrGroup] | None = None,
+    reply_to: AddressOrGroup | Iterable[AddressOrGroup] | None = None,
+    sender: SingleAddress | None = None,
+    date: datetime | None = None,
+    headers: Mapping[str, str | Iterable[str]] | None = None,
+    attachments: Iterable[Attachment] | None = None,
 ) -> EmailMessage:
     """
     Construct an `~email.message.EmailMessage` instance from a subject,
@@ -80,7 +79,7 @@ def compose(
     :rtype: email.message.EmailMessage
     :raises ValueError: if neither ``text`` nor ``html`` is set
     """
-    msg: Optional[MailItem] = None
+    msg: MailItem | None = None
     if text is not None:
         msg = TextBody(text)
     if html is not None:
